@@ -1,4 +1,4 @@
-import { apiErrorHandler, errorHandler } from "../middlewares/errorhandler.middleware.js";
+import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import User from "../models/user.model.js";
 

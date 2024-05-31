@@ -32,8 +32,20 @@ const productSchema = new mongoose.Schema({
     category: { type: Schema.Types.ObjectId, ref: "Category"},
     brand: { type: Schema.Types.ObjectId, ref: "Brand" },
     model: { type: Schema.Types.ObjectId, ref: "Model" },
+    attributes: {
+        materials: [String],
+        labels: [String],
+        colors: [String],
+        sizes: [Number]
+    },
+    additionalInfo: {
+        weight: String,
+        dimension: String
+    }
 
-})
+}, { 
+    timestamps: true
+});
 
 const productModel = mongoose.model("Product", productSchema);
 export default productModel

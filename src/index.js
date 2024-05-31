@@ -8,6 +8,7 @@ import ConnectDB from './db/connection.db.js';
 
 import userRouter from './routes/user.route.js';
 import productRouter from './routes/product.route.js';
+import cartRouter from './routes/cart.route.js';
 
 
 //App
@@ -31,6 +32,7 @@ app.use(errorHandler);
 
 app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
+app.use('/api/cart', cartRouter);
 
 
 // Home Route

@@ -1,19 +1,23 @@
 import 'dotenv/config'
 import express from "express"
 import cors from 'cors';
-import ConnectDB from './db/connection.db.js';
 import bodyParser from 'body-parser';
+
 import { errorHandler } from './middlewares/errorhandler.middleware.js';
+import ConnectDB from './db/connection.db.js';
 
 import userRouter from './routes/user.route.js';
 import productRouter from './routes/product.route.js';
 
 
+//App
 const app = express();
 const port = process.env.PORT;
 
+
 //Database connection
 ConnectDB();
+
 
 //Middlewares
 app.use(cors({
@@ -23,21 +27,25 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
   
-
 app.use(errorHandler);
 
 app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);
 
-  //Routes
+
+// Home Route
 app.get("/", (_req, res) => {
     res.send("Server is Running...")
   });
 
+
+// Health Route
 app.get('/api/health', (_req, res) => {
     res.send("Server is Healthy ...")
 })
-  
+
+
+//Port Listening
   app.listen(port, () => {
     console.log(`Server is Running at PORT: ${port}`);
   });

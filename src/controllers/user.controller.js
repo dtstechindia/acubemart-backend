@@ -2,9 +2,11 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import User from "../models/user.model.js";
 
-const createUser = async (req, res, next) => {
+
+/* Register New User */
+const registerUser = async (req, res, next) => {
     const { name, email, password } = req.body;
-    console.log(name, email, password);
+    //console.log(name, email, password);
     if (!name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
@@ -23,6 +25,8 @@ const createUser = async (req, res, next) => {
     }
 };
 
+
+/* Get All Users from DB */
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.find();
@@ -36,7 +40,7 @@ const getAllUsers = async (req, res, next) => {
 }
 
 export {
-    createUser,
+    registerUser,
     getAllUsers,
 
 }

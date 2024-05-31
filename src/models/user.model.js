@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+//Address Schema subdocument
+
 const addressSchema = new mongoose.Schema({
     street: {
         type: String,
@@ -22,6 +24,8 @@ const addressSchema = new mongoose.Schema({
         required: true
     }
 })
+
+//User Schema Model/Document
 
 const userSchema = new mongoose.Schema({
     name: {

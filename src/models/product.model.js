@@ -1,6 +1,8 @@
 import mongoose, { model } from "mongoose";
 import { Schema } from "mongoose";
 
+
+//Product Schema Model/Document
 const productSchema = new mongoose.Schema({
     name: {
         type: String,

@@ -2,7 +2,7 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Product from "../models/product.model.js";
 
-
+/* Add New Product */
 const addNewProduct = async (req, res, next) => {
     const { name, price, description, stock, image, category, size, color, brand, model } = req.body;
     if (!name || !price || !description || !stock || !size || !color) return next(apiErrorHandler(400, "Please provide all fields"));
@@ -30,7 +30,7 @@ const addNewProduct = async (req, res, next) => {
     }
 };
 
-
+/*  Get All Products */
 const getAllProducts = async (req, res, next) => {
     try {
         const products = await Product.find();

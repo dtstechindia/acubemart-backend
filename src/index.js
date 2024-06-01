@@ -11,6 +11,7 @@ import productRouter from './routes/product.route.js';
 import cartRouter from './routes/cart.route.js';
 import categoryRouter from './routes/category.route.js';
 import brandRouter from './routes/brand.route.js';
+import modelRouter from './routes/model.route.js';
 
 
 //App
@@ -37,6 +38,7 @@ app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/brand', brandRouter);
+app.use('/api/model', modelRouter);
 
 
 // Home Route

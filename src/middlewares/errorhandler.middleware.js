@@ -14,6 +14,7 @@ const errorHandler = (err, req, res, next) => {
 const apiErrorHandler = (statusCode, message) => {
     const error = new Error();
     error.statusCode = statusCode;
+    error.success = false;
     error.message = message;
     return error;
 };

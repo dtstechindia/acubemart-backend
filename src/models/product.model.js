@@ -28,10 +28,25 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    image: [{ type: Schema.Types.ObjectId, ref: "Image"}],
-    category: { type: Schema.Types.ObjectId, ref: "Category"},
-    brand: { type: Schema.Types.ObjectId, ref: "Brand" },
-    model: { type: Schema.Types.ObjectId, ref: "Model" },
+    image: [{ 
+        type: Schema.Types.ObjectId, 
+        ref: "Image" 
+    }],
+    category: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Category",
+        required: true
+    },
+    brand: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Brand",
+        required: true 
+    },
+    model: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Model",
+        required: true 
+    },
     attributes: {
         materials: [String],
         labels: [String],

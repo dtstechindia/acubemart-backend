@@ -1,4 +1,4 @@
-import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
+import { apiErrorHandler, errorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Image from "../models/image.model.js";
 
@@ -11,6 +11,8 @@ const addNewImage = async (req, res, next) => {
     
     try {
         const image = await Image.create({ url, productId });
+        if (!image) return next(apiErrorHandler(404, "No Image Found"));
+
         return res.status(201).json({
             success: true,
             message: "Image Added Successfully",
@@ -18,7 +20,7 @@ const addNewImage = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -30,6 +32,8 @@ const getImagesByProductId = async (req, res, next) => {
     
     try {
         const images = await Image.find({ productId });
+        if (!images) return next(apiErrorHandler(404, "No Images Found"));
+        
         return res.status(200).json({
             success: true,
             message: "Product Images Fetched Successfully",
@@ -37,7 +41,7 @@ const getImagesByProductId = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+       next(error);
     }
 }
 
@@ -46,6 +50,8 @@ const getImagesByProductId = async (req, res, next) => {
 const getImageById = async (req, res, next) => {
     try {
         const image = await Image.findById(req.params.id);
+        if (!image) return next(apiErrorHandler(404, "Image not found"));
+
         return res.status(200).json({
             success: true,
             message: "Image Fetched Successfully",
@@ -53,7 +59,7 @@ const getImageById = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -65,6 +71,8 @@ const deleteImage = async (req, res, next) => {
     
     try {
         const image = await Image.findByIdAndDelete(imageId);
+        if (!image) return next(apiErrorHandler(404, "No Image Found"));
+
         return res.status(200).json({
             success: true,
             message: "Image Deleted Successfully",
@@ -72,7 +80,7 @@ const deleteImage = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 

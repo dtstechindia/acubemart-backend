@@ -18,6 +18,9 @@ const addNewModel = async (req, res, next) => {
             brandId, 
             categoryId
         });
+
+        if (!model) return next(apiErrorHandler(404, "No Model Found"));
+
         return res.status(201).json({
             success: true,
             message: "Model Added Successfully",
@@ -25,7 +28,7 @@ const addNewModel = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -34,6 +37,8 @@ const addNewModel = async (req, res, next) => {
 const getAllModels = async (req, res, next) => {
     try {
         const models = await Model.find();
+        if (!models) return next(apiErrorHandler(404, "No Models Found"));
+
         return res.status(200).json({
             success: true,
             message: "Models Fetched Successfully",
@@ -41,7 +46,7 @@ const getAllModels = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -53,6 +58,8 @@ const deleteModel = async (req, res, next) => {
     
     try {
         const model = await Model.findByIdAndDelete(modelId);
+        if (!model) return next(apiErrorHandler(404, "No Model Found"));
+
         return res.status(200).json({
             success: true,
             message: "Model Deleted Successfully",
@@ -60,7 +67,7 @@ const deleteModel = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };          
 

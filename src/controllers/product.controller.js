@@ -22,6 +22,9 @@ const addNewProduct = async (req, res, next) => {
             brand,
             model
         });
+
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
         return res.status(201).json({
             success: true,
             message: "Product Added Successfully",
@@ -29,7 +32,7 @@ const addNewProduct = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -37,13 +40,15 @@ const addNewProduct = async (req, res, next) => {
 const getAllProducts = async (req, res, next) => {
     try {
         const products = await Product.find();
+        if (!products) return next(apiErrorHandler(404, "No Products Found"));
+
         return res.status(200).json({
             success: true,
             message: "Products Fetched Successfully",
             data: products
         })
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 }
 

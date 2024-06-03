@@ -17,6 +17,9 @@ const addNewBrand = async (req, res, next) => {
             description, 
             categoryId
         });
+
+        if (!brand) return next(apiErrorHandler(404, "No Brand Found"));
+
         return res.status(201).json({
             success: true,
             message: "Brand Added Successfully",
@@ -24,7 +27,7 @@ const addNewBrand = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -32,6 +35,9 @@ const addNewBrand = async (req, res, next) => {
 const getAllBrands = async (req, res, next) => {
     try {
         const brands = await Brand.find();
+
+        if (!brands) return next(apiErrorHandler(404, "No Brands Found"));
+
         return res.status(200).json({
             success: true,
             message: "Brands Fetched Successfully",
@@ -39,7 +45,7 @@ const getAllBrands = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -50,6 +56,8 @@ const deleteBrand = async (req, res, next) => {
     
     try {
         const brand = await Brand.findByIdAndDelete(brandId);
+        if (!brand) return next(apiErrorHandler(404, "No Brand Found"));
+
         return res.status(200).json({
             success: true,
             message: "Brand Deleted Successfully",
@@ -57,7 +65,7 @@ const deleteBrand = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 

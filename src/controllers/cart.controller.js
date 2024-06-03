@@ -27,6 +27,9 @@ const addToCart = async (req, res, next) => {
             userId, 
             products: [{ productId, quantity }]
         });
+
+        if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
+
         return res.status(201).json({
             success: true,
             message: "Product Added to Cart Successfully",
@@ -34,7 +37,7 @@ const addToCart = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -46,6 +49,8 @@ const getCartProducts = async (req, res, next) => {
     
     try {
         const cart = await Cart.findOne({ userId });
+        if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
+
         return res.status(200).json({
             success: true,
             message: "Cart Products Fetched Successfully",
@@ -53,7 +58,7 @@ const getCartProducts = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -73,6 +78,8 @@ const removeCartProduct = async (req, res, next) => {
                  } 
                 } 
             });
+
+        if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
             
         return res.status(200).json({
             success: true,
@@ -81,7 +88,7 @@ const removeCartProduct = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 }
 

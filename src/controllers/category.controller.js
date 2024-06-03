@@ -10,6 +10,8 @@ const addNewCategory = async (req, res, next) => {
     
     try {
         const category = await Category.create({ name, description });
+        if (!category) return next(apiErrorHandler(404, "No Category Found"));
+
         return res.status(201).json({
             success: true,
             message: "Category Added Successfully",
@@ -17,7 +19,7 @@ const addNewCategory = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -25,6 +27,8 @@ const addNewCategory = async (req, res, next) => {
 const getCategories = async (req, res, next) => {
     try {
         const categories = await Category.find();
+        if (!categories) return next(apiErrorHandler(404, "No Categories Found"));
+
         return res.status(200).json({
             success: true,
             message: "Categories Fetched Successfully",
@@ -32,7 +36,7 @@ const getCategories = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -43,6 +47,8 @@ const deleteCategory = async (req, res, next) => {
     
     try {
         const category = await Category.findByIdAndDelete(categoryId);
+        if (!category) return next(apiErrorHandler(404, "No Category Found"));
+        
         return res.status(200).json({
             success: true,
             message: "Category Deleted Successfully",
@@ -50,7 +56,7 @@ const deleteCategory = async (req, res, next) => {
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 

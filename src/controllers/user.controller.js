@@ -15,13 +15,16 @@ const registerUser = async (req, res, next) => {
             email, 
             password 
         });
+
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
         return res.status(201).json({
             success: true,
             data: user
         })
         
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 };
 
@@ -30,12 +33,14 @@ const registerUser = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.find();
+        if (!users) return next(apiErrorHandler(404, "No Users Found"));
+
         return res.status(200).json({
             success: true,
             data: users
         })
     } catch (error) {
-        next(apiErrorHandler(error.statusCode, error.message));
+        next(error);
     }
 }
 

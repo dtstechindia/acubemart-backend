@@ -5,7 +5,7 @@ import Order from "../models/order.model.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
-    const { userId, products, total, address, phone, status, paymentMode, isPaid } = req.body;
+    const { userId, products, total, address, phone, status, paymentMode, isPaid, transactionId } = req.body;
     if (!userId || !products || !total || !address || !phone || !status || !paymentMode || !isPaid) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
@@ -17,7 +17,8 @@ const addNewOrder = async (req, res, next) => {
             phone,
             status,
             paymentMode,
-            isPaid
+            isPaid,
+            transactionId
         });
 
         if (!order) return next(apiErrorHandler(404, "No Order Found"));

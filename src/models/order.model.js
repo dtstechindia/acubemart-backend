@@ -35,16 +35,21 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
+        enum: ["pending", "placed", "dispatched", "delivered", "cancelled"],
+        default: "pending",
         required: true
     },
-    payment: {
+    paymentMode: {
         type: String,
         required: true
     },
-    isPaymentSuccess: {
+    isPaid: {
         type: Boolean,
         required: true
     },
 }, { 
     timestamps: true 
 });
+
+const orderModel = mongoose.model("Order", orderSchema);
+export default orderModel

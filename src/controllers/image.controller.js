@@ -48,8 +48,10 @@ const getImagesByProductId = async (req, res, next) => {
 
 /* Get Image by Id */
 const getImageById = async (req, res, next) => {
+    const imageId  = req.params.id;
+    if (!imageId) return next(apiErrorHandler(400, "Please provide all fields"));
     try {
-        const image = await Image.findById(req.params.id);
+        const image = await Image.findById(imageId);
         if (!image) return next(apiErrorHandler(404, "Image not found"));
 
         return res.status(200).json({

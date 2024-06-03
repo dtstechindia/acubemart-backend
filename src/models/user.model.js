@@ -1,29 +1,6 @@
 import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
-//Address Schema subdocument
-
-const addressSchema = new mongoose.Schema({
-    street: {
-        type: String,
-        required: true
-    },
-    city: {
-        type: String,
-        required: true
-    },
-    state: {
-        type: String,
-        required: true
-    },
-    country: {
-        type: String,
-        required: true
-    },
-    pincode: {
-        type: String,
-        required: true
-    }
-})
 
 //User Schema Model/Document
 
@@ -44,8 +21,11 @@ const userSchema = new mongoose.Schema({
        type: String, 
     },
     address: [
-        addressSchema
-    ],
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Address"
+        }
+        ],
     avatar: {
         type: String,
     }

@@ -13,6 +13,7 @@ import categoryRouter from './routes/category.route.js';
 import brandRouter from './routes/brand.route.js';
 import modelRouter from './routes/model.route.js';
 import imageRouter from './routes/image.route.js';
+import addressRouter from './routes/address.route.js';
 
 
 //App
@@ -41,6 +42,7 @@ app.use('/api/category', categoryRouter);
 app.use('/api/brand', brandRouter);
 app.use('/api/model', modelRouter);
 app.use('/api/image', imageRouter);
+app.use('/api/address', addressRouter);
 
 
 // Home Route

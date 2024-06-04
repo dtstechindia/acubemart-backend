@@ -5,8 +5,8 @@ import Order from "../models/order.model.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
-    const { userId, products, total, address, phone, status, paymentMode, isPaid, transactionId } = req.body;
-    if (!userId || !products || !total || !address || !phone || !status || !paymentMode || !isPaid) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { userId, products, total, address, phone, status, transactionId } = req.body;
+    if (!userId || !products || !total || !address || !phone || !status || !transactionId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
         const order = await Order.create({ 
@@ -16,8 +16,6 @@ const addNewOrder = async (req, res, next) => {
             address,
             phone,
             status,
-            paymentMode,
-            isPaid,
             transactionId
         });
 

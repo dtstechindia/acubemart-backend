@@ -39,16 +39,10 @@ const orderSchema = new mongoose.Schema({
         default: "pending",
         required: true
     },
-    paymentMode: {
-        type: String,
-        required: true
-    },
-    isPaid: {
-        type: Boolean,
-        required: true
-    },
     transactionId: {
-        type: String
+        type: Schema.Types.ObjectId,
+        ref: "Transaction",
+        required: true
     }
 }, { 
     timestamps: true 

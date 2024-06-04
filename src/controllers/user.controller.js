@@ -29,6 +29,25 @@ const registerUser = async (req, res, next) => {
 };
 
 
+/* Get User by Id */
+const getUserById = async (req, res, next) => {
+    const userId  = req.params.id;
+    if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const user = await User.findById(userId);
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
+        return res.status(200).json({
+            success: true,
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Get All Users from DB */
 const getAllUsers = async (req, res, next) => {
     try {
@@ -44,8 +63,38 @@ const getAllUsers = async (req, res, next) => {
     }
 }
 
+
+/* Update User Information */
+const updateUser = async (req, res, next) => {
+    const { id } = req.params;
+    const { name, email, password, phone, address, avatar } = req.body;
+    if (!id || !name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const user = await User.findByIdAndUpdate(id, { 
+            name, 
+            email, 
+            password,
+            phone,
+            address, 
+            avatar
+        });
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
+        return res.status(200).json({
+            success: true,
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 export {
     registerUser,
     getAllUsers,
-
+    updateUser,
+    getUserById,
+    
 }

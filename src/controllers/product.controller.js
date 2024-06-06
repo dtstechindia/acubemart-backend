@@ -52,7 +52,82 @@ const getAllProducts = async (req, res, next) => {
     }
 }
 
+/* Get Product by Id */
+const getProductById = async (req, res, next) => {
+    const productId  = req.params.id;
+    if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Product Fetched Successfully",
+            data: product
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+/* Edit Product by Id */
+const editProductById = async (req, res, next) => {
+    const productId  = req.params.id;
+    if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
+    
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        /* Update Product */
+        const { name, price, description, stock, image, category, size, color, brand, model } = req.body;
+        
+        product.name = name;
+        product.price = price;
+        product.description = description;
+        product.stock = stock;
+        product.image = image;
+        product.category = category;
+        product.size = size;
+        product.color = color;
+        product.brand = brand;
+        product.model = model;
+        await product.save();
+        return res.status(200).json({
+            success: true,
+            message: "Product Updated Successfully",
+            data: product
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+/* Delete Product */
+const deleteProductById = async (req, res, next) => {
+    const productId  = req.params.id;
+    if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
+    
+    try {
+        const product = await Product.findByIdAndDelete(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+        return res.status(200).json({
+            success: true,
+            message: "Product Deleted Successfully",
+            data: product
+        })        
+    } catch (error) {
+        next(error);
+    }
+};
+
 export {
     addNewProduct,
-    getAllProducts
+    getAllProducts,
+    getProductById,
+    editProductById,
+    deleteProductById
 }

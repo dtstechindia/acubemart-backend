@@ -7,28 +7,28 @@ import { Schema } from "mongoose";
 const addressSchema = new mongoose.Schema({
     street: {
         type: String,
-        required: true
+        required: [true, "Street is required"]
     },
     city: {
         type: String,
-        required: true
+        required: [true, "City is required"]
     },
     state: {
         type: String,
-        required: true
+        required: [true, "State is required"]
     },
     country: {
         type: String,
-        required: true
+        required: [true, "Country is required"]
     },
     pincode: {
         type: String,
-        required: true
+        required: [true, "Pincode is required"]
     },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: [true, "User Id is required"]
     },
 }, { 
     timestamps: true 

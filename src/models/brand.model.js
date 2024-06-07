@@ -6,20 +6,20 @@ import { Schema } from "mongoose";
 const brandSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, "Brand name is required"]
     },
     logo: {
         type: String,
-        required: true
+        required: [true, "Brand logo is required"]
     },
     description: {
         type: String,
-        required: true
+        required: [true, "Brand description is required"]
     },
     categoryId: {
         type: Schema.Types.ObjectId,
         ref: "Category",
-        required: true
+        required: [true, "Category Id is required"]
     }
 }, { 
     timestamps: true 

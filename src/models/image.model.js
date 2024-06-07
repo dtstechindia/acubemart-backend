@@ -6,12 +6,12 @@ import { Schema } from "mongoose";
 const imageSchema = new mongoose.Schema({
     url: {
         type: String,
-        required: true
+        required: [true, "Image url is required"]
     },
     productId: {
         type: Schema.Types.ObjectId,
         ref: "Product",
-        required: true
+        required: [true, "Product Id is required"]
     }
 }, { 
     timestamps: true 

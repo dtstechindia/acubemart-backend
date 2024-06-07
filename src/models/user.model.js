@@ -7,16 +7,16 @@ import { Schema } from "mongoose";
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, "Please provide a name"],
     },
     email: {
         type: String,
         unique: true,
-        required: true
+        required: [true, "Please provide an email"],
     },
     password: {
         type: String,
-        required: true
+        required: [true, "Please provide a password"],
     },
     phone: {
        type: String, 
@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     address: [
         {
             type: Schema.Types.ObjectId,
-            ref: "Address"
+            ref: "Address",
         }
         ],
     avatar: {

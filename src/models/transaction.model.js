@@ -7,24 +7,24 @@ const transactionSchema = new mongoose.Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: [true, "User Id is required"]
     },
     orderId: {
         type: Schema.Types.ObjectId,
         ref: "Order",
-        required: true
+        required: [true, "Order Id is required"]
     },
     amount: {
         type: Number,
-        required: true
+        required: [true, "Amount is required"]
     },
     paymentMode: {
         type: String,
-        required: true
+        required: [true, "Payment Mode is required"]
     },
     isPaid: {
         type: Boolean,
-        required: true
+        required: [true, "Is Paid is required"]
     }
 }, { 
     timestamps: true 

@@ -7,42 +7,42 @@ const orderSchema = new mongoose.Schema({
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true
+        required: [true, "User Id is required"]
     },
     products: [{
         productId: {
             type: Schema.Types.ObjectId,
             ref: "Product",
-            required: true
+            required: [true, "Product Id is required"]
         },
         quantity: {
             type: Number,
-            required: true
+            required: [true, "Quantity is required"]
         }
     }],
     total: {
         type: Number,
-        required: true
+        required: [true, "Total is required"]
     },
     address: {
         type: Schema.Types.ObjectId,
         ref: "Address",
-        required: true
+        required: [true, "Address Id is required"]
     },
     phone: {
         type: String,
-        required: true
+        required: [true, "Phone is required"]
     },
     status: {
         type: String,
         enum: ["pending", "placed", "dispatched", "delivered", "cancelled"],
         default: "pending",
-        required: true
+        message: "{VALUE} is not supported"
     },
     transactionId: {
         type: Schema.Types.ObjectId,
         ref: "Transaction",
-        required: true
+        required: [true, "Transaction Id is required"]
     }
 }, { 
     timestamps: true 

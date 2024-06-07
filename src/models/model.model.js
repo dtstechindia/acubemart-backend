@@ -6,21 +6,21 @@ import { Schema } from "mongoose";
 const modelSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, "Model name is required"]
     },
     description: {
         type: String,
-        required: true
+        required: [true, "Model description is required"]
     },
     brandId: {
         type: Schema.Types.ObjectId,
         ref: "Brand",
-        required: true
+        required: [true, "Brand Id is required"]
     },
     categoryId: {
         type: Schema.Types.ObjectId,
         ref: "Category",
-        required: true
+        required: [true, "Category Id is required"]
     }
 }, { 
     timestamps: true 

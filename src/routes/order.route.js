@@ -3,7 +3,8 @@ import { Router } from "express";
 import {
     addNewOrder,
     getAllOrders,
-    getOrderById
+    getOrderById,
+    updateOrder
 } from "../controllers/order.controller.js";
 
 
@@ -20,6 +21,11 @@ router.get("/:id", getOrderById);
 //POST Routes
 /* Add New Order Route -POST `/api/order/add` */
 router.post("/add", addNewOrder);
+
+
+//PATCH Routes
+/* Update Order Route -PATCH `/api/order/update` */
+router.patch("/update", updateOrder);
 
 
 export default router;

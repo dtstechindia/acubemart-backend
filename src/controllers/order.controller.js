@@ -73,8 +73,31 @@ const getOrderById = async (req, res, next) => {
 };
 
 
+/* Update Order */
+const updateOrder = async (req, res, next) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    if (!id || !status) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const order = await Order.findByIdAndUpdate(id, { status });
+        if (!order) return next(apiErrorHandler(404, "No Order Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Order Updated Successfully",
+            data: order
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 export { 
     addNewOrder, 
     getAllOrders, 
-    getOrderById 
+    getOrderById,
+    updateOrder 
 }

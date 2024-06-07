@@ -96,10 +96,29 @@ const updateUser = async (req, res, next) => {
     }
 };
 
+/* Delete User */
+const deleteUser = async (req, res, next) => {
+    const userId  = req.params.id;
+    if (!userId) return next(apiErrorHandler(400, "Please provide User Id"));
+    
+    try {
+        const user = await User.findByIdAndDelete(userId);
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
+        return res.status(200).json({
+            success: true,
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 export {
     registerUser,
     getAllUsers,
     updateUser,
     getUserById,
-    
+    deleteUser
 }

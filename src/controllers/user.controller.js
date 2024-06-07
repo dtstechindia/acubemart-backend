@@ -8,8 +8,13 @@ const registerUser = async (req, res, next) => {
     const { name, email, password } = req.body;
     //console.log(name, email, password);
     if (!name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
+
     
     try {
+
+        const userExists = await User.findOne({ email });
+        if (userExists) return next(apiErrorHandler(400, "User Already Exists"));
+
         const user = await User.create({ 
             name, 
             email, 

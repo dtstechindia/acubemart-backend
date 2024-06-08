@@ -26,7 +26,7 @@ router.post("/register", registerUser);
 
 //PATCH Routes
 /* Update User Route - PATCH `/api/user/update` */
-router.patch("/update", updateUser);
+router.patch("/update/:id", updateUser);
 
 /* Update User Password Route - PATCH `/api/user/password` */
 router.patch("/password", updateUserPassword);

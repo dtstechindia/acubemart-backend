@@ -2,6 +2,8 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Transaction from "../models/transaction.model.js";
 
+import Order from "../models/order.model.js";
+
 
 /* Add New Transaction */
 const addNewTransaction = async (req, res, next) => {
@@ -17,7 +19,12 @@ const addNewTransaction = async (req, res, next) => {
             isPaid
         });
 
-        if (!transaction) return next(apiErrorHandler(404, "No Transaction Found"));
+        const order = await Order.findById(orderId);
+        order.isPaid = true;
+        order.paymentMode = paymentMode;
+        order.transactionId = transaction._id;
+        order.status = "Placed";
+        order.save();
 
         return res.status(201).json({
             success: true,

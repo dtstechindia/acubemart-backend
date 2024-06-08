@@ -82,7 +82,7 @@ const editProductById = async (req, res, next) => {
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         /* Update Product */
-        const { name, price, description, stock, image, category, size, color, brand, model } = req.body;
+        const { name, price, description, stock, image, category, size, color, brand, model, variant, additionalInfo } = req.body;
         
         product.name = name;
         product.price = price;
@@ -94,6 +94,8 @@ const editProductById = async (req, res, next) => {
         product.color = color;
         product.brand = brand;
         product.model = model;
+        product.variant = variant;
+        product.additionalInfo = additionalInfo;
         await product.save();
         return res.status(200).json({
             success: true,

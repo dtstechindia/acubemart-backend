@@ -2,6 +2,8 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Address from "../models/address.model.js";
 
+import User from "../models/user.model.js";
+
 
 /* Add New Address */
 const addNewAddress = async (req, res, next) => {
@@ -18,7 +20,9 @@ const addNewAddress = async (req, res, next) => {
             userId
         });
 
-        if (!address) return next(apiErrorHandler(404, "No Address Found"));
+        const user = await User.findById(userId);
+        user.address.push(address._id);
+        await user.save();
 
         return res.status(201).json({
             success: true,

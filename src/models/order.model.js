@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
     transactionId: {
         type: Schema.Types.ObjectId,
         ref: "Transaction",
-        required: [true, "Transaction Id is required"]
+        //required: [true, "Transaction Id is required"]
     }
 }, { 
     timestamps: true 

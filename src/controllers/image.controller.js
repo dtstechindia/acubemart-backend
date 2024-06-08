@@ -1,6 +1,7 @@
-import { apiErrorHandler, errorHandler } from "../middlewares/errorhandler.middleware.js";
+import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Image from "../models/image.model.js";
+import Product from "../models/product.model.js";
 
 
 
@@ -11,7 +12,12 @@ const addNewImage = async (req, res, next) => {
     
     try {
         const image = await Image.create({ url, productId });
-        if (!image) return next(apiErrorHandler(404, "No Image Found"));
+
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        product.image.push(image._id);
+        await product.save();
 
         return res.status(201).json({
             success: true,

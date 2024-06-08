@@ -4,6 +4,7 @@ import {
     registerUser,
     getAllUsers,
     updateUser,
+    updateUserPassword,
     getUserById,
     deleteUser
  } from "../controllers/user.controller.js";
@@ -26,6 +27,10 @@ router.post("/register", registerUser);
 //PATCH Routes
 /* Update User Route - PATCH `/api/user/update` */
 router.patch("/update", updateUser);
+
+/* Update User Password Route - PATCH `/api/user/password` */
+router.patch("/password", updateUserPassword);
+
 
 
 //DELETE Routes

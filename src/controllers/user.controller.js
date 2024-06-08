@@ -1,3 +1,5 @@
+import bcryptjs from "bcryptjs";
+
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import User from "../models/user.model.js";
@@ -15,17 +17,22 @@ const registerUser = async (req, res, next) => {
         const userExists = await User.findOne({ email });
         if (userExists) return next(apiErrorHandler(400, "User Already Exists"));
 
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(password, salt);
+
         const user = await User.create({ 
             name, 
             email, 
-            password 
+            password: hashedPassword
         });
 
-        if (!user) return next(apiErrorHandler(404, "No User Found"));
+        const userWithoutPassword = { ...user._doc };
+        delete userWithoutPassword.password;
 
         return res.status(201).json({
             success: true,
-            data: user
+            message: "User Registered Successfully",
+            data: userWithoutPassword
         })
         
     } catch (error) {
@@ -45,6 +52,7 @@ const getUserById = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
+            message: "User Fetched Successfully",
             data: user
         })
         
@@ -61,6 +69,7 @@ const getAllUsers = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
+            message: "Users Fetched Successfully",
             data: users
         })
     } catch (error) {
@@ -69,17 +78,50 @@ const getAllUsers = async (req, res, next) => {
 }
 
 
+/* Update User Password */
+const updateUserPassword = async (req, res, next) => {
+   
+    const { email, oldPassword, newPassword } = req.body;
+    if (!email || !oldPassword || !newPassword) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+
+        const user = await User.findOne({ email }).select("+password");
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
+        const isMatch = await bcryptjs.compare(oldPassword, user.password);
+        if (!isMatch) return next(apiErrorHandler(400, "Incorrect Credentials"));
+
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+        user.password = hashedPassword;
+        await user.save();
+
+        const userWithoutPassword = { ...user._doc };
+        delete userWithoutPassword.password;
+
+        return res.status(200).json({
+            success: true,
+            message: "Password Updated Successfully",
+            data: userWithoutPassword
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Update User Information */
 const updateUser = async (req, res, next) => {
     const { id } = req.params;
-    const { name, email, password, phone, address, avatar } = req.body;
-    if (!id || !name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { name, email, phone, address, avatar } = req.body;
+    if (!id || !name || !email) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
         const user = await User.findByIdAndUpdate(id, { 
             name, 
             email, 
-            password,
             phone,
             address, 
             avatar
@@ -88,6 +130,7 @@ const updateUser = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
+            message: "User Updated Successfully",
             data: user
         })
         
@@ -120,5 +163,6 @@ export {
     getAllUsers,
     updateUser,
     getUserById,
+    updateUserPassword,
     deleteUser
 }

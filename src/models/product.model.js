@@ -48,15 +48,17 @@ const productSchema = new mongoose.Schema({
         ref: "Model",
         required: [true, "Product model is required"]
     },
-    attributes: {
-        materials: [String],
-        labels: [String],
-        colors: [String],
-        sizes: [Number]
+    variant: {
+        type: [Schema.Types.ObjectId],
+        ref: "Variant",
+        //required: [true, "Product variant is required"]
     },
     additionalInfo: {
+        shortDescription: String,
         weight: String,
-        dimension: String
+        dimension: String,
+        materials: [String],
+        labels: [String],
     }
 
 }, { 

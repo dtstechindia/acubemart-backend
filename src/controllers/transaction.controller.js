@@ -21,7 +21,6 @@ const addNewTransaction = async (req, res, next) => {
 
         const order = await Order.findById(orderId);
         order.isPaid = true;
-        order.paymentMode = paymentMode;
         order.transactionId = transaction._id;
         order.status = "Placed";
         order.save();

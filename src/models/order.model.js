@@ -37,7 +37,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ["pending", "placed", "dispatched", "delivered", "cancelled"],
         default: "pending",
-        message: "{VALUE} is not supported"
+        message: "{VALUE} is not a valid status"
     },
     transactionId: {
         type: Schema.Types.ObjectId,

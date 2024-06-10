@@ -4,6 +4,7 @@ import {
     addNewAddress,
     getAllAddresses,
     getAddressById,
+    updateAddress,
     deleteAddress
  } from "../controllers/address.controller.js";
 
@@ -22,6 +23,11 @@ router.get("/:id", getAddressById);
 //POST Routes
 /* Add New Address Route -POST `/api/address/add` */
 router.post("/add", addNewAddress);
+
+
+//PATCH Routes
+/* Update Address Route -PATCH `/api/address/update` */
+router.patch("/update/:id", updateAddress);
 
 
 //DELETE Routes

@@ -50,7 +50,7 @@ const getTransactionById = async (req, res, next) => {
     if (!transactionId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const transaction = await Transaction.findById(transactionId);
+        const transaction = await Transaction.findById(transactionId).populate("orderId userId");
         if (!transaction) return next(apiErrorHandler(404, "No Transaction Found"));
 
         return res.status(200).json({
@@ -71,7 +71,7 @@ const getTransactionsByOrderId = async (req, res, next) => {
     if (!orderId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const transactions = await Transaction.find({ orderId });
+        const transactions = await Transaction.find({ orderId }).populate("orderId userId");
         if (!transactions) return next(apiErrorHandler(404, "No Transactions Found"));
 
         return res.status(200).json({
@@ -85,7 +85,7 @@ const getTransactionsByOrderId = async (req, res, next) => {
     }
 };
 
-/* Get Transactions by UserId */
+/* Get all Transactions by UserId */
 const getTransactionsByUserId = async (req, res, next) => {
     const userId = req.params.id;
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));

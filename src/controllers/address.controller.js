@@ -75,6 +75,35 @@ const getAddressById = async (req, res, next) => {
     }
 };
 
+/* Update Address by Id */
+const updateAddress = async (req, res, next) => {
+    const addressId = req.params.id;
+    if (!addressId) return next(apiErrorHandler(400, "AddressId is required"));
+
+    const { street, city, state, country, pincode } = req.body;
+    
+    try {
+        const address = await Address.findByIdAndUpdate(addressId, { 
+            street, 
+            city, 
+            state, 
+            country, 
+            pincode
+        });
+        if (!address) return next(apiErrorHandler(404, "No Address Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Address Updated Successfully",
+            data: address
+        })  
+        
+    } catch (error) {
+        next(error);
+    }   
+};
+
+
 /* Delete Address */
 const deleteAddress = async (req, res, next) => {
     const { addressId } = req.body;
@@ -100,5 +129,6 @@ export {
     addNewAddress, 
     getAllAddresses, 
     getAddressById, 
+    updateAddress,
     deleteAddress 
 }

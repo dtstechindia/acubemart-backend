@@ -58,7 +58,7 @@ const getProductById = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const product = await Product.findById(productId);
+        const product = await Product.findById(productId).populate("image");
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         return res.status(200).json({

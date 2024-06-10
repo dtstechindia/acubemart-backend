@@ -8,7 +8,7 @@ const addToCart = async (req, res, next) => {
     const { userId, productId, quantity } = req.body;
     if (!userId ) return next(apiErrorHandler(400, "User not found"));
 
-    if (!productId || !quantity) return next(apiErrorHandler(400, "Please Add Products"));
+    if (!productId || !quantity || quantity < 1) return next(apiErrorHandler(400, "Please Add Products"));
     
     try {
         /* Check if Cart Already Exists */
@@ -28,8 +28,6 @@ const addToCart = async (req, res, next) => {
             products: [{ productId, quantity }]
         });
 
-        if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
-
         return res.status(201).json({
             success: true,
             message: "Product Added to Cart Successfully",
@@ -45,10 +43,10 @@ const addToCart = async (req, res, next) => {
 /* Get Cart Products */
 const getCartProducts = async (req, res, next) => {
     const { userId } = req.body;
-    if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!userId) return next(apiErrorHandler(400, "UserId is required"));
     
     try {
-        const cart = await Cart.findOne({ userId });
+        const cart = await Cart.findOne({ userId }).populate("products.productId");
         if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
 
         return res.status(200).json({

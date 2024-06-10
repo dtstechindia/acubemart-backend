@@ -49,7 +49,7 @@ const getVariantById = async (req, res, next) => {
     if (!variantId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const variant = await Variant.findById(variantId);
+        const variant = await Variant.findById(variantId).populate("productId");
         if (!variant) return next(apiErrorHandler(404, "No Variant Found"));    
 
         return res.status(200).json({

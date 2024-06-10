@@ -8,8 +8,8 @@ const addNewModel = async (req, res, next) => {
     const { name, description, brandId, categoryId } = req.body;
     if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
-    if (!brandId) return next(apiErrorHandler(404, "Brand not found"));
-    if (!categoryId) return next(apiErrorHandler(404, "Category not found"));
+    if (!brandId) return next(apiErrorHandler(404, "BrandId is required"));
+    if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
     
     try {
         const model = await Model.create({ 
@@ -36,7 +36,7 @@ const addNewModel = async (req, res, next) => {
 /* Get All Models */
 const getAllModels = async (req, res, next) => {
     try {
-        const models = await Model.find();
+        const models = await Model.find().populate("brandId categoryId");
         if (!models) return next(apiErrorHandler(404, "No Models Found"));
 
         return res.status(200).json({

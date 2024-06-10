@@ -34,7 +34,7 @@ const addNewImage = async (req, res, next) => {
 /* Get Image by ProductId */
 const getImagesByProductId = async (req, res, next) => {
     const { productId } = req.body;
-    if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     
     try {
         const images = await Image.find({ productId });
@@ -55,7 +55,7 @@ const getImagesByProductId = async (req, res, next) => {
 /* Get Image by Id */
 const getImageById = async (req, res, next) => {
     const imageId  = req.params.id;
-    if (!imageId) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!imageId) return next(apiErrorHandler(400, "ImageId is required"));
     try {
         const image = await Image.findById(imageId);
         if (!image) return next(apiErrorHandler(404, "Image not found"));

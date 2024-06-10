@@ -34,7 +34,7 @@ const addNewBrand = async (req, res, next) => {
 /* Get All Brands */
 const getAllBrands = async (req, res, next) => {
     try {
-        const brands = await Brand.find();
+        const brands = await Brand.find().populate("categoryId");
 
         if (!brands) return next(apiErrorHandler(404, "No Brands Found"));
 

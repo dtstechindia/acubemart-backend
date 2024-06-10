@@ -20,11 +20,11 @@ const transactionSchema = new mongoose.Schema({
     },
     paymentMode: {
         type: String,
+        enum: ["COD", "ONLINE"],
+        message: "{VALUE} is not a valid payment mode",
+        //default: "COD",
+        toUpperCase: true,
         required: [true, "Payment Mode is required"]
-    },
-    isPaid: {
-        type: Boolean,
-        required: [true, "Is Paid is required"]
     }
 }, { 
     timestamps: true 

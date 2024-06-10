@@ -18,8 +18,6 @@ const addNewOrder = async (req, res, next) => {
             if (product.quantity < products[i].quantity) return next(apiErrorHandler(400, "Insufficient Stock"));
             
             total += product.price * products[i].quantity;
-
-            await product.save();
         }
 
         /* Create New Order */
@@ -52,7 +50,7 @@ const getAllOrders = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const orders = await Order.find({ userId });
+        const orders = await Order.find({ userId }).populate("products.productId");
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -72,7 +70,7 @@ const getOrderById = async (req, res, next) => {
     if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
     
     try {
-        const order = await Order.findById(orderId);
+        const order = await Order.findById(orderId).populate("products.productId");
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

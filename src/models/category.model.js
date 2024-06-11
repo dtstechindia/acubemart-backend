@@ -11,6 +11,11 @@ const categorySchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, "Category description is required"]
+    },
+    typeId: {
+        type: Schema.Types.ObjectId,
+        ref: "Type",
+        required: [true, "Type Id is required"]
     }
 }, { 
     timestamps: true 

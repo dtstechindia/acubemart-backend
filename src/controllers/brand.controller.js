@@ -5,17 +5,18 @@ import Brand from "../models/brand.model.js";
 
 /* Add New Brand */
 const addNewBrand = async (req, res, next) => {
-    const { name, logo, description, categoryId } = req.body;
+    const { name, logo, description, categoryId, typeId } = req.body;
     if (!name || !logo || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
-    if (!categoryId) return next(apiErrorHandler(404, "Category not found"));
+    if (!categoryId || !typeId) return next(apiErrorHandler(404, "Category or Type not found"));
 
     try {
         const brand = await Brand.create({ 
             name, 
             logo, 
             description, 
-            categoryId
+            categoryId,
+            typeId
         });
 
         if (!brand) return next(apiErrorHandler(404, "No Brand Found"));

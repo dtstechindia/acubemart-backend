@@ -4,10 +4,10 @@ import Product from "../models/product.model.js";
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
-    const { name, price, description, stock, image, category, size, color, brand, model } = req.body;
-    if (!name || !price || !description || !stock || !image || !size || !color) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { name, price, description, stock, image, category, size, color, brand, model, type } = req.body;
+    if (!name || !price || !description || !stock || !image || !size || !color ) return next(apiErrorHandler(400, "Please provide all fields"));
     
-    if (!category || !brand || !model) return next(apiErrorHandler(404, "Category or Brand or Model not found"));
+    if (!category || !brand || !model || !type) return next(apiErrorHandler(404, "Category or Brand or Model or Type not found"));
     
     try {
         const product = await Product.create({ 
@@ -20,7 +20,8 @@ const addNewProduct = async (req, res, next) => {
             size, 
             color,
             brand,
-            model
+            model,
+            type
         });
 
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -58,7 +59,7 @@ const getProductById = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const product = await Product.findById(productId).populate("image");
+        const product = await Product.findById(productId).populate("image category brand model variant type");
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         return res.status(200).json({
@@ -82,7 +83,7 @@ const editProductById = async (req, res, next) => {
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         /* Update Product */
-        const { name, price, description, stock, image, category, size, color, brand, model, variant, additionalInfo } = req.body;
+        const { name, price, description, stock, image, category, size, color, brand, model, type, variant, additionalInfo } = req.body;
         
         product.name = name;
         product.price = price;
@@ -96,6 +97,8 @@ const editProductById = async (req, res, next) => {
         product.model = model;
         product.variant = variant;
         product.additionalInfo = additionalInfo;
+        product.type = type;
+
         await product.save();
         return res.status(200).json({
             success: true,

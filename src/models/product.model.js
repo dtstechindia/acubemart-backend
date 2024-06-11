@@ -48,6 +48,11 @@ const productSchema = new mongoose.Schema({
         ref: "Model",
         required: [true, "Product model is required"]
     },
+    type: {
+        type: Schema.Types.ObjectId,
+        ref: "Type",
+        required: [true, "Product type is required"]
+    },
     variant: {
         type: [Schema.Types.ObjectId],
         ref: "Variant",
@@ -59,7 +64,7 @@ const productSchema = new mongoose.Schema({
         dimension: String,
         materials: [String],
         labels: [String],
-    }
+    },
 
 }, { 
     timestamps: true

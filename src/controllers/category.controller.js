@@ -5,11 +5,17 @@ import Category from "../models/category.model.js";
 
 /* Add New Category */
 const addNewCategory = async (req, res, next) => {
-    const { name, description } = req.body;
+    const { name, description, typeId } = req.body;
     if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
+    if (!typeId) return next(apiErrorHandler(404, "Type not found"));
+    
     try {
-        const category = await Category.create({ name, description });
+        const category = await Category.create({ 
+            name, 
+            description,
+            typeId
+        });
         if (!category) return next(apiErrorHandler(404, "No Category Found"));
 
         return res.status(201).json({

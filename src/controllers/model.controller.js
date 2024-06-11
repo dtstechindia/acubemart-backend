@@ -5,18 +5,20 @@ import Model from "../models/model.model.js";
 
 /* Add New Model */
 const addNewModel = async (req, res, next) => {
-    const { name, description, brandId, categoryId } = req.body;
+    const { name, description, brandId, categoryId, typeId } = req.body;
     if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!brandId) return next(apiErrorHandler(404, "BrandId is required"));
     if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
+    if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     
     try {
         const model = await Model.create({ 
             name, 
             description, 
             brandId, 
-            categoryId
+            categoryId,
+            typeId
         });
 
         if (!model) return next(apiErrorHandler(404, "No Model Found"));

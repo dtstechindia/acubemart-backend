@@ -21,6 +21,11 @@ const modelSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Category",
         required: [true, "Category Id is required"]
+    },
+    typeId: {
+        type: Schema.Types.ObjectId,
+        ref: "Type",
+        required: [true, "Type Id is required"]
     }
 }, { 
     timestamps: true 

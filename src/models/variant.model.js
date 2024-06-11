@@ -3,38 +3,38 @@ import { Schema } from "mongoose";
 
 
 //Attributes Schema Model/Document
-const varientSchema = new mongoose.Schema({
+const variantSchema = new mongoose.Schema({
     productId: {
         type: Schema.Types.ObjectId,
         ref: "Product",
         required: [true, "Product Id is required"]
     },
-    varient: 
+    variant: 
         {
             size: {
                 type: Number,
-                required: [true, "Varient Size is required"]
+                required: [true, "Variant Size is required"]
             },
             color: {
                 type: String,
-                required: [true, "Varient Color is required"]
+                required: [true, "Variant Color is required"]
             },
             image: {
                 type: Object.Types.ObjectId,
                 ref: "Image",
-                required: [true, "Varient Image is required"]
+                required: [true, "Variant Image is required"]
             },
             material: {
                 type: String,
-                required: [true, "Varient Material is required"]
+                required: [true, "Variant Material is required"]
             },
             label: {
                 type: String,
-                required: [true, "Varient Label is required"]
+                required: [true, "Variant Label is required"]
             },
             price: {
                 type: Number,
-                required: [true, "Varient Price is required"]
+                required: [true, "Variant Price is required"]
             }
         }
 }, { 
@@ -42,5 +42,5 @@ const varientSchema = new mongoose.Schema({
 });
 
 
-const varientModel = mongoose.model("Varient", varientSchema);
-export default varientModel
+const variantModel = mongoose.model("Variant", variantSchema);
+export default variantModel

@@ -16,6 +16,7 @@ import imageRouter from './routes/image.route.js';
 import addressRouter from './routes/address.route.js';
 import orderRouter from './routes/order.route.js';
 import transactionRouter from './routes/transaction.route.js';
+import typeRouter from './routes/type.route.js';
 
 
 //App
@@ -47,6 +48,7 @@ app.use('/api/image', imageRouter);
 app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/transaction', transactionRouter);
+app.use('/api/type', typeRouter);
 
 
 // Home Route

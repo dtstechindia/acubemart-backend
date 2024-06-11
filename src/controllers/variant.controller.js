@@ -1,6 +1,7 @@
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Variant from "../models/variant.model.js";
+import Product from "../models/product.model.js";
 
 
 /* Add New Product Variant */
@@ -10,6 +11,12 @@ const addNewVariant = async (req, res, next) => {
     
     try {
         const variant = await Variant.create({ productId, varient });
+
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        product.variant.push(variant._id);
+        await product.save();
 
         return res.status(201).json({
             success: true,

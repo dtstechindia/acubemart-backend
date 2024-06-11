@@ -20,19 +20,13 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: [true, "Product stock is required"]
     },
-    size: {
-        type: [Number],
-        required: [true, "Product size is required"]
-    },
-    color: {
-        type: [String],
-        required: [true, "Product color is required"]
-    },
-    image: [{ 
-        type: Schema.Types.ObjectId, 
-        ref: "Image" ,
-        required: [true, "Product image is required"]
-    }],
+    image: [
+        { 
+            type: Schema.Types.ObjectId, 
+            ref: "Image" ,
+            required: [true, "Product image is required"]
+        }
+    ],
     category: { 
         type: Schema.Types.ObjectId, 
         ref: "Category",
@@ -53,6 +47,13 @@ const productSchema = new mongoose.Schema({
         ref: "Type",
         required: [true, "Product type is required"]
     },
+    attributes: [
+        {
+            type: [Schema.Types.ObjectId],
+            ref: "Attribute",
+            //required: [true, "Product attribute is required"]
+        }
+    ],
     variant: {
         type: [Schema.Types.ObjectId],
         ref: "Variant",

@@ -17,6 +17,7 @@ import addressRouter from './routes/address.route.js';
 import orderRouter from './routes/order.route.js';
 import transactionRouter from './routes/transaction.route.js';
 import typeRouter from './routes/type.route.js';
+import attributeRouter from './routes/attribute.route.js';
 
 
 //App
@@ -49,6 +50,7 @@ app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/transaction', transactionRouter);
 app.use('/api/type', typeRouter);
+app.use('/api/attribute', attributeRouter);
 
 
 // Home Route

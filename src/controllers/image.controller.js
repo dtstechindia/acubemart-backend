@@ -90,7 +90,8 @@ const updateImageById = async (req, res, next) => {
                 productId, 
                 isFeatured 
             }, { 
-                new: true 
+                new: true, 
+                runValidators: true
             }
         );
         if (!image) return next(apiErrorHandler(404, "No Image Found"));
@@ -132,5 +133,6 @@ export {
     addNewImage, 
     getImagesByProductId,
     getImageById,
+    updateImageById,
     deleteImage 
 }

@@ -4,6 +4,7 @@ import {
     addNewImage,
     getImagesByProductId,
     getImageById,
+    updateImageById,
     deleteImage
 } from "../controllers/image.controller.js";
 
@@ -21,6 +22,11 @@ router.get("/:id", getImageById);
 //POST Routes
 /* Add New Image Route -POST `/api/image/add` */
 router.post("/add", addNewImage);
+
+
+//PATCH Routes
+/* Update Image Route -PATCH `/api/image/update` */
+router.patch("/update/:id", updateImageById);
 
 
 //DELETE Routes

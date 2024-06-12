@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     addNewModel,
     getAllModels,
+    updateModelById,
     deleteModel
 } from "../controllers/model.controller.js";
 
@@ -17,6 +18,11 @@ router.get("/all", getAllModels);
 //POST Routes
 // Add New Model Route -POST `/api/model/add`
 router.post("/add", addNewModel);
+
+
+//PATCH Routes
+// Update Model Route -PATCH `/api/model/update`
+router.patch("/update/:id", updateModelById);
 
 
 //DELETE Routes

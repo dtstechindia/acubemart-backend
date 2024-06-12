@@ -53,6 +53,40 @@ const getAllModels = async (req, res, next) => {
 };
 
 
+/* Update Model by Id */
+const updateModelById = async (req, res, next) => {
+    const modelId  = req.params.id;
+    if (!modelId) return next(apiErrorHandler(400, "Model Id not found"));
+    const { name, description, brandId, categoryId, typeId } = req.body;
+    
+    try {
+        const model = await Model.findByIdAndUpdate(
+            modelId, 
+            { 
+                name, 
+                description,
+                brandId,
+                categoryId,
+                typeId
+            }, { 
+                new: true, 
+                runValidators: true
+            }
+        );
+        if (!model) return next(apiErrorHandler(404, "No Model Found"));
+        
+        return res.status(200).json({
+            success: true,
+            message: "Model Updated Successfully",
+            data: model
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 /* Delete Model */
 const deleteModel = async (req, res, next) => {
     const { modelId } = req.body;
@@ -76,5 +110,6 @@ const deleteModel = async (req, res, next) => {
 export { 
         addNewModel,
         getAllModels,
+        updateModelById,
         deleteModel 
     }

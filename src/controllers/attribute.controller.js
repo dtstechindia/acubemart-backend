@@ -69,7 +69,8 @@ const updateAttribute = async (req, res, next) => {
                 productId
             },
             { 
-                new: true 
+                new: true,
+                runValidators: true 
             }
         );
         if (!attribute) return next(apiErrorHandler(404, "No Attribute Found"));

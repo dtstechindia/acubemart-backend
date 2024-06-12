@@ -93,7 +93,8 @@ const updateAddress = async (req, res, next) => {
                 pincode
             },
             { 
-                new: true
+                new: true,
+                runValidators: true
             }
         );
         if (!address) return next(apiErrorHandler(404, "No Address Found"));

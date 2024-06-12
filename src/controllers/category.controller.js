@@ -46,6 +46,39 @@ const getCategories = async (req, res, next) => {
     }
 };
 
+
+/* Update Category by Id */
+const updateCategoryById = async (req, res, next) => {
+    const categoryId  = req.params.id;
+    if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
+    
+    const { name, description, typeId } = req.body;
+    
+    try {
+        const category = await Category.findByIdAndUpdate(
+            categoryId, 
+            { 
+                name, 
+                description,
+                typeId
+            },
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        );
+
+        return res.status(200).json({ 
+            success: true,
+            message: "Category Updated Successfully",
+            data: category
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Delete Category */
 const deleteCategory = async (req, res, next) => {
     const { categoryId } = req.body;
@@ -69,6 +102,7 @@ const deleteCategory = async (req, res, next) => {
 export {
     addNewCategory,
     getCategories,
+    updateCategoryById,
     deleteCategory,
     
 }

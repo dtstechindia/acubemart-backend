@@ -3,6 +3,7 @@ import { Router } from "express";
 import { 
     addNewCategory,
     getCategories,
+    updateCategoryById,
     deleteCategory
  } from "../controllers/category.controller.js";
 
@@ -16,6 +17,12 @@ router.get("/all", getCategories);
 //POST Routes
 /* Add New Category Route -POST `/api/category/add` */
 router.post("/add", addNewCategory);    
+
+
+//PATCH Routes
+/* Update Category Route -PATCH `/api/category/update` */
+router.patch("/update/:id", updateCategoryById);
+
 
 //DELETE Routes
 /* Delete Category Route -DELETE `/api/category/delete` */

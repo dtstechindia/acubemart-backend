@@ -114,18 +114,25 @@ const updateUserPassword = async (req, res, next) => {
 
 /* Update User Information */
 const updateUser = async (req, res, next) => {
-    const { id } = req.params;
+    const userId = req.params.id;
     const { name, email, phone, address, avatar } = req.body;
-    if (!id) return next(apiErrorHandler(400, "userId is required"));
+    if (!userId) return next(apiErrorHandler(400, "userId is required"));
     
     try {
-        const user = await User.findByIdAndUpdate(id, { 
-            name, 
-            email, 
-            phone,
-            address, 
-            avatar
-        });
+        const user = await User.findByIdAndUpdate(
+            userId, 
+            { 
+                name, 
+                email, 
+                phone,
+                address, 
+                avatar
+            },
+            { 
+                new: true, 
+                runValidators: true 
+            }
+    );
         if (!user) return next(apiErrorHandler(404, "No User Found"));
 
         return res.status(200).json({

@@ -41,6 +41,36 @@ const getAllTypes = async (req, res, next) => {
 }
 
 
+/* Update Type by Id */
+const updateTypeById = async (req, res, next) => {
+    const typeId  = req.params.id;
+    if (!typeId) return next(apiErrorHandler(400, "Type Id not found"));
+    const { name } = req.body;
+    
+    try {
+        const type = await Type.findByIdAndUpdate(
+            typeId, 
+            { 
+                name 
+            }, { 
+                new: true, 
+                runValidators: true
+            }
+        );
+        if (!type) return next(apiErrorHandler(404, "No Type Found"));
+        
+        return res.status(200).json({
+            success: true,
+            message: "Type Updated Successfully",
+            data: type
+        })  
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 /* Delete Type */
 const deleteType = async (req, res, next) => {
     try {
@@ -64,5 +94,6 @@ const deleteType = async (req, res, next) => {
 export {
     addNewType,
     getAllTypes,
+    updateTypeById,
     deleteType
 }

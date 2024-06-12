@@ -81,30 +81,31 @@ const getProductById = async (req, res, next) => {
 const editProductById = async (req, res, next) => {
     const productId  = req.params.id;
     if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
-    
+    const { name, price, description, stock, image, category, brand, model, type, variant, additionalInfo, attributes } = req.body;
+
     try {
-        const product = await Product.findById(productId);
-        if (!product) return next(apiErrorHandler(404, "No Product Found"));
-
-        /* Update Product */
-        const { name, price, description, stock, image, category, brand, model, type, variant, additionalInfo, attributes } = req.body;
+        const product = await Product.findByIdAndUpdate(
+            productId,
+            { 
+                name,
+                price,
+                description, 
+                stock, 
+                image, 
+                category, 
+                brand, 
+                model, 
+                type, 
+                variant, 
+                additionalInfo, 
+                attributes 
+            },
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        );
         
-        product.name = name;
-        product.price = price;
-        product.description = description;
-        product.stock = stock;
-        product.image = image;
-        product.category = category;
-        product.size = size;
-        product.color = color;
-        product.brand = brand;
-        product.model = model;
-        product.variant = variant;
-        product.additionalInfo = additionalInfo;
-        product.type = type;
-        product.attributes = attributes;
-
-        await product.save();
         return res.status(200).json({
             success: true,
             message: "Product Updated Successfully",

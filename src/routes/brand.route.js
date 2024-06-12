@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     addNewBrand,
     deleteBrand,
+    updateBrandById,
     getAllBrands
 } from "../controllers/brand.controller.js";
 
@@ -16,6 +17,11 @@ router.get("/all", getAllBrands);
 //POST Routes
 /* Add New Brand Route -POST `/api/brand/add` */
 router.post("/add", addNewBrand);
+
+
+//PATCH Routes
+/* Update Brand Route -PATCH `/api/brand/update` */
+router.patch("/update/:id", updateBrandById);
 
 //DELETE Routes
 /* Delete Brand Route -DELETE `/api/brand/delete` */

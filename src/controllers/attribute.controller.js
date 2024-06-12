@@ -55,6 +55,35 @@ const getAllAttributes = async (req, res, next) => {
 }
 
 
+/* Update Attribute by Id */
+const updateAttribute = async (req, res, next) => {
+    const { attributeId, name, value, productId } = req.body;
+    if (!attributeId) return next(apiErrorHandler(400, "AttributeId is required"));
+    
+    try {
+        const attribute = await Attribute.findByIdAndUpdate(
+            attributeId, 
+            {
+                name, 
+                value,
+                productId
+            },
+            { 
+                new: true 
+            }
+        );
+        if (!attribute) return next(apiErrorHandler(404, "No Attribute Found"));
+        
+        return res.status(200).json({
+            success: true,
+            message: "Attribute Updated Successfully",
+            data: attribute
+        })  
+    } catch (error) {
+        next(error);
+    }
+}
+
 /* Delete Attribute by Id */
 const deleteAttribute = async (req, res, next) => {
     const { attributeId } = req.body;
@@ -78,5 +107,6 @@ const deleteAttribute = async (req, res, next) => {
 export { 
     addNewAttribute, 
     getAllAttributes, 
+    updateAttribute,
     deleteAttribute 
 }

@@ -12,6 +12,10 @@ const imageSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Product",
         required: [true, "Product Id is required"]
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
     }
 }, { 
     timestamps: true 

@@ -7,11 +7,15 @@ import Product from "../models/product.model.js";
 
 /* Add New Image */
 const addNewImage = async (req, res, next) => {
-    const { url, productId } = req.body;
+    const { url, productId, isFeatured } = req.body;
     if (!url || !productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const image = await Image.create({ url, productId });
+        const image = await Image.create({ 
+            url,
+            productId,
+            isFeatured
+        });
 
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -69,6 +73,37 @@ const getImageById = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+
+/* Update Image by Id */
+const updateImageById = async (req, res, next) => {
+    const imageId  = req.params.id;
+    if (!imageId) return next(apiErrorHandler(400, "Image Id not found"));
+    const { url, productId, isFeatured } = req.body;
+    
+    try {
+        const image = await Image.findByIdAndUpdate(
+            imageId, 
+            { 
+                url, 
+                productId, 
+                isFeatured 
+            }, { 
+                new: true 
+            }
+        );
+        if (!image) return next(apiErrorHandler(404, "No Image Found"));
+        
+        return res.status(200).json({
+            success: true,
+            message: "Image Updated Successfully",
+            data: image
+        })
+        
+    } catch (error) {
+        next(error);
+    }   
 };
 
 

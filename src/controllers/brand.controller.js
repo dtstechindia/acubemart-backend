@@ -50,6 +50,42 @@ const getAllBrands = async (req, res, next) => {
     }
 };
 
+
+/* Update Brand by Id */
+const updateBrandById = async (req, res, next) => {
+    const brandId  = req.params.id;
+    if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
+
+    const { name, logo, description, categoryId, typeId } = req.body;
+
+    try {
+        const brand = await Brand.findByIdAndUpdate(
+            brandId, 
+            { 
+                name, 
+                logo, 
+                description, 
+                categoryId, 
+                typeId 
+            }, { 
+                new: true, 
+                runValidators: true 
+            }
+        );
+        if (!brand) return next(apiErrorHandler(404, "No Brand Found"));
+
+        
+        return res.status(200).json({
+            success: true,
+            message: "Brand Updated Successfully",
+            data: brand
+        })
+        
+    } catch (error) {
+        next(error);
+    }    
+};
+
 /* Delete Brand */
 const deleteBrand = async (req, res, next) => {
     const { brandId } = req.body;
@@ -74,5 +110,6 @@ const deleteBrand = async (req, res, next) => {
 export {
     addNewBrand,
     getAllBrands,
+    updateBrandById,
     deleteBrand
 }

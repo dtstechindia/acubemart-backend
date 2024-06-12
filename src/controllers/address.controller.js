@@ -83,13 +83,19 @@ const updateAddress = async (req, res, next) => {
     const { street, city, state, country, pincode } = req.body;
     
     try {
-        const address = await Address.findByIdAndUpdate(addressId, { 
-            street, 
-            city, 
-            state, 
-            country, 
-            pincode
-        });
+        const address = await Address.findByIdAndUpdate(
+            addressId, 
+            { 
+                street, 
+                city, 
+                state, 
+                country, 
+                pincode
+            },
+            { 
+                new: true
+            }
+        );
         if (!address) return next(apiErrorHandler(404, "No Address Found"));
 
         return res.status(200).json({

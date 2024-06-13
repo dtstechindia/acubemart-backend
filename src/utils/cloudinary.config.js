@@ -9,22 +9,28 @@ cloudinary.config({
 
 
 //Upload Multiple Images
-export const uploadMultipleImages = async (images) => {
-    const imageUrls = [];
-    for (const image of images) {
-        const result = await cloudinary.uploader.upload(image, {
-            folder: "acubemart",
-            resource_type: "image",
-            overwrite: true,
-            unique_filename: false,
-            use_filename: true,
-            transformation: [{ width: 400, height: 400, gravity: "auto", crop: "fill" }],
-        });
-        imageUrls.push({
-            url: result.secure_url,
-            public_id: result.public_id
-        });
-    }
+export const uploadMultipleImages = async (req, res, next) => {
+    try {
+        const images = req.files.map((file) => file.path);
+        if (!images) return next(apiErrorHandler(400, "Images are required"));
 
-    return imageUrls;
+        if (images.length > 5) return next(apiErrorHandler(400, "Maximum 5 images can be uploaded at a time"));
+        
+        const imageUrls = [];
+        for (const image of images) {
+            const result = await cloudinary.uploader.upload(image, {
+                folder: "acubemart",
+                resource_type: "image",
+                overwrite: true,
+                unique_filename: false,
+                use_filename: true,
+                transformation: [{ width: 400, height: 400, gravity: "auto", crop: "fill" }],
+            });
+            imageUrls.push(result.secure_url);
+        }
+    
+        return imageUrls;
+    } catch (error) {
+        next(error);
+    }
 }

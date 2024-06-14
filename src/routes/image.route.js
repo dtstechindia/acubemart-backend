@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
     addNewImage,
+    addImagesByProductId,
     getImagesByProductId,
     getImageById,
     updateImageById,
@@ -22,6 +23,9 @@ router.get("/:id", getImageById);
 //POST Routes
 /* Add New Image Route -POST `/api/image/add` */
 router.post("/add", addNewImage);
+
+/* Add Images by ProductId Route -POST `/api/image/add/:id` */
+router.post("/add/multiple/:id", addImagesByProductId);
 
 
 //PATCH Routes

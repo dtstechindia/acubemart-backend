@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema({
         { 
             type: Schema.Types.ObjectId, 
             ref: "Image" ,
-            required: [true, "Product image is required"]
+            //required: [true, "Product image is required"]
         }
     ],
     category: { 

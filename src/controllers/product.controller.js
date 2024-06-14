@@ -4,8 +4,8 @@ import Product from "../models/product.model.js";
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
-    const { name, price, description, stock, image, category, brand, model, type } = req.body;
-    if (!name || !price || !description || !stock || !image ) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { name, price, description, stock, category, brand, model, type } = req.body;
+    if (!name || !price || !description || !stock  ) return next(apiErrorHandler(400, "Please provide all fields"));
 
     if (!category) return next(apiErrorHandler(404, "Category is required"));
     
@@ -20,8 +20,7 @@ const addNewProduct = async (req, res, next) => {
             name, 
             price, 
             description, 
-            stock, 
-            image, 
+            stock,  
             category, 
             brand,
             model,

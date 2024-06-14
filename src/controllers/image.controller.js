@@ -5,6 +5,36 @@ import Product from "../models/product.model.js";
 
 
 
+/* Add or upload array of images by ProductId */
+const addImagesByProductId = async (req, res, next) => {
+    const { productId } = req.body;
+    const imageUrls = await uploadMultipleImages(req, res, next); 
+    if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
+    
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        for (let index = 0; index < imageUrls.length; index++) {
+            const image = await Image.create({ 
+                url: imageUrls[index],
+                productId
+            });
+            product.image.push(image._id);
+            await product.save();
+        }
+
+        return res.status(201).json({
+            success: true,
+            message: "Images Added Successfully",
+            data: imageUrls
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Add New Image */
 const addNewImage = async (req, res, next) => {
     const { url, productId, isFeatured } = req.body;
@@ -108,6 +138,7 @@ const updateImageById = async (req, res, next) => {
 };
 
 
+
 /* Delete Image */
 const deleteImage = async (req, res, next) => {
     const { imageId } = req.body;
@@ -130,7 +161,8 @@ const deleteImage = async (req, res, next) => {
 
 
 export { 
-    addNewImage, 
+    addNewImage,
+    addImagesByProductId, 
     getImagesByProductId,
     getImageById,
     updateImageById,

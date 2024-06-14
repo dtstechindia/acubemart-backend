@@ -1,10 +1,10 @@
 import 'dotenv/config'
 import express from "express"
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import multer from 'multer';
 
-import { errorHandler } from './middlewares/errorhandler.middleware.js';
 import ConnectDB from './db/connection.db.js';
+import { errorHandler } from './middlewares/errorhandler.middleware.js';
 
 import userRouter from './routes/user.route.js';
 import productRouter from './routes/product.route.js';
@@ -34,8 +34,10 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
   }))
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('uploads'));
   
 app.use(errorHandler);
 

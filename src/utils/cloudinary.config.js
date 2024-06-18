@@ -1,3 +1,5 @@
+import multer from 'multer';
+import { apiErrorHandler } from '../middlewares/errorhandler.middleware.js';
 import { v2 as cloudinary } from 'cloudinary' 
 
 //Cloudinary Configuration
@@ -11,14 +13,15 @@ cloudinary.config({
 //Upload Multiple Images
 export const uploadMultipleImages = async (req, res, next) => {
     try {
-        const images = req.files.map((file) => file.path);
+        const images = req.files;
+        console.log(images);
         if (!images) return next(apiErrorHandler(400, "Images are required"));
 
         if (images.length > 5) return next(apiErrorHandler(400, "Maximum 5 images can be uploaded at a time"));
         
         const imageUrls = [];
         for (const image of images) {
-            const result = await cloudinary.uploader.upload(image, {
+            const result = await cloudinary.uploader.upload(image.path, {
                 folder: "acubemart",
                 resource_type: "image",
                 overwrite: true,

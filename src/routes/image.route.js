@@ -8,6 +8,7 @@ import {
     updateImageById,
     deleteImage
 } from "../controllers/image.controller.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -24,8 +25,8 @@ router.get("/:id", getImageById);
 /* Add New Image Route -POST `/api/image/add` */
 router.post("/add", addNewImage);
 
-/* Add Images by ProductId Route -POST `/api/image/add/:id` */
-router.post("/add/multiple/:id", addImagesByProductId);
+/* Add Images by ProductId Route -POST `/api/image/add/multiple` */
+router.post("/add/multiple", addImagesByProductId);
 
 
 //PATCH Routes

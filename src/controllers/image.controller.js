@@ -3,14 +3,20 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import Image from "../models/image.model.js";
 import Product from "../models/product.model.js";
 
+import { uploadMultipleImages } from "../utils/cloudinary.config.js";
+
 
 
 /* Add or upload array of images by ProductId */
 const addImagesByProductId = async (req, res, next) => {
     const { productId } = req.body;
-    const imageUrls = await uploadMultipleImages(req, res, next); 
-    if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     
+    if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
+    //Upload Multiple Images
+    const imageUrls = await uploadMultipleImages(req, res, next); 
+    console.log(imageUrls);
+    if (!imageUrls) return next(apiErrorHandler(400, "Images upload failed"));
+
     try {
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

@@ -35,7 +35,28 @@ export const uploadMultipleImages = async (req, res, next) => {
         //console.log(imageUrls);
         return imageUrls;
     } catch (error) {
-        console.log(error);
+        //console.log(error);
+        next(error);
+    }
+}
+
+
+export const uploadSingleImage = async (req, res, next) => {
+    try {
+        const image = req.file;
+        if (!image) return next(apiErrorHandler(400, "Image is required"));
+        
+        const result = await cloudinary.uploader.upload(image.path, {
+            folder: "acubemart",
+            resource_type: "image",
+            overwrite: true,
+            unique_filename: false,
+            use_filename: true,
+            //transformation: [{ width: 400, height: 400, gravity: "auto", crop: "fill" }],
+        });
+        return result.secure_url;
+    } catch (error) {
+        //console.log(error);
         next(error);
     }
 }

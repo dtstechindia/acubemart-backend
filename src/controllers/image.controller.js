@@ -3,7 +3,7 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import Image from "../models/image.model.js";
 import Product from "../models/product.model.js";
 
-import { uploadMultipleImages } from "../utils/cloudinary.middleware.js";
+import { uploadMultipleImages, uploadSingleImage } from "../utils/cloudinary.middleware.js";
 
 
 
@@ -46,12 +46,15 @@ const addImagesByProductId = async (req, res, next) => {
 
 /* Add New Image */
 const addNewImage = async (req, res, next) => {
-    const { url, productId, isFeatured } = req.body;
-    if (!url || !productId) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { productId, isFeatured } = req.body;
+    if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
+        const imageUrl = await uploadSingleImage(req, res, next);
+        if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
         const image = await Image.create({ 
-            url,
+            url: imageUrl,
             productId,
             isFeatured
         });
@@ -119,14 +122,13 @@ const getImageById = async (req, res, next) => {
 const updateImageById = async (req, res, next) => {
     const imageId  = req.params.id;
     if (!imageId) return next(apiErrorHandler(400, "Image Id not found"));
-    const { url, productId, isFeatured } = req.body;
+
+    const { isFeatured } = req.body;
     
     try {
         const image = await Image.findByIdAndUpdate(
             imageId, 
-            { 
-                url, 
-                productId, 
+            {  
                 isFeatured 
             }, { 
                 new: true, 

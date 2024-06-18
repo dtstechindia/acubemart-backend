@@ -9,6 +9,7 @@ import {
     deleteImage
 } from "../controllers/image.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import multer from "multer";
 
 const router = Router();
 
@@ -23,15 +24,15 @@ router.get("/:id", getImageById);
 
 //POST Routes
 /* Add New Image Route -POST `/api/image/add` */
-router.post("/add", addNewImage);
+router.post("/add", upload.single("image"), addNewImage);
 
 /* Add Images by ProductId Route -POST `/api/image/add/multiple` */
-router.post("/add/multiple", addImagesByProductId);
+router.post("/add/multiple", upload.array("images"), addImagesByProductId);
 
 
 //PATCH Routes
 /* Update Image Route -PATCH `/api/image/update` */
-router.patch("/update/:id", updateImageById);
+router.patch("/update/:id", upload.single("image"), updateImageById);
 
 
 //DELETE Routes

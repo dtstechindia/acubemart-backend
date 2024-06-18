@@ -38,9 +38,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('uploads'));
-  
+
+
 app.use(errorHandler);
-app.use(multer().any());
+
 
 app.use('/api/user', userRouter);
 app.use('/api/product', productRouter);

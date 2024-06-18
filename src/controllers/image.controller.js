@@ -3,7 +3,7 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import Image from "../models/image.model.js";
 import Product from "../models/product.model.js";
 
-import { uploadMultipleImages } from "../utils/cloudinary.config.js";
+import { uploadMultipleImages } from "../utils/cloudinary.middleware.js";
 
 
 
@@ -14,9 +14,10 @@ const addImagesByProductId = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     //Upload Multiple Images
     const imageUrls = await uploadMultipleImages(req, res, next); 
-    console.log(imageUrls);
+    //console.log(imageUrls);
     if (!imageUrls) return next(apiErrorHandler(400, "Images upload failed"));
 
+    const images = [];
     try {
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -26,6 +27,8 @@ const addImagesByProductId = async (req, res, next) => {
                 url: imageUrls[index],
                 productId
             });
+
+            images.push(image);
             product.image.push(image._id);
             await product.save();
         }
@@ -33,7 +36,7 @@ const addImagesByProductId = async (req, res, next) => {
         return res.status(201).json({
             success: true,
             message: "Images Added Successfully",
-            data: imageUrls
+            data: images
         })
         
     } catch (error) {

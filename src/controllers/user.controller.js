@@ -17,7 +17,7 @@ const registerUser = async (req, res, next) => {
         const userExists = await User.findOne({ email });
         if (userExists) return next(apiErrorHandler(400, "User Already Exists"));
 
-        const salt = await bcryptjs.genSalt(process.env.BCRYPTJS_SALT);
+        const salt = await bcryptjs.genSalt(parseInt(process.env.BCRYPTJS_SALT));
         const hashedPassword = await bcryptjs.hash(password, salt);
 
         const user = await User.create({ 
@@ -47,7 +47,7 @@ const getUserById = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const user = await User.findById(userId).populate("address");
+        const user = await User.findById(userId).populate("address", "street city state country pincode _id");
         if (!user) return next(apiErrorHandler(404, "No User Found"));
 
         return res.status(200).json({
@@ -92,7 +92,7 @@ const updateUserPassword = async (req, res, next) => {
         const isMatch = await bcryptjs.compare(oldPassword, user.password);
         if (!isMatch) return next(apiErrorHandler(400, "Incorrect Credentials"));
 
-        const salt = await bcryptjs.genSalt(10);
+        const salt = await bcryptjs.genSalt(parseInt(process.env.BCRYPTJS_SALT));
         const hashedPassword = await bcryptjs.hash(newPassword, salt);
 
         user.password = hashedPassword;

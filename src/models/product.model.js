@@ -64,7 +64,12 @@ const productSchema = new mongoose.Schema({
         materials: [String],
         labels: [String],
     },
-
+    status: {
+        type: String,
+        enum: ["draft", "published", "archived"],
+        default: "draft",
+        message: "{VALUE} is not a valid status"
+    }
 }, { 
     timestamps: true
 });

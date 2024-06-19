@@ -12,6 +12,10 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: [true, "Category description is required"]
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
     typeId: {
         type: Schema.Types.ObjectId,
         ref: "Type",

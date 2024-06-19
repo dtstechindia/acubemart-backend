@@ -40,6 +40,29 @@ const addNewProduct = async (req, res, next) => {
     }
 };
 
+/* Get All Published Products */
+const getAllPublishedProducts = async (req, res, next) => {
+    try {
+        const products = await Product.find({ status: "published" })
+        .populate({ path: "type", select: "name _id" })
+        .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "brand", select: "name logo description _id" })
+        .populate({ path: "model", select: "name description _id" })
+        .populate({ path: "image", select: "url isFeatured _id" })
+        .populate({ path: "attributes", select: "name value _id" });
+        
+        if (!products) return next(apiErrorHandler(404, "No Products Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Products Fetched Successfully",
+            data: products
+        })
+    } catch (error) {
+        next(error);
+    }
+}
+
 /*  Get All Products */
 const getAllProducts = async (req, res, next) => {
     try {
@@ -93,7 +116,7 @@ const getProductById = async (req, res, next) => {
 const editProductById = async (req, res, next) => {
     const productId  = req.params.id;
     if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
-    const { name, price, description, stock, image, category, brand, model, type, variant, additionalInfo, attributes } = req.body;
+    const { name, price, description, stock, image, category, brand, model, type, variant, additionalInfo, attributes, status } = req.body;
 
     try {
         const product = await Product.findByIdAndUpdate(
@@ -110,7 +133,8 @@ const editProductById = async (req, res, next) => {
                 type, 
                 variant, 
                 additionalInfo, 
-                attributes 
+                attributes,
+                status 
             },
             { 
                 new: true, 
@@ -150,7 +174,8 @@ const deleteProductById = async (req, res, next) => {
 export {
     addNewProduct,
     getAllProducts,
+    getAllPublishedProducts,
     getProductById,
     editProductById,
-    deleteProductById
+    deleteProductById,
 }

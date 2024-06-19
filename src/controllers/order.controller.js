@@ -50,7 +50,7 @@ const getAllOrders = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const orders = await Order.find({ userId }).populate("products.productId");
+        const orders = await Order.find({ userId }).populate("products.productId address");
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -70,7 +70,7 @@ const getOrderById = async (req, res, next) => {
     if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
     
     try {
-        const order = await Order.findById(orderId).populate("products.productId");
+        const order = await Order.findById(orderId).populate("products.productId address");
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

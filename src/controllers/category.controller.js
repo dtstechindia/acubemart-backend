@@ -47,12 +47,30 @@ const getCategories = async (req, res, next) => {
 };
 
 
+/* Get All Active Categories */
+const getAllActiveCategories = async (req, res, next) => {
+    try {
+        const categories = await Category.find({ isActive: true });
+        if (!categories) return next(apiErrorHandler(404, "No Categories Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Categories Fetched Successfully",
+            data: categories
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 /* Update Category by Id */
 const updateCategoryById = async (req, res, next) => {
     const categoryId  = req.params.id;
     if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
     
-    const { name, description, typeId } = req.body;
+    const { name, description, typeId, isActive } = req.body;
     
     try {
         const category = await Category.findByIdAndUpdate(
@@ -60,7 +78,8 @@ const updateCategoryById = async (req, res, next) => {
             { 
                 name, 
                 description,
-                typeId
+                typeId,
+                isActive
             },
             { 
                 new: true, 
@@ -102,6 +121,7 @@ const deleteCategory = async (req, res, next) => {
 export {
     addNewCategory,
     getCategories,
+    getAllActiveCategories,
     updateCategoryById,
     deleteCategory,
     

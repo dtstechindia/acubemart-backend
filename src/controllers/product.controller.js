@@ -43,7 +43,14 @@ const addNewProduct = async (req, res, next) => {
 /*  Get All Products */
 const getAllProducts = async (req, res, next) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find()
+        .populate({ path: "type", select: "name _id" })
+        .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "brand", select: "name logo description _id" })
+        .populate({ path: "model", select: "name description _id" })
+        .populate({ path: "image", select: "url isFeatured _id" })
+        .populate({ path: "attributes", select: "name value _id" });
+        
         if (!products) return next(apiErrorHandler(404, "No Products Found"));
 
         return res.status(200).json({
@@ -62,7 +69,13 @@ const getProductById = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const product = await Product.findById(productId).populate("image category brand model variant type attributes");
+        const product = await Product.findById(productId)
+        .populate({ path: "type", select: "name _id" })
+        .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "brand", select: "name logo description _id" })
+        .populate({ path: "model", select: "name description _id" })
+        .populate({ path: "image", select: "url isFeatured _id" })
+        .populate({ path: "attributes", select: "name value _id" });
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         return res.status(200).json({

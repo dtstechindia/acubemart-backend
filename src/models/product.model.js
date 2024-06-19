@@ -47,13 +47,11 @@ const productSchema = new mongoose.Schema({
         ref: "Type",
         required: [true, "Product type is required"]
     },
-    attributes: [
-        {
+    attributes:{
             type: [Schema.Types.ObjectId],
             ref: "Attribute",
             //required: [true, "Product attribute is required"]
-        }
-    ],
+        },
     variant: {
         type: [Schema.Types.ObjectId],
         ref: "Variant",

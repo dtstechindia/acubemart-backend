@@ -32,7 +32,7 @@ router.post("/add/multiple", upload.array("images"), addImagesByProductId);
 
 //PATCH Routes
 /* Update Image Route -PATCH `/api/image/update` */
-router.patch("/update/:id", upload.single("image"), updateImageById);
+router.patch("/update/:id", updateImageById);
 
 
 //DELETE Routes

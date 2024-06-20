@@ -5,10 +5,8 @@ import Model from "../models/model.model.js";
 
 /* Add New Model */
 const addNewModel = async (req, res, next) => {
-    const { name, description, brandId, categoryId, typeId } = req.body;
+    const { name, description, categoryId, typeId } = req.body;
     if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
-    
-    if (!brandId) return next(apiErrorHandler(404, "BrandId is required"));
     if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
     if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     
@@ -16,7 +14,6 @@ const addNewModel = async (req, res, next) => {
         const model = await Model.create({ 
             name, 
             description, 
-            brandId, 
             categoryId,
             typeId
         });
@@ -38,7 +35,7 @@ const addNewModel = async (req, res, next) => {
 /* Get All Models */
 const getAllModels = async (req, res, next) => {
     try {
-        const models = await Model.find().populate("brandId categoryId typeId");
+        const models = await Model.find().populate("categoryId typeId");
         if (!models) return next(apiErrorHandler(404, "No Models Found"));
 
         return res.status(200).json({
@@ -57,7 +54,7 @@ const getAllModels = async (req, res, next) => {
 const updateModelById = async (req, res, next) => {
     const modelId  = req.params.id;
     if (!modelId) return next(apiErrorHandler(400, "Model Id not found"));
-    const { name, description, brandId, categoryId, typeId } = req.body;
+    const { name, description, categoryId, typeId } = req.body;
     
     try {
         const model = await Model.findByIdAndUpdate(
@@ -65,7 +62,6 @@ const updateModelById = async (req, res, next) => {
             { 
                 name, 
                 description,
-                brandId,
                 categoryId,
                 typeId
             }, { 

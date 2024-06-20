@@ -5,7 +5,7 @@ import Brand from "../models/brand.model.js";
 
 /* Add New Brand */
 const addNewBrand = async (req, res, next) => {
-    const { name, logo, description, categoryId, typeId } = req.body;
+    const { name, logo, description, typeId } = req.body;
     if (!name || !logo || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!categoryId || !typeId) return next(apiErrorHandler(404, "Category or Type not found"));
@@ -15,7 +15,6 @@ const addNewBrand = async (req, res, next) => {
             name, 
             logo, 
             description, 
-            categoryId,
             typeId
         });
 
@@ -35,7 +34,7 @@ const addNewBrand = async (req, res, next) => {
 /* Get All Brands */
 const getAllBrands = async (req, res, next) => {
     try {
-        const brands = await Brand.find().populate("categoryId");
+        const brands = await Brand.find();
 
         if (!brands) return next(apiErrorHandler(404, "No Brands Found"));
 
@@ -56,7 +55,7 @@ const updateBrandById = async (req, res, next) => {
     const brandId  = req.params.id;
     if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
 
-    const { name, logo, description, categoryId, typeId } = req.body;
+    const { name, logo, description, typeId } = req.body;
 
     try {
         const brand = await Brand.findByIdAndUpdate(
@@ -64,8 +63,7 @@ const updateBrandById = async (req, res, next) => {
             { 
                 name, 
                 logo, 
-                description, 
-                categoryId, 
+                description,
                 typeId 
             }, { 
                 new: true, 

@@ -16,11 +16,6 @@ const brandSchema = new mongoose.Schema({
         type: String,
         required: [true, "Brand description is required"]
     },
-    categoryId: {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
-        required: [true, "Category Id is required"]
-    },
     typeId: {
         type: Schema.Types.ObjectId,
         ref: "Type",

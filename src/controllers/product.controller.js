@@ -171,6 +171,11 @@ const deleteProductById = async (req, res, next) => {
     }
 };
 
+
+//Filter Get routes
+//todo
+/* Get All Products By Type, Category, Brand, Model Id */
+
 export {
     addNewProduct,
     getAllProducts,

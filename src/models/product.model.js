@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema({
         ref: "Category",
         required: [true, "Product category is required"]
     },
+    element: {
+        type: Schema.Types.ObjectId,
+        ref: "Element",
+        required: [true, "Product element is required"]
+    },
     brand: { 
         type: Schema.Types.ObjectId, 
         ref: "Brand",

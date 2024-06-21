@@ -4,10 +4,12 @@ import Product from "../models/product.model.js";
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
-    const { name, price, description, stock, category, brand, model, type } = req.body;
+    const { name, price, description, stock, category, element, brand, model, type } = req.body;
     if (!name || !price || !description || !stock  ) return next(apiErrorHandler(400, "Please provide all fields"));
 
     if (!category) return next(apiErrorHandler(404, "Category is required"));
+
+    if (!element) return next(apiErrorHandler(404, "Element is required"));
     
     if (!type) return next(apiErrorHandler(404, "Type is required"));
     
@@ -22,6 +24,7 @@ const addNewProduct = async (req, res, next) => {
             description, 
             stock,  
             category, 
+            element,
             brand,
             model,
             type
@@ -46,6 +49,7 @@ const getAllPublishedProducts = async (req, res, next) => {
         const products = await Product.find({ status: "published" })
         .populate({ path: "type", select: "name _id" })
         .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "element", select: "name description _id" })
         .populate({ path: "brand", select: "name logo description _id" })
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id" })
@@ -69,6 +73,7 @@ const getAllProducts = async (req, res, next) => {
         const products = await Product.find()
         .populate({ path: "type", select: "name _id" })
         .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "element", select: "name description _id" })
         .populate({ path: "brand", select: "name logo description _id" })
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id" })
@@ -95,6 +100,7 @@ const getProductById = async (req, res, next) => {
         const product = await Product.findById(productId)
         .populate({ path: "type", select: "name _id" })
         .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "element", select: "name description _id" })
         .populate({ path: "brand", select: "name logo description _id" })
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id" })
@@ -116,7 +122,7 @@ const getProductById = async (req, res, next) => {
 const editProductById = async (req, res, next) => {
     const productId  = req.params.id;
     if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
-    const { name, price, description, stock, image, category, brand, model, type, variant, additionalInfo, attributes, status } = req.body;
+    const { name, price, description, stock, image, category, element, brand, model, type, variant, additionalInfo, attributes, status } = req.body;
 
     try {
         const product = await Product.findByIdAndUpdate(
@@ -128,6 +134,7 @@ const editProductById = async (req, res, next) => {
                 stock, 
                 image, 
                 category, 
+                element,
                 brand, 
                 model, 
                 type, 

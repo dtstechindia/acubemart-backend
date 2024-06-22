@@ -33,7 +33,7 @@ const addNewElement = async (req, res, next) => {
 /* Get All Elements */
 const getAllElements = async (req, res, next) => {
     try {
-        const elements = await Element.find().populate("categoryId typeId");
+        const elements = await Element.find();
         if (!elements) return next(apiErrorHandler(404, "No Elements Found"));
         res.status(200).json({
             success: true,
@@ -52,7 +52,7 @@ const getAllElementsByCategoryId = async (req, res, next) => {
     if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
     
     try {
-        const elements = await Element.find({ categoryId }).populate("categoryId typeId");
+        const elements = await Element.find({ categoryId });
         if (!elements) return next(apiErrorHandler(404, "No Elements Found"));
         res.status(200).json({
             success: true,

@@ -34,7 +34,7 @@ ConnectDB();
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true
-  }))
+  }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -68,7 +68,7 @@ app.get("/", (_req, res) => {
 // Health Route
 app.get('/api/health', (_req, res) => {
     res.send("Server is Healthy ...")
-})
+});
 
 
 //Port Listening

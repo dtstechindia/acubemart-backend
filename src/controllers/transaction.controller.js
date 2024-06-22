@@ -50,7 +50,9 @@ const getTransactionById = async (req, res, next) => {
     if (!transactionId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const transaction = await Transaction.findById(transactionId).populate("orderId userId");
+        const transaction = await Transaction.findById(transactionId)
+        .populate({ path: "orderId", select: "products total status address status phone _id" })
+        .populate({ path: "userId", select: "name email _id" });
         if (!transaction) return next(apiErrorHandler(404, "No Transaction Found"));
 
         return res.status(200).json({
@@ -71,7 +73,9 @@ const getTransactionsByOrderId = async (req, res, next) => {
     if (!orderId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const transactions = await Transaction.find({ orderId }).populate("orderId userId");
+        const transactions = await Transaction.find({ orderId })
+        .populate({ path: "orderId", select: "products total status address status phone _id" })
+        .populate({ path: "userId", select: "name email _id" });
         if (!transactions) return next(apiErrorHandler(404, "No Transactions Found"));
 
         return res.status(200).json({
@@ -91,7 +95,9 @@ const getTransactionsByUserId = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const transactions = await Transaction.find({ userId });
+        const transactions = await Transaction.find({ userId })
+        .populate({ path: "orderId", select: "products total status address status phone _id" })
+        .populate({ path: "userId", select: "name email _id" });
         if (!transactions) return next(apiErrorHandler(404, "No Transactions Found"));
 
         return res.status(200).json({

@@ -50,7 +50,10 @@ const getAllOrders = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const orders = await Order.find({ userId }).populate("products.productId address");
+        const orders = await Order.find({ userId })
+        .populate({ path:"products.productId", select: "name price image _id" })
+        .populate({ path: "address", select: "street city state country pincode _id" })
+        .populate({ path: "userId", select: "name email phone _id" });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -70,7 +73,10 @@ const getOrderById = async (req, res, next) => {
     if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
     
     try {
-        const order = await Order.findById(orderId).populate("products.productId address");
+        const order = await Order.findById(orderId)
+        .populate({ path:"products.productId", select: "name price image _id" })
+        .populate({ path: "address", select: "street city state country pincode _id" })
+        .populate({ path: "userId", select: "name email phone _id" });
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({
@@ -92,7 +98,11 @@ const updateOrder = async (req, res, next) => {
     if (!id || !status) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const order = await Order.findByIdAndUpdate(id, { status });
+        const order = await Order.findByIdAndUpdate(id, { status })
+        .populate({ path:"products.productId", select: "name price image _id" })
+        .populate({ path: "address", select: "street city state country pincode _id" })
+        .populate({ path: "userId", select: "name email phone _id" });
+        
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

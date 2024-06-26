@@ -8,7 +8,7 @@ const addNewBrand = async (req, res, next) => {
     const { name, logo, description, typeId } = req.body;
     if (!name || !logo || !description) return next(apiErrorHandler(400, "Please provide all fields"));
     
-    if (!categoryId || !typeId) return next(apiErrorHandler(404, "Category or Type not found"));
+    if (!typeId) return next(apiErrorHandler(404, "Category or Type not found"));
 
     try {
         const brand = await Brand.create({ 

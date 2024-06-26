@@ -35,7 +35,7 @@ const addNewModel = async (req, res, next) => {
 /* Get All Models */
 const getAllModels = async (req, res, next) => {
     try {
-        const models = await Model.find().populate("categoryId typeId");
+        const models = await Model.find().populate("brandId typeId");
         if (!models) return next(apiErrorHandler(404, "No Models Found"));
 
         return res.status(200).json({

@@ -41,7 +41,8 @@ const getAllAddresses = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const addresses = await Address.find({ userId });
+        const addresses = await Address.find({ userId })
+        .populate({ path: "userId", select: "name email phone _id", strictPopulate: false  });
         if (!addresses) return next(apiErrorHandler(404, "No Addresses Found"));
 
         return res.status(200).json({
@@ -61,7 +62,8 @@ const getAddressById = async (req, res, next) => {
     if (!addressId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const address = await Address.findById(addressId);
+        const address = await Address.findById(addressId)
+        .populate({ path: "userId", select: "name email phone _id", strictPopulate: false  });
         if (!address) return next(apiErrorHandler(404, "No Address Found"));
 
         return res.status(200).json({

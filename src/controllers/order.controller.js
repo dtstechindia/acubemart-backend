@@ -53,7 +53,8 @@ const getAllOrders = async (req, res, next) => {
         const orders = await Order.find({ userId })
         .populate({ path:"products.productId", select: "name price image _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" });
+        .populate({ path: "userId", select: "name email phone _id" })
+        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -76,7 +77,8 @@ const getOrderById = async (req, res, next) => {
         const order = await Order.findById(orderId)
         .populate({ path:"products.productId", select: "name price image _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" });
+        .populate({ path: "userId", select: "name email phone _id" })
+        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

@@ -47,7 +47,8 @@ const getUserById = async (req, res, next) => {
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const user = await User.findById(userId).populate("address", "street city state country pincode _id");
+        const user = await User.findById(userId)
+        .populate({path: "address", select: "street city state country pincode _id", strictPopulate: false  });
         if (!user) return next(apiErrorHandler(404, "No User Found"));
 
         return res.status(200).json({

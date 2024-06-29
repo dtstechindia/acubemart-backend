@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 import { apiErrorHandler } from '../middlewares/errorhandler.middleware.js';
 import { v2 as cloudinary } from 'cloudinary' 
 
@@ -32,6 +34,11 @@ export const uploadMultipleImages = async (req, res, next) => {
             imageUrls.push(result.secure_url);
         }
 
+        //Delete Files
+        for (const image of images) {
+            fs.unlinkSync(image.path);
+        }
+
         //console.log(imageUrls);
         return imageUrls;
     } catch (error) {
@@ -54,6 +61,8 @@ export const uploadSingleImage = async (req, res, next) => {
             use_filename: true,
             //transformation: [{ width: 400, height: 400, gravity: "auto", crop: "fill" }],
         });
+        //Delete File
+        fs.unlinkSync(image.path);
         return result.secure_url;
     } catch (error) {
         //console.log(error);

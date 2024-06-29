@@ -48,7 +48,7 @@ const getAllPublishedProducts = async (req, res, next) => {
     try {
         const products = await Product.find({ status: "published" })
         .populate({ path: "type", select: "name _id" })
-        .populate({ path: "category", select: "name description _id" })
+        .populate({ path: "category", select: "name description isActive _id" })
         .populate({ path: "element", select: "name description _id" })
         .populate({ path: "brand", select: "name logo description _id" })
         .populate({ path: "model", select: "name description _id" })

@@ -18,6 +18,18 @@ const addNewProduct = async (req, res, next) => {
     if (!model) return next(apiErrorHandler(404, "Model is required"));
     
     try {
+        //Generating slug for product name as it is unique
+        const slug = name.split(" ").join("-").toLowerCase();
+
+        //Checking if slug already exists
+        const slugExists = await Product.findOne({ slug });
+
+        //add unique slug suffix number if slug already exists
+        if (slugExists) {
+            const newSlug = `${slug}-s${ Math.floor(1000 + Math.random() * 9000) }`;
+            slug = newSlug;
+        }
+
         const product = await Product.create({ 
             name, 
             price, 
@@ -27,7 +39,8 @@ const addNewProduct = async (req, res, next) => {
             element,
             brand,
             model,
-            type
+            type,
+            slug
         });
 
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

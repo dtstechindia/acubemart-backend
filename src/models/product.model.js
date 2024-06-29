@@ -74,6 +74,11 @@ const productSchema = new mongoose.Schema({
         enum: ["draft", "published", "archived"],
         default: "draft",
         message: "{VALUE} is not a valid status"
+    },
+    slug: {
+        type: String,
+        required: [true, "Product slug is required"],
+        unique: true
     }
 }, { 
     timestamps: true

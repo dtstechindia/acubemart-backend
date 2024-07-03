@@ -40,6 +40,41 @@ const registerUser = async (req, res, next) => {
     }
 };
 
+/* Login User with access token and refresh token */
+const loginUser = async (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email) return next(apiErrorHandler(400, "Email is required"));
+    if (!password) return next(apiErrorHandler(400, "Password is required"));
+
+    try {
+        const user = await User.findOne({ email }).select("+password");
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) return next(apiErrorHandler(400, "Incorrect Credentials"));
+
+        const userWithoutPassword = { ...user._doc };
+        delete userWithoutPassword.password;
+
+        return res.status(200).json({
+            success: true,
+            message: "User Logged In Successfully",
+            data: userWithoutPassword
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+/* User Logout */
+const logoutUser = (req, res, next) => {
+    return res.status(200).json({
+        success: true,
+        message: "User Logged Out Successfully"
+    })
+}
 
 /* Get User by Id */
 const getUserById = async (req, res, next) => {
@@ -168,6 +203,8 @@ const deleteUser = async (req, res, next) => {
 
 export {
     registerUser,
+    loginUser,
+    logoutUser,
     getAllUsers,
     updateUser,
     getUserById,

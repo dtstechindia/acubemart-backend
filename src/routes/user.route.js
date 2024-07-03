@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import { 
     registerUser,
+    loginUser,
+    logoutUser,
     getAllUsers,
     updateUser,
     updateUserPassword,
@@ -22,6 +24,12 @@ router.get("/:id", getUserById);
 //POST Routes
  /* Register User Route - POST `/api/user/register` */
 router.post("/register", registerUser);   
+
+/* Login User Route - POST `/api/user/login` */
+router.post("/login", loginUser);
+
+/* Logout User Route - POST `/api/user/logout` */
+router.post("/logout", logoutUser);
 
 
 //PATCH Routes

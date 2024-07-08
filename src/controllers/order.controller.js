@@ -44,8 +44,29 @@ const addNewOrder = async (req, res, next) => {
     }
 };
 
+/* Get all orders list of customers */
+const getAllOrdersList = async (req, res, next) => {
+    try {
+        const orders = await Order.find()
+        .populate({ path:"products.productId", select: "name slug price image _id" })
+        .populate({ path: "address", select: "street city state country pincode _id" })
+        .populate({ path: "userId", select: "name email phone _id" })
+        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
+        if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Orders Fetched Successfully",
+            data: orders
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
 /* Get All Orders by UserId */
-const getAllOrders = async (req, res, next) => {
+const getAllOrdersByUserId = async (req, res, next) => {
     const { userId } = req.body;
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
@@ -121,7 +142,8 @@ const updateOrder = async (req, res, next) => {
 
 export { 
     addNewOrder, 
-    getAllOrders, 
+    getAllOrdersList,
+    getAllOrdersByUserId, 
     getOrderById,
     updateOrder 
 }

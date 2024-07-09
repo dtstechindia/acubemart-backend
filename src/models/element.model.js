@@ -21,6 +21,14 @@ const elementSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Type",
         required: [true, "Type Id is required"]
+    },
+    stock: {
+        type: Number,
+        required: [true, "Element stock is required"]
+    },
+    sales: {
+        type: Number,
+        default: 0
     }
 }, { 
     timestamps: true 

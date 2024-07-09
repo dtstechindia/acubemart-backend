@@ -5,8 +5,8 @@ import Element from "../models/element.model.js";
 
 /* Add new element */
 const addNewElement = async (req, res, next) => {
-    const { name, description, categoryId, typeId } = req.body;
-    if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { name, description, categoryId, typeId, stock } = req.body;
+    if (!name || !description || !stock) return next(apiErrorHandler(400, "Please provide all fields"));
     if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
     if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     
@@ -15,7 +15,8 @@ const addNewElement = async (req, res, next) => {
             name, 
             description, 
             categoryId,
-            typeId
+            typeId,
+            stock
         });
 
         res.status(201).json({
@@ -33,7 +34,9 @@ const addNewElement = async (req, res, next) => {
 /* Get All Elements */
 const getAllElements = async (req, res, next) => {
     try {
-        const elements = await Element.find();
+        const elements = await Element.find()
+        .populate({ path: "categoryId", select: "name _id" })
+        .populate({ path: "typeId", select: "name _id" });
         if (!elements) return next(apiErrorHandler(404, "No Elements Found"));
         res.status(200).json({
             success: true,

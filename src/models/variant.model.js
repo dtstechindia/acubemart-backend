@@ -9,7 +9,15 @@ const variantSchema = new mongoose.Schema({
         ref: "Product",
         required: [true, "Product Id is required"]
     },
-    variant: 
+    name: {
+        type: String,
+        required: [true, "Variant Name is required"]
+    },
+    value: {
+        type: String,
+        required: [true, "Variant Value is required"]
+    }
+    /* variant: 
         {
             size: {
                 type: Number,
@@ -36,7 +44,7 @@ const variantSchema = new mongoose.Schema({
                 type: Number,
                 required: [true, "Variant Price is required"]
             }
-        }
+        } */
 }, { 
     timestamps: true 
 });

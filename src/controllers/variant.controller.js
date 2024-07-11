@@ -6,11 +6,11 @@ import Product from "../models/product.model.js";
 
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
-    const { productId, varient } = req.body;
-    if (!productId || !varient) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { productId, name , value } = req.body;
+    if (!productId || !name || !value) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const variant = await Variant.create({ productId, varient });
+        const variant = await Variant.create({ productId, name, value });
 
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -31,7 +31,7 @@ const addNewVariant = async (req, res, next) => {
 
 
 /* Get All Product Variants by ProductId */
-const getAllVariants = async (req, res, next) => {
+const getAllVariantsByProductId = async (req, res, next) => {
     const { productId } = req.body;
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
@@ -112,7 +112,7 @@ const deleteVariant = async (req, res, next) => {
 
 export { 
     addNewVariant, 
-    getAllVariants, 
+    getAllVariantsByProductId, 
     getVariantById,
     updateVariant,
     deleteVariant 

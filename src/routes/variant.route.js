@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { 
     addNewVariant,
-    getVariantsByProductId,
+    getAllVariantsByProductId,
     getVariantById,
     updateVariant,
     deleteVariant
@@ -14,7 +14,7 @@ const router = Router();
 
 //GET Routes
 /* Get Variants by ProductId Route -GET `/api/variant/all` */
-router.get("/all", getVariantsByProductId);
+router.get("/all", getAllVariantsByProductId);
 
 /* Get Variant by Id Route -GET `/api/variant/:id` */
 router.get("/:id", getVariantById);

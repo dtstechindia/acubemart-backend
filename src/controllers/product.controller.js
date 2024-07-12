@@ -4,7 +4,7 @@ import Product from "../models/product.model.js";
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
-    const { name, price, description, stock, category, element, brand, model, type } = req.body;
+    const { name, price, description, stock, category, element, brand, model, type, status, additionalInfo, barcode, sku } = req.body;
     if (!name || !price || !description || !stock  ) return next(apiErrorHandler(400, "Please provide all fields"));
 
     if (!category) return next(apiErrorHandler(404, "Category is required"));
@@ -19,14 +19,14 @@ const addNewProduct = async (req, res, next) => {
     
     try {
         //Generating slug for product name as it is unique
-        const slug = name.split(" ").join("-").toLowerCase();
+        let slug = name.split(" ").join("-").toLowerCase();
 
         //Checking if slug already exists
-        const slugExists = await Product.findOne({ slug });
+        let slugExists = await Product.findOne({ slug });
 
         //add unique slug suffix number if slug already exists
         if (slugExists) {
-            const newSlug = `${slug}-s${ Math.floor(1000 + Math.random() * 9000) }`;
+            let newSlug = `${slug}-s${ Math.floor(1000 + Math.random() * 9000) }`;
             slug = newSlug;
         }
 
@@ -40,7 +40,11 @@ const addNewProduct = async (req, res, next) => {
             brand,
             model,
             type,
-            slug
+            slug,
+            status,
+            additionalInfo,
+            barcode,
+            sku
         });
 
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

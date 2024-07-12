@@ -63,11 +63,12 @@ const productSchema = new mongoose.Schema({
         //required: [true, "Product variant is required"]
     },
     additionalInfo: {
+        isPhysicalProduct: Boolean,
         shortDescription: String,
         weight: String,
         dimension: String,
-        materials: [String],
-        labels: [String],
+        materials: String,
+        labels: String,
     },
     status: {
         type: String,
@@ -78,6 +79,14 @@ const productSchema = new mongoose.Schema({
     slug: {
         type: String,
         required: [true, "Product slug is required"],
+        unique: true
+    },
+    barcode: {
+        type: String,
+        unique: true
+    },
+    sku: {
+        type: String,
         unique: true
     }
 }, { 

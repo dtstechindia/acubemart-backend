@@ -19,6 +19,7 @@ import transactionRouter from './routes/transaction.route.js';
 import typeRouter from './routes/type.route.js';
 import attributeRouter from './routes/attribute.route.js';
 import elementRouter from './routes/element.route.js';
+import variantRouter from './routes/variant.route.js';
 
 
 //App
@@ -57,6 +58,7 @@ app.use('/api/transaction', transactionRouter);
 app.use('/api/type', typeRouter);
 app.use('/api/attribute', attributeRouter);
 app.use('/api/element', elementRouter);
+app.use('/api/variant', variantRouter);
 
 
 // Home Route

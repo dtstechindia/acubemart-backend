@@ -33,3 +33,6 @@ router.patch("/update", updateVariant);
 //DELETE Routes
 /* Delete Variant Route -DELETE `/api/variant/delete` */
 router.delete("/delete", deleteVariant);
+
+
+export default router

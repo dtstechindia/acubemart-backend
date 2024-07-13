@@ -15,7 +15,7 @@ const addNewVariant = async (req, res, next) => {
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
-        product.variant.push(variant._id);
+        product.variants.push(variant._id);
         await product.save();
 
         return res.status(201).json({

@@ -143,7 +143,7 @@ const getProductById = async (req, res, next) => {
 const editProductById = async (req, res, next) => {
     const productId  = req.params.id;
     if (!productId) return next(apiErrorHandler(400, "Product Id not found"));
-    const { name, price, description, stock, image, category, element, brand, model, type, variant, additionalInfo, attributes, status } = req.body;
+    const { name, price, description, stock, category, element, brand, model, type, variant, additionalInfo, attributes, status, sku, barcode } = req.body;
 
     try {
         const product = await Product.findByIdAndUpdate(
@@ -152,8 +152,7 @@ const editProductById = async (req, res, next) => {
                 name,
                 price,
                 description, 
-                stock, 
-                image, 
+                stock,
                 category, 
                 element,
                 brand, 
@@ -162,7 +161,9 @@ const editProductById = async (req, res, next) => {
                 variant, 
                 additionalInfo, 
                 attributes,
-                status 
+                status,
+                sku,
+                barcode 
             },
             { 
                 new: true, 

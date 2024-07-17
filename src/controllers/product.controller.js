@@ -6,7 +6,7 @@ import Product from "../models/product.model.js";
 const addNewProduct = async (req, res, next) => {
     const { name, price, description, stock, category, element, brand, model, type, status, additionalInfo, barcode, sku } = req.body;
     if (!name || !price || !description || !stock  ) return next(apiErrorHandler(400, "Please provide all fields"));
-
+    
     if (!category) return next(apiErrorHandler(404, "Category is required"));
 
     if (!element) return next(apiErrorHandler(404, "Element is required"));
@@ -44,7 +44,7 @@ const addNewProduct = async (req, res, next) => {
             status,
             additionalInfo,
             barcode,
-            sku
+            sku,
         });
 
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -71,7 +71,8 @@ const getAllPublishedProducts = async (req, res, next) => {
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id", strictPopulate: false  })
         .populate({ path: "attributes", select: "name value _id", strictPopulate: false  })
-        .populate({ path: "variants", select: "name value _id", strictPopulate: false });
+        .populate({ path: "variants", select: "name value _id", strictPopulate: false })
+        .populate({ path: "featuredImage", select: "url _id", strictPopulate: false  });
         if (!products) return next(apiErrorHandler(404, "No Products Found"));
 
         return res.status(200).json({
@@ -95,7 +96,8 @@ const getAllProducts = async (req, res, next) => {
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id", strictPopulate: false  })
         .populate({ path: "attributes", select: "name value _id", strictPopulate: false  })
-        .populate({ path: "variants", select: "name value _id", strictPopulate: false });
+        .populate({ path: "variants", select: "name value _id", strictPopulate: false })
+        .populate({ path: "featuredImage", select: "url _id", strictPopulate: false  });
         if (!products) return next(apiErrorHandler(404, "No Products Found"));
 
         return res.status(200).json({
@@ -122,7 +124,8 @@ const getProductById = async (req, res, next) => {
         .populate({ path: "model", select: "name description _id" })
         .populate({ path: "image", select: "url isFeatured _id", strictPopulate: false  })
         .populate({ path: "attributes", select: "name value _id", strictPopulate: false  })
-        .populate({ path: "variants", select: "name value _id", strictPopulate: false });
+        .populate({ path: "variants", select: "name value _id", strictPopulate: false })
+        .populate({ path: "featuredImage", select: "url _id", strictPopulate: false  });
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         return res.status(200).json({

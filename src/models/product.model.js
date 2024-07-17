@@ -88,6 +88,11 @@ const productSchema = new mongoose.Schema({
     sku: {
         type: String,
         unique: true
+    },
+    featuredImage: {
+        type: Schema.Types.ObjectId,
+        ref: "Image",
+        //required: [true, "Product featured image is required"]
     }
 }, { 
     timestamps: true

@@ -63,6 +63,7 @@ const addNewImage = async (req, res, next) => {
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         product.image.push(image._id);
+        product.featuredImage = image._id;
         await product.save();
 
         return res.status(201).json({

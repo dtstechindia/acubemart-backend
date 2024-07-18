@@ -6,7 +6,8 @@ import {
     getAllPublishedProducts,
     getProductById,
     editProductById,
-    deleteProductById
+    deleteProductById,
+    getProductBySlug
 } from "../controllers/product.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -24,6 +25,8 @@ router.get("/published", getAllPublishedProducts);
 // Get Product by Id Route -GET `/api/product/:id`
 router.get("/:id", getProductById);
 
+// Get Product by SLUG Route -GET `/api/product/slug/:slug`
+router.post("/:slug", getProductBySlug);
 
 //POST Routes
 // Add New Product Route -POST `/api/product/add`

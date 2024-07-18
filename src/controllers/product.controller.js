@@ -4,7 +4,7 @@ import Product from "../models/product.model.js";
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
-    const { name, price, description, stock, category, element, brand, model, type, status, additionalInfo, barcode, sku } = req.body;
+    const { name, price, description, stock, category, element, brand, model, type, status, additionalInfo, barcode, sku, sp, video, codCharges, discount, deliveryCharges } = req.body;
     if (!name || !price || !description || !stock  ) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!category) return next(apiErrorHandler(404, "Category is required"));
@@ -45,6 +45,11 @@ const addNewProduct = async (req, res, next) => {
             additionalInfo,
             barcode,
             sku,
+            sp,
+            video,
+            codCharges,
+            discount,
+            deliveryCharges
         });
 
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

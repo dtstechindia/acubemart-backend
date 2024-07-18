@@ -93,6 +93,25 @@ const productSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Image",
         //required: [true, "Product featured image is required"]
+    },
+    sp: {
+        type: Number,
+        //required: [true, "Product Selling Price is required"]
+    },
+    video: {
+        type: String
+
+    }, 
+    codCharges: {
+        type: Number
+
+    }, 
+    discount: {
+        type: Number
+
+    }, 
+    deliveryCharges: {
+        type: Number
     }
 }, { 
     timestamps: true

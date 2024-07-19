@@ -40,7 +40,9 @@ const addToCart = async (req, res, next) => {
 
 /* Get Cart Products */
 const getCartProducts = async (req, res, next) => {
-  const { userId } = req.body;
+  const { userId } = req.query;
+  
+  console.log("userId", req.query);
   if (!userId) return next(apiErrorHandler(400, "UserId is required"));
 
   try {

@@ -26,7 +26,7 @@ router.get("/published", getAllPublishedProducts);
 router.get("/:id", getProductById);
 
 // Get Product by SLUG Route -GET `/api/product/slug/:slug`
-router.post("/:slug", getProductBySlug);
+router.post("/slug/:slug", getProductBySlug);
 
 //POST Routes
 // Add New Product Route -POST `/api/product/add`

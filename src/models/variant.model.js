@@ -13,38 +13,25 @@ const variantSchema = new mongoose.Schema({
         type: String,
         required: [true, "Variant Name is required"]
     },
-    value: {
-        type: String,
-        required: [true, "Variant Value is required"]
-    }
-    /* variant: 
-        {
-            size: {
-                type: Number,
-                required: [true, "Variant Size is required"]
-            },
-            color: {
+    image: {
+        type: Schema.Types.ObjectId,
+        ref: "Image",
+        //required: [true, "Variant Image is required"]
+    },
+    price: {
+        type: Number,
+        required: [true, "Variant Price is required"]
+    },
+    variantAttributes: [{
+            name: {
                 type: String,
-                required: [true, "Variant Color is required"]
+                required: [true, "Variant Name is required"]
             },
-            image: {
-                type: Object.Types.ObjectId,
-                ref: "Image",
-                required: [true, "Variant Image is required"]
-            },
-            material: {
+            value: {
                 type: String,
-                required: [true, "Variant Material is required"]
-            },
-            label: {
-                type: String,
-                required: [true, "Variant Label is required"]
-            },
-            price: {
-                type: Number,
-                required: [true, "Variant Price is required"]
-            }
-        } */
+                required: [true, "Variant Value is required"]
+            }  
+        }]
 }, { 
     timestamps: true 
 });

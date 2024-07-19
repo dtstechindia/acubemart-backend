@@ -6,11 +6,11 @@ import Product from "../models/product.model.js";
 
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
-    const { productId, name , value } = req.body;
-    if (!productId || !name || !value) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { productId, name , price, variantAttributes } = req.body;
+    if (!productId || !name || !price, !variantAttributes) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const variant = await Variant.create({ productId, name, value });
+        const variant = await Variant.create({ productId, name, price, variantAttributes });
 
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

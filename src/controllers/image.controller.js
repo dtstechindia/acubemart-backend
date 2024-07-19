@@ -78,6 +78,43 @@ const addNewImage = async (req, res, next) => {
 };
 
 
+/* Add new Image for variants */
+const addNewImageForVariant = async (req, res, next) => {
+    const { productId, variantId } = req.body;
+    if (!productId || !variantId) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const imageUrl = await uploadSingleImage(req, res, next);
+        if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
+        const image = await Image.create({ 
+            url: imageUrl,
+            productId,
+        });
+
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        product.image.push(image._id);
+        await product.save();
+
+        const variant = await Product.findById(variantId);
+        if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
+
+        variant.image.push(image._id);
+        await variant.save();
+
+        return res.status(201).json({
+            success: true,
+            message: "Image Added Successfully",
+            data: image
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Get Image by ProductId */
 const getImagesByProductId = async (req, res, next) => {
     const { productId } = req.body;
@@ -176,6 +213,7 @@ export {
     addNewImage,
     addImagesByProductId, 
     getImagesByProductId,
+    addNewImageForVariant,
     getImageById,
     updateImageById,
     deleteImage 

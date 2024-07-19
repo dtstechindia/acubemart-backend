@@ -105,7 +105,7 @@ const getAllPublishedProducts = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name value _id",
+        select: "name price image variantAttributes _id",
         strictPopulate: false,
       })
       .populate({
@@ -146,7 +146,7 @@ const getAllProducts = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name value _id",
+        select: "name price image variantAttributes _id",
         strictPopulate: false,
       })
       .populate({
@@ -191,7 +191,7 @@ const getProductById = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name value _id",
+        select: "name price image variantAttributes _id",
         strictPopulate: false,
       })
       .populate({
@@ -235,7 +235,7 @@ const getProductBySlug = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name value _id",
+        select: "name price image variantAttributes _id",
         strictPopulate: false,
       })
       .populate({

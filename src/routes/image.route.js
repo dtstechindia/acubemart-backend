@@ -6,7 +6,8 @@ import {
     getImagesByProductId,
     getImageById,
     updateImageById,
-    deleteImage
+    deleteImage,
+    addNewImageForVariant
 } from "../controllers/image.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import multer from "multer";
@@ -28,6 +29,10 @@ router.post("/add", upload.single("image"), addNewImage);
 
 /* Add Images by ProductId Route -POST `/api/image/add/multiple` */
 router.post("/add/multiple", upload.array("images"), addImagesByProductId);
+
+
+/* Add new image for variant Route -POST `/api/image/add/variant` */
+router.post("/add/variant", upload.single("image"), addNewImageForVariant);
 
 
 //PATCH Routes

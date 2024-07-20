@@ -13,11 +13,11 @@ const variantSchema = new mongoose.Schema({
         type: String,
         required: [true, "Variant Name is required"]
     },
-    image: {
+    image: [{
         type: Schema.Types.ObjectId,
         ref: "Image",
         //required: [true, "Variant Image is required"]
-    },
+    }],
     price: {
         type: Number,
         required: [true, "Variant Price is required"]
@@ -27,10 +27,10 @@ const variantSchema = new mongoose.Schema({
                 type: String,
                 required: [true, "Variant Name is required"]
             },
-            value: {
+            value: [{
                 type: String,
                 required: [true, "Variant Value is required"]
-            }  
+            }]  
         }]
 }, { 
     timestamps: true 

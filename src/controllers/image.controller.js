@@ -2,6 +2,7 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Image from "../models/image.model.js";
 import Product from "../models/product.model.js";
+import Variant from "../models/variant.model.js";
 
 import { uploadMultipleImages, uploadSingleImage } from "../utils/cloudinary.middleware.js";
 
@@ -98,7 +99,7 @@ const addNewImageForVariant = async (req, res, next) => {
         product.image.push(image._id);
         await product.save();
 
-        const variant = await Product.findById(variantId);
+        const variant = await Variant.findById(variantId);
         if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
 
         variant.image.push(image._id);

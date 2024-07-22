@@ -7,8 +7,6 @@ import Product from "../models/product.model.js";
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
     const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo } = req.body;
-    console.log(req.body);
-    console.log(productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo);
     if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges ) return next(apiErrorHandler(400, "Please provide all fields"));
     //Add Attributes value to an array if attribute name is same
     

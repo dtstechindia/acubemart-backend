@@ -18,10 +18,6 @@ const variantSchema = new mongoose.Schema({
         ref: "Image",
         //required: [true, "Variant Image is required"]
     }],
-    price: {
-        type: Number,
-        required: [true, "Variant Price is required"]
-    },
     variantAttributes: [{
             name: {
                 type: String,
@@ -31,7 +27,30 @@ const variantSchema = new mongoose.Schema({
                 type: String,
                 required: [true, "Variant Value is required"]
             }]  
-        }]
+    }],
+    mrp: {
+        type: Number,
+        required: [true, "Variant MRP is required"]
+    },
+    sp: {
+        type: Number,
+        required: [true, "Variant SP is required"]  
+    },
+    discount: {
+        type: Number,
+        required: [true, "Variant Discount is required"]  
+    },
+    deliveryCharges: {
+        type: Number,
+        required: [true, "Variant Delievery Charge is required"]
+    },
+    codCharges: {
+        type: Number,
+        required: [true, "Variant COD Charges is required"]
+    },
+    video: {
+        type: String
+    }
 }, { 
     timestamps: true 
 });

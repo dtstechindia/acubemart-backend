@@ -6,8 +6,10 @@ import Product from "../models/product.model.js";
 
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
-    const { productId, name , price, variantAttributes } = req.body;
-    if (!productId || !name || !price, !variantAttributes) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo } = req.body;
+    console.log(req.body);
+    console.log(productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo);
+    if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges ) return next(apiErrorHandler(400, "Please provide all fields"));
     //Add Attributes value to an array if attribute name is same
     
     const result = variantAttributes.reduce((acc, {name, value}) => {
@@ -21,11 +23,21 @@ const addNewVariant = async (req, res, next) => {
     
     const modifiedAttributes = Object.keys(result).map(name => ({ name, value: result[name]}));
     
-    console.log(modifiedAttributes);
+    //console.log(modifiedAttributes);
     
     
     try {
-        const variant = await Variant.create({ productId, name, price, variantAttributes: modifiedAttributes });
+        const variant = await Variant.create({ 
+            productId, 
+            name,
+            mrp,
+            sp,
+            discount,
+            deliveryCharges,
+            codCharges, 
+            variantAttributes: modifiedAttributes,
+            vodeo 
+        });
 
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));

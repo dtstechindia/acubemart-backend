@@ -32,7 +32,7 @@ router.post("/add/multiple", upload.array("images"), addImagesByProductId);
 
 
 /* Add new image for variant Route -POST `/api/image/add/variant` */
-router.post("/add/variant", upload.array("image"), addNewImageForVariant);
+router.post("/add/variant", upload.single("image"), addNewImageForVariant);
 
 
 //PATCH Routes

@@ -105,8 +105,13 @@ const getAllPublishedProducts = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name price image variantAttributes _id",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes _id",
         strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
       })
       .populate({
         path: "featuredImage",
@@ -146,8 +151,13 @@ const getAllProducts = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name price image variantAttributes _id",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes _id",
         strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
       })
       .populate({
         path: "featuredImage",
@@ -191,8 +201,13 @@ const getProductById = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name price image variantAttributes _id",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes _id",
         strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
       })
       .populate({
         path: "featuredImage",
@@ -235,8 +250,13 @@ const getProductBySlug = async (req, res, next) => {
       })
       .populate({
         path: "variants",
-        select: "name price image variantAttributes _id",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes _id",
         strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
       })
       .populate({
         path: "featuredImage",

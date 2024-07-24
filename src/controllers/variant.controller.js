@@ -6,7 +6,7 @@ import Product from "../models/product.model.js";
 
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
-    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video } = req.body;
+    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video, description } = req.body;
     //console.log(req.body);
     //console.log(productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo);
     if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges ) return next(apiErrorHandler(400, "Please provide all fields"));
@@ -36,9 +36,10 @@ const addNewVariant = async (req, res, next) => {
             deliveryCharges,
             codCharges, 
             variantAttributes: modifiedAttributes,
-            video 
+            video,
+            description 
         });
-        console.log(variant);
+        
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
 

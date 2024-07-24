@@ -50,6 +50,10 @@ const variantSchema = new mongoose.Schema({
     },
     video: {
         type: String
+    },
+    description: {
+        type: String,
+        required: [true, "Variant Description is required"]
     }
 }, { 
     timestamps: true 

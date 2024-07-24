@@ -27,31 +27,31 @@ const productSchema = new mongoose.Schema({
             //required: [true, "Product image is required"]
         }
     ],
-    category: { 
+    category: [{ 
         type: Schema.Types.ObjectId, 
         ref: "Category",
         required: [true, "Product category is required"]
-    },
-    element: {
+    }],
+    element: [{
         type: Schema.Types.ObjectId,
         ref: "Element",
         required: [true, "Product element is required"]
-    },
-    brand: { 
+    }],
+    brand: [{ 
         type: Schema.Types.ObjectId, 
         ref: "Brand",
         required: [true , "Product brand is required"]
-    },
-    model: { 
+    }],
+    model: [{ 
         type: Schema.Types.ObjectId, 
         ref: "Model",
         required: [true, "Product model is required"]
-    },
-    type: {
+    }],
+    type: [{
         type: Schema.Types.ObjectId,
         ref: "Type",
         required: [true, "Product type is required"]
-    },
+    }],
     attributes:{
             type: [Schema.Types.ObjectId],
             ref: "Attribute",

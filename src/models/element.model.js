@@ -10,7 +10,7 @@ const elementSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, "Element description is required"]
+        //required: [true, "Element description is required"]
     },
     categoryId: {
         type: Schema.Types.ObjectId,

@@ -3,6 +3,7 @@ import { Router } from "express";
 import { 
     addNewElement,
     getAllElements,
+    getElementById,
     getAllElementsByCategoryId,
     updateElementById,
     deleteElementById
@@ -18,6 +19,9 @@ router.get("/all", getAllElements);
 
 /* Get All Elements by Category Id Route -GET `/api/element/category/:id` */
 router.get("/category/:id", getAllElementsByCategoryId);
+
+/* Get Element by Id Route -GET `/api/element/:id` */
+router.get("/:id", getElementById);
 
 
 //POST Routes

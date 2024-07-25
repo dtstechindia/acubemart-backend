@@ -6,7 +6,7 @@ import Element from "../models/element.model.js";
 /* Add new element */
 const addNewElement = async (req, res, next) => {
     const { name, description, categoryId, typeId, stock } = req.body;
-    if (!name || !description || !stock) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!name || !stock) return next(apiErrorHandler(400, "Please provide all fields"));
     if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
     if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     
@@ -47,6 +47,27 @@ const getAllElements = async (req, res, next) => {
         next(error);
     }
 }  
+
+
+/* Get Element by Id */
+const getElementById = async (req, res, next) => {
+    const elementId  = req.params.id;
+    if (!elementId) return next(apiErrorHandler(400, "Element Id not found"));
+    
+    try {
+        const element = await Element.findById(elementId)
+        .populate({ path: "categoryId", select: "name _id" })
+        .populate({ path: "typeId", select: "name _id" });
+        if (!element) return next(apiErrorHandler(404, "No Element Found"));
+        res.status(200).json({
+            success: true,
+            message: "Element",
+            data: element
+        })
+    } catch (error) {
+        next(error);
+    }
+}
 
 
 /* Get All Elements by Category Id */
@@ -123,6 +144,7 @@ const deleteElementById = async (req, res, next) => {
 export { 
     addNewElement, 
     getAllElements,
+    getElementById,
     getAllElementsByCategoryId,
     updateElementById,
     deleteElementById 

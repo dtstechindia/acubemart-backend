@@ -128,6 +128,10 @@ const deleteVariant = async (req, res, next) => {
         const variant = await Variant.findByIdAndDelete(variantId);
         if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
 
+        const product = await Product.findById(variant.productId);
+        product.variants.pull(variantId);
+        await product.save();
+
         return res.status(200).json({
             success: true,
             message: "Variant Deleted Successfully",

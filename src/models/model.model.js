@@ -10,7 +10,7 @@ const modelSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, "Model description is required"]
+        //required: [true, "Model description is required"]
     },
     brandId: {
         type: Schema.Types.ObjectId,

@@ -6,7 +6,7 @@ import Brand from "../models/brand.model.js";
 /* Add New Brand */
 const addNewBrand = async (req, res, next) => {
     const { name, logo, description, typeId } = req.body;
-    if (!name || !logo || !description) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!name) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!typeId) return next(apiErrorHandler(404, "Category or Type not found"));
 

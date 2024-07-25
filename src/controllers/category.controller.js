@@ -6,7 +6,7 @@ import Category from "../models/category.model.js";
 /* Add New Category */
 const addNewCategory = async (req, res, next) => {
     const { name, description, typeId } = req.body;
-    if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!name) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!typeId) return next(apiErrorHandler(404, "Type not found"));
     

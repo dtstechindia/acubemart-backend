@@ -6,7 +6,7 @@ import Model from "../models/model.model.js";
 /* Add New Model */
 const addNewModel = async (req, res, next) => {
     const { name, description, brandId, typeId } = req.body;
-    if (!name || !description) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!name) return next(apiErrorHandler(400, "Please provide all fields"));
     if (!brandId) return next(apiErrorHandler(404, "BrandId is required"));
     if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     

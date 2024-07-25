@@ -10,7 +10,7 @@ const categorySchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: [true, "Category description is required"]
+        //required: [true, "Category description is required"]
     },
     isActive: {
         type: Boolean,

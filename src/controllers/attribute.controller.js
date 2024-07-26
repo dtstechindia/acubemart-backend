@@ -87,12 +87,17 @@ const updateAttribute = async (req, res, next) => {
 
 /* Delete Attribute by Id */
 const deleteAttribute = async (req, res, next) => {
-    const { attributeId } = req.body;
+    const attributeId = req.params.id;
     if (!attributeId) return next(apiErrorHandler(400, "AttributeId is required"));
     
     try {
         const attribute = await Attribute.findByIdAndDelete(attributeId);
         if (!attribute) return next(apiErrorHandler(404, "No Attribute Found"));
+
+        const product = await Product.findById(attribute.productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+        product.attributes.pull(attributeId);
+        await product.save();
         
         return res.status(200).json({
             success: true,

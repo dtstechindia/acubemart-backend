@@ -26,8 +26,8 @@ router.patch("/update", updateAttribute);
 
 
 //DELETE Routes
-/* Delete Attribute Route -DELETE `/api/attribute/delete` */
-router.delete("/delete", deleteAttribute);
+/* Delete Attribute Route -DELETE `/api/attribute/delete/:id` */
+router.delete("/delete/:id", deleteAttribute);
 
 
 export default router;

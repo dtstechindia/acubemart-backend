@@ -25,6 +25,6 @@ router.patch("/update/:id", updateBrandById);
 
 //DELETE Routes
 /* Delete Brand Route -DELETE `/api/brand/delete` */
-router.delete("/delete", deleteBrand);
+router.delete("/delete/:id", deleteBrand);
 
 export default router

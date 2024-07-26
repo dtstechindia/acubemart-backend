@@ -34,7 +34,7 @@ const addNewBrand = async (req, res, next) => {
 /* Get All Brands */
 const getAllBrands = async (req, res, next) => {
     try {
-        const brands = await Brand.find();
+        const brands = await Brand.find().populate({ path: "typeId", select: "name _id", strictPopulate: false });
 
         if (!brands) return next(apiErrorHandler(404, "No Brands Found"));
 
@@ -86,7 +86,7 @@ const updateBrandById = async (req, res, next) => {
 
 /* Delete Brand */
 const deleteBrand = async (req, res, next) => {
-    const { brandId } = req.body;
+    const brandId = req.params.id;
     if (!brandId) return next(apiErrorHandler(404, "Brand not found"));
     
     try {

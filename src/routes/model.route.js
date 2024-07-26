@@ -27,7 +27,7 @@ router.patch("/update/:id", updateModelById);
 
 //DELETE Routes
 // Delete Model Route -DELETE `/api/model/delete`
-router.delete("/delete", deleteModel);
+router.delete("/delete/:id", deleteModel);
 
 
 export default router

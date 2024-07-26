@@ -32,7 +32,7 @@ const addNewCategory = async (req, res, next) => {
 /* Get All Categories */
 const getCategories = async (req, res, next) => {
     try {
-        const categories = await Category.find();
+        const categories = await Category.find().populate({ path: "typeId", select: "name _id", strictPopulate: false });
         if (!categories) return next(apiErrorHandler(404, "No Categories Found"));
 
         return res.status(200).json({
@@ -100,7 +100,7 @@ const updateCategoryById = async (req, res, next) => {
 
 /* Delete Category */
 const deleteCategory = async (req, res, next) => {
-    const { categoryId } = req.body;
+    const categoryId = req.params.id;
     if (!categoryId) return next(apiErrorHandler(404, "Category not found"));
     
     try {

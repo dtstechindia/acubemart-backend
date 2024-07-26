@@ -30,7 +30,7 @@ router.patch("/update/:id", updateCategoryById);
 
 //DELETE Routes
 /* Delete Category Route -DELETE `/api/category/delete` */
-router.delete("/delete", deleteCategory);
+router.delete("/delete/:id", deleteCategory);
 
 
 export default router

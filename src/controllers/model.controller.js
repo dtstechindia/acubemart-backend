@@ -35,7 +35,9 @@ const addNewModel = async (req, res, next) => {
 /* Get All Models */
 const getAllModels = async (req, res, next) => {
     try {
-        const models = await Model.find().populate("brandId typeId");
+        const models = await Model.find().populate("brandId typeId")
+            .populate({ path: "brandId", select: "name _id", strictPopulate: false })
+            .populate({ path: "typeId", select: "name _id", strictPopulate: false });
         if (!models) return next(apiErrorHandler(404, "No Models Found"));
 
         return res.status(200).json({
@@ -85,7 +87,7 @@ const updateModelById = async (req, res, next) => {
 
 /* Delete Model */
 const deleteModel = async (req, res, next) => {
-    const { modelId } = req.body;
+    const modelId = req.params.id;
     if (!modelId) return next(apiErrorHandler(404, "Model not found"));
     
     try {

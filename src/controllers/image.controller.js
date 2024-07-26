@@ -191,12 +191,21 @@ const updateImageById = async (req, res, next) => {
 
 /* Delete Image */
 const deleteImage = async (req, res, next) => {
-    const { imageId } = req.body;
+    const imageId = req.params.id;
     if (!imageId) return next(apiErrorHandler(404, "Image not found"));
     
     try {
         const image = await Image.findByIdAndDelete(imageId);
         if (!image) return next(apiErrorHandler(404, "No Image Found"));
+
+        const product = await Product.findById(image.productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        const index = product.image.indexOf(image._id);
+        if (index > -1) {
+            product.image.splice(index, 1);
+            await product.save();
+        }
 
         return res.status(200).json({
             success: true,

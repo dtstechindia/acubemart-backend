@@ -41,8 +41,8 @@ router.patch("/update/:id", updateImageById);
 
 
 //DELETE Routes
-/* Delete Image Route -DELETE `/api/image/delete` */
-router.delete("/delete", deleteImage);
+/* Delete Image Route -DELETE `/api/image/delete/:id` */
+router.delete("/delete/:id", deleteImage);
 
 
 export default router

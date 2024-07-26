@@ -2,6 +2,7 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Variant from "../models/variant.model.js";
 import Product from "../models/product.model.js";
+import Image from "../models/image.model.js";
 
 
 /* Add New Product Variant */
@@ -128,10 +129,18 @@ const deleteVariant = async (req, res, next) => {
         const variant = await Variant.findByIdAndDelete(variantId);
         if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
 
+        
+
         const product = await Product.findById(variant.productId);
         product.variants.pull(variantId);
+        for (let i = 0; i < variant.image.length; i++) {
+            product.image.pull(variant.image[i]);
+        }
         await product.save();
 
+        for (let i = 0; i < variant.image.length; i++) {
+            await Image.findByIdAndDelete(variant.image[i]);
+        }
         return res.status(200).json({
             success: true,
             message: "Variant Deleted Successfully",

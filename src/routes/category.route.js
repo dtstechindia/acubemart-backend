@@ -5,7 +5,8 @@ import {
     getCategories,
     getAllActiveCategories,
     updateCategoryById,
-    deleteCategory
+    deleteCategory,
+    getCategoryById
  } from "../controllers/category.controller.js";
 
 
@@ -17,6 +18,10 @@ router.get("/all", getCategories);
 
 /* Get All Active Categories Route -GET `/api/category/active` */
 router.get("/active", getAllActiveCategories);
+
+
+/* Get Category by Id Route -GET `/api/category/:id` */
+router.get("/:id", getCategoryById);
 
 //POST Routes
 /* Add New Category Route -POST `/api/category/add` */

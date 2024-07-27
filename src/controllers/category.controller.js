@@ -5,7 +5,7 @@ import Category from "../models/category.model.js";
 
 /* Add New Category */
 const addNewCategory = async (req, res, next) => {
-    const { name, description, typeId } = req.body;
+    const { name, description, typeId, mediaId } = req.body;
     if (!name) return next(apiErrorHandler(400, "Please provide all fields"));
     
     if (!typeId) return next(apiErrorHandler(404, "Type not found"));
@@ -14,7 +14,8 @@ const addNewCategory = async (req, res, next) => {
         const category = await Category.create({ 
             name, 
             description,
-            typeId
+            typeId,
+            mediaId,
         });
         if (!category) return next(apiErrorHandler(404, "No Category Found"));
 
@@ -32,7 +33,9 @@ const addNewCategory = async (req, res, next) => {
 /* Get All Categories */
 const getCategories = async (req, res, next) => {
     try {
-        const categories = await Category.find().populate({ path: "typeId", select: "name _id", strictPopulate: false });
+        const categories = await Category.find()
+        .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
         if (!categories) return next(apiErrorHandler(404, "No Categories Found"));
 
         return res.status(200).json({
@@ -65,12 +68,35 @@ const getAllActiveCategories = async (req, res, next) => {
 };
 
 
+/* Get Category By Id */
+const getCategoryById = async (req, res, next) => {
+    const categoryId  = req.params.id;
+    if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
+    
+    try {
+        const category = await Category.findById(categoryId)
+        .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
+        if (!category) return next(apiErrorHandler(404, "Category not found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Category Fetched Successfully",
+            data: category
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 /* Update Category by Id */
 const updateCategoryById = async (req, res, next) => {
     const categoryId  = req.params.id;
     if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
     
-    const { name, description, typeId, isActive } = req.body;
+    const { name, description, typeId, isActive, mediaId } = req.body;
     
     try {
         const category = await Category.findByIdAndUpdate(
@@ -79,7 +105,8 @@ const updateCategoryById = async (req, res, next) => {
                 name, 
                 description,
                 typeId,
-                isActive
+                isActive,
+                mediaId
             },
             { 
                 new: true, 
@@ -122,6 +149,7 @@ export {
     addNewCategory,
     getCategories,
     getAllActiveCategories,
+    getCategoryById,
     updateCategoryById,
     deleteCategory,
     

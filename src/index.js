@@ -21,6 +21,7 @@ import attributeRouter from './routes/attribute.route.js';
 import elementRouter from './routes/element.route.js';
 import variantRouter from './routes/variant.route.js';
 import adminRouter from './routes/admin.route.js';
+import mediaRouter from './routes/media.route.js';
 
 
 //App
@@ -60,6 +61,7 @@ app.use('/api/attribute', attributeRouter);
 app.use('/api/element', elementRouter);
 app.use('/api/variant', variantRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api/media', mediaRouter);
 
 
 // Home Route

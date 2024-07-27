@@ -29,7 +29,12 @@ const elementSchema = new mongoose.Schema({
     sales: {
         type: Number,
         default: 0
-    }
+    },
+    mediaId: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        //required: [true, "Element image is required"]
+    },
 }, { 
     timestamps: true 
 });

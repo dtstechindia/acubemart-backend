@@ -20,7 +20,12 @@ const categorySchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Type",
         required: [true, "Type Id is required"]
-    }
+    },
+    mediaId: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        //required: [true, "Category image is required"]
+    },
 }, { 
     timestamps: true 
 });

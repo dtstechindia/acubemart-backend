@@ -36,8 +36,8 @@ router.post("/logout", logoutAdmin);
 router.patch("/update/:id", updateAdminPassword);
 
 //DELETE Routes
-/* Delete Admin Route -DELETE `/api/admin/delete` */
-router.delete("/delete", deleteAdmin);
+/* Delete Admin Route -DELETE `/api/admin/delete/:id` */
+router.delete("/delete/:id", deleteAdmin);
 
 
 export default router

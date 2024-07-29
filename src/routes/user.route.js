@@ -42,7 +42,7 @@ router.patch("/password", updateUserPassword);
 
 
 //DELETE Routes
-/* Delete User Route - DELETE `/api/user/delete` */
-router.delete("/delete", deleteUser);
+/* Delete User Route - DELETE `/api/user/delete/:id` */
+router.delete("/delete/:id", deleteUser);
 
 export default router

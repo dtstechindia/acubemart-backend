@@ -23,8 +23,9 @@ const addNewProduct = async (req, res, next) => {
     codCharges,
     discount,
     deliveryCharges,
+    isSimpleProduct,
   } = req.body;
-  if (!name || !price || !description || !stock)
+  if (!name || !price || !description || !stock || !isSimpleProduct)
     return next(apiErrorHandler(400, "Please provide all fields"));
 
   if (!category) return next(apiErrorHandler(404, "Category is required"));
@@ -70,6 +71,7 @@ const addNewProduct = async (req, res, next) => {
       codCharges,
       discount,
       deliveryCharges,
+      isSimpleProduct,
     });
 
     if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -300,6 +302,7 @@ const editProductById = async (req, res, next) => {
     codCharges,
     discount,
     deliveryCharges,
+    isSimpleProduct
   } = req.body;
 
   try {
@@ -326,6 +329,7 @@ const editProductById = async (req, res, next) => {
         codCharges,
         discount,
         deliveryCharges,
+        isSimpleProduct
       },
       {
         new: true,

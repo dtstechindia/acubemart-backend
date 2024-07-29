@@ -112,6 +112,10 @@ const productSchema = new mongoose.Schema({
     }, 
     deliveryCharges: {
         type: Number
+    },
+    isSimpleProduct:{
+        type: Boolean,
+        required: [true, "Product Type is required"]
     }
 }, { 
     timestamps: true

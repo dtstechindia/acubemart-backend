@@ -30,7 +30,8 @@ const userSchema = new mongoose.Schema({
         }
         ],
     avatar: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Media"
     }
 }, {
     timestamps: true

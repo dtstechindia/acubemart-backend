@@ -4,6 +4,8 @@ import { upload } from "../middlewares/multer.middleware.js";
 import {
     addNewMediaForCategory,
     addNewMediaForElement,
+    addNewMediaForAdmin,
+    addNewMediaForUser,
     getMediaById,
     deleteMediaById
 } from "../controllers/media.controller.js";
@@ -23,6 +25,12 @@ router.post("/add/category/:id", upload.single("image"), addNewMediaForCategory)
 
 /* Add New Media Route -POST `/api/media/add/element/:id` */
 router.post("/add/element/:id", upload.single("image"), addNewMediaForElement);
+
+/* Add New Media Route -POST `/api/media/add/admin/:id` */
+router.post("/add/admin/:id", upload.single("image"), addNewMediaForAdmin);
+
+/* Add New Media Route -POST `/api/media/add/user/:id` */
+router.post("/add/user/:id", upload.single("image"), addNewMediaForUser);
 
 
 //DELETE Routes

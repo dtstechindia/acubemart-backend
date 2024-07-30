@@ -23,7 +23,8 @@ const adminSchema = new mongoose.Schema({
         message: "{VALUE} is not a valid role",
     },
     avatar: {
-        type: String
+        type: Schema.Types.ObjectId,
+        ref: "Media"
     }
 }, { 
     timestamps: true 

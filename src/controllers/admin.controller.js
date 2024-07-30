@@ -23,7 +23,11 @@ const registerAdmin = async (req, res, next) => {
         await admin.save();
         let adminWithoutPassword = { ...admin._doc };
         delete adminWithoutPassword.password;
-        return res.status(201).json({ success: true, message: "Admin Added Successfully", admin: adminWithoutPassword });
+        return res.status(201).json({ 
+            success: true, 
+            message: "Admin Added Successfully", 
+            admin: adminWithoutPassword 
+        });
     } catch (error) {
         next(error);
     }
@@ -32,8 +36,14 @@ const registerAdmin = async (req, res, next) => {
 /* Get All Admins */
 const getAllAdmins = async (req, res, next) => {
     try {
-        const admins = await Admin.find().select("-password");
-        return res.status(200).json({ success: true, message: "Admins Fetched Successfully", admins });
+        const admins = await Admin.find()
+        .select("-password")
+        .populate({ path: "avatar", select: "url _id", strictPopulate: false });
+        return res.status(200).json({ 
+            success: true, 
+            message: "Admins Fetched Successfully", 
+            admins 
+        });
     } catch (error) {
         next(error);
     }
@@ -45,9 +55,15 @@ const getAdminById = async (req, res, next) => {
     const adminId = req.params.id;
     if (!adminId) return next(apiErrorHandler(400, "Please provide Admin Id"));
     try {
-        const admin = await Admin.findById(adminId).select("-password");
+        const admin = await Admin.findById(adminId)
+        .select("-password")
+        .populate({ path: "avatar", select: "url _id", strictPopulate: false });
         if (!admin) return next(apiErrorHandler(404, "No Admin Found"));
-        return res.status(200).json({ success: true, message: "Admin Fetched Successfully", admin });
+        return res.status(200).json({ 
+            success: true, 
+            message: "Admin Fetched Successfully", 
+            admin 
+        });
     } catch (error) {
         next(error);
     }

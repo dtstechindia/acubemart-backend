@@ -111,7 +111,8 @@ const loginAdmin = async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
     try {
-        const admin = await Admin.findOne({ email });
+        const admin = await Admin.findOne({ email })
+        .populate({ path: "avatar", select: "url _id", strictPopulate: false });
         if (!admin) return next(apiErrorHandler(404, "No Admin Found"));
         const isMatch = await bcryptjs.compare(password, admin.password);
         if (!isMatch) return next(apiErrorHandler(400, "Incorrect Credentials"));

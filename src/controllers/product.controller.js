@@ -25,8 +25,8 @@ const addNewProduct = async (req, res, next) => {
     deliveryCharges,
     isSimpleProduct,
   } = req.body;
-  if (!name || !price || !description || !stock || !isSimpleProduct)
-    return next(apiErrorHandler(400, "Please provide all fields"));
+  
+  if (!name || !price || !description || !stock) return next(apiErrorHandler(400, "Please provide all fields"));
 
   if (!category) return next(apiErrorHandler(404, "Category is required"));
 

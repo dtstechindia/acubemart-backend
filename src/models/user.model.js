@@ -32,6 +32,18 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: Schema.Types.ObjectId,
         ref: "Media"
+    },
+    orders: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Order"
+        }
+    ],
+    status: {
+        type: String,
+        default: "active",
+        enum: ["active", "blocked"],
+        message: "{VALUE} is not a valid status"
     }
 }, {
     timestamps: true

@@ -7,7 +7,7 @@ import User from "../models/user.model.js";
 
 /* Register New User */
 const registerUser = async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
     //console.log(name, email, password);
     if (!name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
 
@@ -23,7 +23,8 @@ const registerUser = async (req, res, next) => {
         const user = await User.create({ 
             name, 
             email, 
-            password: hashedPassword
+            password: hashedPassword,
+            phone
         });
 
         const userWithoutPassword = { ...user._doc };

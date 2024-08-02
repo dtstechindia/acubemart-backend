@@ -15,9 +15,9 @@ const addNewOrder = async (req, res, next) => {
         for (let i = 0; i < products.length; i++) {
             const product = await Product.findById(products[i].productId);
             if (!product) return next(apiErrorHandler(404, "No Product Found"));
-            if (product.quantity < products[i].quantity) return next(apiErrorHandler(400, "Insufficient Stock"));
+            if (product.stock < products[i].quantity) return next(apiErrorHandler(400, "Insufficient Stock"));
             
-            total += product.price * products[i].quantity;
+            total += product.sp * products[i].quantity;
         }
 
         /* Create New Order */
@@ -29,9 +29,9 @@ const addNewOrder = async (req, res, next) => {
             phone,
         });
 
-        /* await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
+        await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
 
-        if (!order) return next(apiErrorHandler(404, "No Order Found")); */
+        if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(201).json({
             success: true,
@@ -48,7 +48,7 @@ const addNewOrder = async (req, res, next) => {
 const getAllOrdersList = async (req, res, next) => {
     try {
         const orders = await Order.find()
-        .populate({ path:"products.productId", select: "name slug price image _id" })
+        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
@@ -67,12 +67,12 @@ const getAllOrdersList = async (req, res, next) => {
 
 /* Get All Orders by UserId */
 const getAllOrdersByUserId = async (req, res, next) => {
-    const { userId } = req.body;
-    if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
+    const userId = req.params.id;
+    if (!userId) return next(apiErrorHandler(400, "User Id is required"));
     
     try {
         const orders = await Order.find({ userId })
-        .populate({ path:"products.productId", select: "name slug price image _id" })
+        .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
@@ -96,7 +96,7 @@ const getOrderById = async (req, res, next) => {
     
     try {
         const order = await Order.findById(orderId)
-        .populate({ path:"products.productId", select: "name slug price image _id" })
+        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
@@ -122,7 +122,7 @@ const updateOrder = async (req, res, next) => {
     
     try {
         const order = await Order.findByIdAndUpdate(id, { status })
-        .populate({ path:"products.productId", select: "name slug price image _id" })
+        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" });
         

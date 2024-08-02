@@ -16,8 +16,8 @@ const router = Router();
 /* Get All Orders List Route -GET `/api/order/all` */
 router.get("/all", getAllOrdersList);
 
-/* Get All Orders by UserId Route -GET `/api/order/user` */
-router.get("/user", getAllOrdersByUserId);
+/* Get All Orders by UserId Route -GET `/api/order/user/:id` */
+router.get("/user/:id", getAllOrdersByUserId);
 
 /* Get Order by Id Route -GET `/api/order/:id` */
 router.get("/:id", getOrderById);

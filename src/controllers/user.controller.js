@@ -84,7 +84,7 @@ const getUserById = async (req, res, next) => {
     
     try {
         const user = await User.findById(userId)
-        .select("-password")
+        .populate({path: "orders", select: "total _id", strictPopulate: false  })
         .populate({path: "address", select: "street city state country pincode _id", strictPopulate: false  })
         .populate({path: "avatar", select: "url _id", strictPopulate: false  });
         if (!user) return next(apiErrorHandler(404, "No User Found"));
@@ -104,7 +104,6 @@ const getUserById = async (req, res, next) => {
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.find()
-        .select("-password")
         .populate({path: "address", select: "street city state country pincode _id", strictPopulate: false  })
         .populate({path: "avatar", select: "url _id", strictPopulate: false  });
         if (!users) return next(apiErrorHandler(404, "No Users Found"));

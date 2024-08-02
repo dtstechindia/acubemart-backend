@@ -48,7 +48,7 @@ const addNewOrder = async (req, res, next) => {
 const getAllOrdersList = async (req, res, next) => {
     try {
         const orders = await Order.find()
-        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
+        .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
@@ -96,7 +96,7 @@ const getOrderById = async (req, res, next) => {
     
     try {
         const order = await Order.findById(orderId)
-        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
+        .populate({ path:"products.productId", select: "name slug price sp sku deliveryCharges codCharges _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });

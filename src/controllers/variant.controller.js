@@ -7,10 +7,10 @@ import Image from "../models/image.model.js";
 
 /* Add New Product Variant */
 const addNewVariant = async (req, res, next) => {
-    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video, description } = req.body;
+    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video, description, sku, barcode, stock } = req.body;
     //console.log(req.body);
     //console.log(productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo);
-    if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges ) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges || !sku || !barcode || !stock ) return next(apiErrorHandler(400, "Please provide all fields"));
     //Add Attributes value to an array if attribute name is same
     
     const result = variantAttributes.reduce((acc, {name, value}) => {
@@ -38,7 +38,10 @@ const addNewVariant = async (req, res, next) => {
             codCharges, 
             variantAttributes: modifiedAttributes,
             video,
-            description 
+            description,
+            sku,
+            barcode,
+            stock 
         });
         
         const product = await Product.findById(productId);

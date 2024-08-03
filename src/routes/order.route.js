@@ -28,8 +28,8 @@ router.post("/add", addNewOrder);
 
 
 //PATCH Routes
-/* Update Order Route -PATCH `/api/order/update` */
-router.patch("/update", updateOrder);
+/* Update Order Route -PATCH `/api/order/update/:id` */
+router.patch("/update/:id", updateOrder);
 
 
 export default router;

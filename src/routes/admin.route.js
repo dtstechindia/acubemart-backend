@@ -5,6 +5,7 @@ import {
     getAllAdmins,
     getAdminById,
     updateAdminPassword,
+    updateAdmin,
     deleteAdmin,
     loginAdmin,
     logoutAdmin
@@ -32,8 +33,11 @@ router.post("/logout", logoutAdmin);
 
 
 //PATCH Routes
-/* Update Admin Route -PATCH `/api/admin/update` */
-router.patch("/update/:id", updateAdminPassword);
+/* Update Admin Route -PATCH `/api/admin/update/password/:id` */
+router.patch("/update/password/:id", updateAdminPassword);
+
+/* Update Admin Route -PATCH `/api/admin/update/:id` */
+router.patch("/update/:id", updateAdmin);
 
 //DELETE Routes
 /* Delete Admin Route -DELETE `/api/admin/delete/:id` */

@@ -92,6 +92,29 @@ const updateAdminPassword = async (req, res, next) => {
 }
 
 
+/* Update Admin */
+const updateAdmin = async (req, res, next) => {
+    const adminId = req.params.id;
+    const { name, email } = req.body;
+    if (!adminId) return next(apiErrorHandler(400, "Please provide Admin Id"));
+    try {
+        const admin = await Admin.findByIdAndUpdate(
+            adminId, 
+            { name, email }, 
+            { new: true }
+        );
+        if (!admin) return next(apiErrorHandler(404, "No Admin Found"));
+        return res.status(200).json({ 
+            success: true, 
+            message: "Admin Updated Successfully", 
+            admin 
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 /* Delete Admin */
 const deleteAdmin = async (req, res, next) => {
     const adminId = req.params.id;
@@ -138,6 +161,7 @@ export {
     loginAdmin, 
     logoutAdmin, 
     updateAdminPassword, 
+    updateAdmin,
     deleteAdmin,
     getAllAdmins, 
     getAdminById,

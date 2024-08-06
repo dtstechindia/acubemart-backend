@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { 
     addNewTransaction,
+    getAllTransactions,
     getTransactionById,
     getTransactionsByOrderId,
     getTransactionsByUserId,
@@ -13,6 +14,9 @@ const router = Router();
 
 
 //GET Routes
+
+/* Get All Transactions Route -GET `/api/transaction/all` */
+router.get("/all", getAllTransactions);
 
 /* Get Transaction by Id Route -GET `/api/transaction/:id` */
 router.get("/:id", getTransactionById);

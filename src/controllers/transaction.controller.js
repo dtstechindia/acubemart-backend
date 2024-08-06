@@ -7,7 +7,7 @@ import Order from "../models/order.model.js";
 
 /* Add New Transaction */
 const addNewTransaction = async (req, res, next) => {
-    const { userId, orderId, paymentMode } = req.body;
+    const { userId, orderId, paymentMode, status } = req.body;
     if (!userId || !orderId || !paymentMode) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
@@ -24,10 +24,11 @@ const addNewTransaction = async (req, res, next) => {
             orderId, 
             amount, 
             paymentMode, 
+            status
         });
 
         /* Update Order */
-        order.isPaid = true;
+        //order.isPaid = true;
         order.transactionId = transaction._id;
         order.status = "placed";
         order.save();
@@ -36,6 +37,26 @@ const addNewTransaction = async (req, res, next) => {
             success: true,
             message: "Transaction Added Successfully",
             data: transaction
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+/* Get All Transactions */
+const getAllTransactions = async (req, res, next) => {
+    try {
+        const transactions = await Transaction.find()
+        .populate({ path: "orderId", select: "products total status address status phone _id" })
+        .populate({ path: "userId", select: "name email _id" });
+        if (!transactions) return next(apiErrorHandler(404, "No Transactions Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Transactions Fetched Successfully",
+            data: transactions
         })
         
     } catch (error) {
@@ -135,6 +156,7 @@ const deleteTransaction = async (req, res, next) => {
 
 export { 
     addNewTransaction, 
+    getAllTransactions,
     getTransactionById, 
     getTransactionsByOrderId,
     getTransactionsByUserId,

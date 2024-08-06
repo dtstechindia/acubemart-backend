@@ -20,11 +20,19 @@ const transactionSchema = new mongoose.Schema({
     },
     paymentMode: {
         type: String,
-        enum: ["COD", "ONLINE"],
+        enum: ["COD", "UPI", "CREDIT_CARD", "DEBIT_CARD", "NETBANKING" ],
         message: "{VALUE} is not a valid payment mode",
         //default: "COD",
         toUpperCase: true,
         required: [true, "Payment Mode is required"]
+    },
+    status: {
+        type: String,
+        enum: ["SUCCESS", "FAILED"],
+        message: "{VALUE} is not a valid status",
+        //default: "SUCCESS",
+        toUpperCase: true,
+        required: [true, "Status is required"]
     }
 }, { 
     timestamps: true 

@@ -39,11 +39,11 @@ const orderSchema = new mongoose.Schema({
         default: "pending",
         message: "{VALUE} is not a valid status"
     },
-    transactionId: {
+    transactionId: [{
         type: Schema.Types.ObjectId,
         ref: "Transaction",
         //required: [true, "Transaction Id is required"]
-    }
+    }],
 }, { 
     timestamps: true 
 });

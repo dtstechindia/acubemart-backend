@@ -29,7 +29,7 @@ const addNewTransaction = async (req, res, next) => {
 
         /* Update Order */
         //order.isPaid = true;
-        order.transactionId = transaction._id;
+        order.transactionId.push(transaction._id);
         order.status = "placed";
         order.save();
 

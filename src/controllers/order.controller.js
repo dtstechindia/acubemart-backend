@@ -51,7 +51,7 @@ const getAllOrdersList = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
 
         return res.status(200).json({
@@ -75,7 +75,7 @@ const getAllOrdersByUserId = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -99,7 +99,7 @@ const getOrderById = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp sku deliveryCharges codCharges _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

@@ -3,8 +3,8 @@ import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import Coupon from "../models/coupon.model.js";
 
 /* Add new Coupon */
-const addNewCoupon = async (req, res) => {
-    const { code, description, couponType, amount, expiry, usageLimit } = req.body;
+const addNewCoupon = async (req, res, next) => {
+    const { code, description, couponType, amount, expiry, status, usageLimit } = req.body;
     if (!code || !couponType || !amount || !expiry || !usageLimit) return next(apiErrorHandler(400, "Please provide all fields"));
 
     try {
@@ -14,7 +14,8 @@ const addNewCoupon = async (req, res) => {
             couponType,
             amount,
             expiry,
-            usageLimit
+            usageLimit,
+            status
         });
 
         if (!coupon) return next(apiErrorHandler(404, "No Coupon Found"));
@@ -30,7 +31,7 @@ const addNewCoupon = async (req, res) => {
 
 
 /* Get All Coupons */
-const getAllCoupons = async (req, res) => {
+const getAllCoupons = async (req, res, next) => {
     try {
         const coupons = await Coupon.find();
         if (!coupons) return next(apiErrorHandler(404, "No Coupons Found"));
@@ -46,7 +47,7 @@ const getAllCoupons = async (req, res) => {
 
 
 /* Get Coupon by Id */
-const getCouponById = async (req, res) => {
+const getCouponById = async (req, res, next) => {
     const couponId  = req.params.id;
     if (!couponId) return next(apiErrorHandler(400, "Coupon Id is required"));
     
@@ -65,9 +66,9 @@ const getCouponById = async (req, res) => {
 
 
 /* Update Coupon by Id */
-const updateCouponById = async (req, res) => {
+const updateCouponById = async (req, res, next) => {
     const couponId  = req.params.id;
-    const { code, description, couponType, amount, expiry, isActive, usageLimit } = req.body;
+    const { code, description, couponType, amount, expiry, status, usageLimit } = req.body;
 
     if (!couponId) return next(apiErrorHandler(400, "Coupon Id not found"));
 
@@ -80,7 +81,7 @@ const updateCouponById = async (req, res) => {
                 couponType,
                 amount,
                 expiry,
-                isActive,
+                status,
                 usageLimit
             }, { 
                 new: true, 
@@ -101,7 +102,7 @@ const updateCouponById = async (req, res) => {
 
 
 /* Delete Coupon by Id */
-const deleteCouponById = async (req, res) => {
+const deleteCouponById = async (req, res, next) => {
     const couponId  = req.params.id;
     if (!couponId) return next(apiErrorHandler(400, "Coupon Id not found"));
     try {

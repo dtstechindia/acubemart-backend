@@ -27,9 +27,11 @@ const couponSchema = new mongoose.Schema({
         type: Date,
         required: [true, "Coupon expiry date is required"]
     },
-    isActive: {
-        type: Boolean,
-        default: true
+    status: {
+        type: String,
+        enum: ["active", "inactive"],
+        default: "active",
+        message: "{VALUE} is not a valid status"
     },
     usageLimit: {
         type: Number,

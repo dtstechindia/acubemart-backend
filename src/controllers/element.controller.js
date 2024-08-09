@@ -5,8 +5,8 @@ import Element from "../models/element.model.js";
 
 /* Add new element */
 const addNewElement = async (req, res, next) => {
-    const { name, description, categoryId, typeId, stock, mediaId } = req.body;
-    if (!name || !stock) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { name, description, categoryId, typeId, mediaId } = req.body;
+    if (!name) return next(apiErrorHandler(400, "Name is required"));
     if (!categoryId) return next(apiErrorHandler(404, "CategoryId is required"));
     if (!typeId) return next(apiErrorHandler(404, "TypeId is required"));
     
@@ -16,7 +16,6 @@ const addNewElement = async (req, res, next) => {
             description, 
             categoryId,
             typeId,
-            stock,
             mediaId,
         });
 

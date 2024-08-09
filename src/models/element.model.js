@@ -22,10 +22,6 @@ const elementSchema = new mongoose.Schema({
         ref: "Type",
         required: [true, "Type Id is required"]
     },
-    stock: {
-        type: Number,
-        required: [true, "Element stock is required"]
-    },
     sales: {
         type: Number,
         default: 0

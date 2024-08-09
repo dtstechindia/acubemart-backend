@@ -15,8 +15,7 @@ const couponSchema = new mongoose.Schema({
     },
     couponType: {   
         type: String,
-        enum: ["fixed", "percent"],
-        default: "fixed",
+        enum: ["fixed_amount", "percent_discount", "free_shipping", "buy_one_get_one"],
         message: "{VALUE} is not a valid coupon type"
     },
     amount: {

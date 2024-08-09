@@ -12,8 +12,7 @@ const addNewBrand = async (req, res, next) => {
 
     try {
         const brand = await Brand.create({ 
-            name, 
-            logo, 
+            name,  
             description, 
             typeId
         });
@@ -50,6 +49,27 @@ const getAllBrands = async (req, res, next) => {
 };
 
 
+/* Get Brand By Id */
+const getBrandById = async (req, res, next) => {
+    const brandId = req.params.id;
+    if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
+
+    try {
+        const brand = await Brand.findById(brandId).populate({ path: "typeId", select: "name _id", strictPopulate: false });
+        if (!brand) return next(apiErrorHandler(404, "No Brand Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Brand Fetched Successfully",
+            data: brand
+        })
+        
+    } catch (error) {
+        next(error);
+    }   
+};
+
+
 /* Update Brand by Id */
 const updateBrandById = async (req, res, next) => {
     const brandId  = req.params.id;
@@ -61,8 +81,7 @@ const updateBrandById = async (req, res, next) => {
         const brand = await Brand.findByIdAndUpdate(
             brandId, 
             { 
-                name, 
-                logo, 
+                name,  
                 description,
                 typeId 
             }, { 
@@ -108,6 +127,7 @@ const deleteBrand = async (req, res, next) => {
 export {
     addNewBrand,
     getAllBrands,
+    getBrandById,
     updateBrandById,
     deleteBrand
 }

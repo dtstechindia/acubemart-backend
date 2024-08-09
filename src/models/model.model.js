@@ -21,7 +21,12 @@ const modelSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Type",
         required: [true, "Type Id is required"]
-    }
+    },
+    mediaId: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        //required: [true, "Model image is required"]
+    },
 }, { 
     timestamps: true 
 });

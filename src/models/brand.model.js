@@ -8,10 +8,6 @@ const brandSchema = new mongoose.Schema({
         type: String,
         required: [true, "Brand name is required"]
     },
-    logo: {
-        type: String,
-        //required: [true, "Brand logo is required"]
-    },
     description: {
         type: String,
         //required: [true, "Brand description is required"]
@@ -20,7 +16,12 @@ const brandSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Type",
         required: [true, "Type Id is required"]
-    }
+    },
+    mediaId: {
+        type: Schema.Types.ObjectId,
+        ref: "Media",
+        //required: [true, "Category image is required"]
+    },
 }, { 
     timestamps: true 
 });

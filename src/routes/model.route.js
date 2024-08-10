@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     addNewModel,
     getAllModels,
+    getModelById,
     updateModelById,
     deleteModel
 } from "../controllers/model.controller.js";
@@ -13,6 +14,9 @@ const router = Router();
 //GET Routes
 // Get All Models Route -GET `/api/model/all`
 router.get("/all", getAllModels);
+
+// Get Model by Id Route -GET `/api/model/:id`
+router.get("/:id", getModelById);
 
 
 //POST Routes

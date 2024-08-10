@@ -37,7 +37,8 @@ const getAllModels = async (req, res, next) => {
     try {
         const models = await Model.find().populate("brandId typeId")
             .populate({ path: "brandId", select: "name _id", strictPopulate: false })
-            .populate({ path: "typeId", select: "name _id", strictPopulate: false });
+            .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+            .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
         if (!models) return next(apiErrorHandler(404, "No Models Found"));
 
         return res.status(200).json({
@@ -49,6 +50,29 @@ const getAllModels = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+
+/* Get Model By Id */
+const getModelById = async (req, res, next) => {
+    const modelId = req.params.id;
+    if (!modelId) return next(apiErrorHandler(400, "Model Id not found"));
+    try {
+        const model = await Model.findById(modelId).populate("brandId typeId")
+            .populate({ path: "brandId", select: "name _id", strictPopulate: false })
+            .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+            .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
+        if (!model) return next(apiErrorHandler(404, "No Model Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Model Fetched Successfully",
+            data: model
+        })
+        
+    } catch (error) {
+        next(error);
+    }   
 };
 
 
@@ -108,6 +132,7 @@ const deleteModel = async (req, res, next) => {
 export { 
         addNewModel,
         getAllModels,
+        getModelById,
         updateModelById,
         deleteModel 
     }

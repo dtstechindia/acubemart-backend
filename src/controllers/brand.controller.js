@@ -33,7 +33,9 @@ const addNewBrand = async (req, res, next) => {
 /* Get All Brands */
 const getAllBrands = async (req, res, next) => {
     try {
-        const brands = await Brand.find().populate({ path: "typeId", select: "name _id", strictPopulate: false });
+        const brands = await Brand.find()
+        .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
 
         if (!brands) return next(apiErrorHandler(404, "No Brands Found"));
 
@@ -55,7 +57,9 @@ const getBrandById = async (req, res, next) => {
     if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
 
     try {
-        const brand = await Brand.findById(brandId).populate({ path: "typeId", select: "name _id", strictPopulate: false });
+        const brand = await Brand.findById(brandId)
+        .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
         if (!brand) return next(apiErrorHandler(404, "No Brand Found"));
 
         return res.status(200).json({
@@ -75,7 +79,7 @@ const updateBrandById = async (req, res, next) => {
     const brandId  = req.params.id;
     if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
 
-    const { name, logo, description, typeId } = req.body;
+    const { name, description, typeId } = req.body;
 
     try {
         const brand = await Brand.findByIdAndUpdate(

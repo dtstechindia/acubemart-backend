@@ -6,7 +6,7 @@ import bcryptjs from "bcryptjs";
 
 /* Add New Admin with session token and refresh token */
 const registerAdmin = async (req, res, next) => {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
     if (!name || !email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
         email = email.toLowerCase();
     try {
@@ -72,7 +72,7 @@ const getAdminById = async (req, res, next) => {
 
 /* Update Admin Password */
 const updateAdminPassword = async (req, res, next) => {
-    const { email, oldPassword, newPassword } = req.body;
+    let { email, oldPassword, newPassword } = req.body;
     if (!email || !oldPassword || !newPassword) return next(apiErrorHandler(400, "Please provide all fields"));
     email = email.toLowerCase();
     try {
@@ -96,7 +96,7 @@ const updateAdminPassword = async (req, res, next) => {
 /* Update Admin */
 const updateAdmin = async (req, res, next) => {
     const adminId = req.params.id;
-    const { name, email } = req.body;
+    let { name, email } = req.body;
     email = email.toLowerCase();
     if (!adminId) return next(apiErrorHandler(400, "Please provide Admin Id"));
     try {
@@ -133,7 +133,7 @@ const deleteAdmin = async (req, res, next) => {
 
 /* Login Admin */
 const loginAdmin = async (req, res, next) => {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
     if (!email || !password) return next(apiErrorHandler(400, "Please provide all fields"));
     email = email.toLowerCase();
     try {

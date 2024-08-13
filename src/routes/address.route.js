@@ -14,7 +14,7 @@ const router = Router();
 
 //GET Routes
 /* Get All Addresses by UserId Route -GET `/api/address/all` */
-router.get("/all", getAllAddresses);
+router.get("/all/:id", getAllAddresses);
 
 /* Get Address by Id Route -GET `/api/address/:id` */
 router.get("/:id", getAddressById);

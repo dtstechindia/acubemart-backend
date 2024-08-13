@@ -37,7 +37,7 @@ const addNewAddress = async (req, res, next) => {
 
 /* Get All Addresses by UserId */
 const getAllAddresses = async (req, res, next) => {
-    const { userId } = req.body;
+    const userId = req.params.id;
     if (!userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {

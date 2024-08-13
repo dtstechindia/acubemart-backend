@@ -44,6 +44,11 @@ const orderSchema = new mongoose.Schema({
         ref: "Transaction",
         //required: [true, "Transaction Id is required"]
     }],
+    couponId: {
+        type: Schema.Types.ObjectId,
+        ref: "Coupon",
+        //required: [true, "Coupon Id is required"]
+    }
 }, { 
     timestamps: true 
 });

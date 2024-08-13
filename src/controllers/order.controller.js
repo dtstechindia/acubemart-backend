@@ -6,7 +6,7 @@ import User from "../models/user.model.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
-    const { userId, products, address, phone } = req.body;
+    const { userId, products, address, phone, couponId } = req.body;
     if (!userId || !products || !address || !phone) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
@@ -27,6 +27,7 @@ const addNewOrder = async (req, res, next) => {
             total, 
             address,
             phone,
+            couponId
         });
 
         await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
@@ -51,7 +52,8 @@ const getAllOrdersList = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
+        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
 
         return res.status(200).json({
@@ -75,7 +77,8 @@ const getAllOrdersByUserId = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
+        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
         if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
 
         return res.status(200).json({
@@ -99,7 +102,8 @@ const getOrderById = async (req, res, next) => {
         .populate({ path:"products.productId", select: "name slug price sp sku deliveryCharges codCharges _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  });
+        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
+        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({
@@ -117,15 +121,15 @@ const getOrderById = async (req, res, next) => {
 /* Update Order */
 const updateOrder = async (req, res, next) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, couponId } = req.body;
     if (!id || !status) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const order = await Order.findByIdAndUpdate(id, { status })
+        const order = await Order.findByIdAndUpdate(id, { status, couponId }, { new: true })
         .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
         .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" });
-        
+        .populate({ path: "userId", select: "name email phone _id" })
+        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         return res.status(200).json({

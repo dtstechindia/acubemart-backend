@@ -51,24 +51,43 @@ const getCartProducts = async (req, res, next) => {
   if (!userId) return next(apiErrorHandler(400, "UserId is required"));
 
   try {
+    // Populate both image and brand fields
     const cart = await Cart.findOne({ userId }).populate({
       path: "products.productId",
-      populate: {
-        path: "image",
-        model: "Image",
-      },
+      populate: [
+        {
+          path: "image",
+          model: "Image",
+        },
+        {
+          path: "brand",
+          model: "Brand", // Ensure Brand model is correctly referenced
+        },
+      ],
     });
+
     if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
 
     // Transform the products array
     const transformedProducts = cart.products
       .map((product) => {
         if (!product.productId) return null;
+
+        // Ensure brand is an array; map over it if so
+        const brands = Array.isArray(product.productId.brand)
+          ? product.productId.brand.map((brand) => ({
+              _id: brand._id,
+              name: brand.name,
+              // Include any other brand fields you need
+            }))
+          : [];
+
         return {
           _id: product._id,
           quantity: product.quantity,
           ...product.productId._doc,
           image: product.productId.image.map((img) => img.url),
+          brand: brands,
         };
       })
       .filter((product) => product !== null); // Filter out any null products

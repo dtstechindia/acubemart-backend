@@ -26,7 +26,7 @@ router.post("/add", addNewAddress);
 
 
 //PATCH Routes
-/* Update Address Route -PATCH `/api/address/update` */
+/* Update Address Route -PATCH `/api/address/update/:id` */
 router.patch("/update/:id", updateAddress);
 
 

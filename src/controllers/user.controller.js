@@ -156,7 +156,7 @@ const updateUserPassword = async (req, res, next) => {
 /* Update User Information */
 const updateUser = async (req, res, next) => {
     const userId = req.params.id;
-    const { name, email, phone, address, avatar } = req.body;
+    const { name, email, phone } = req.body;
     if (!userId) return next(apiErrorHandler(400, "userId is required"));
     
     try {
@@ -166,8 +166,6 @@ const updateUser = async (req, res, next) => {
                 name, 
                 email, 
                 phone,
-                address, 
-                avatar
             },
             { 
                 new: true, 

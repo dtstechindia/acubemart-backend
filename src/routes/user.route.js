@@ -33,7 +33,7 @@ router.post("/logout", logoutUser);
 
 
 //PATCH Routes
-/* Update User Route - PATCH `/api/user/update` */
+/* Update User Route - PATCH `/api/user/update/:id` */
 router.patch("/update/:id", updateUser);
 
 /* Update User Password Route - PATCH `/api/user/password` */

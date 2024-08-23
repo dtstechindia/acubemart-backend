@@ -39,8 +39,13 @@ const addNewProduct = async (req, res, next) => {
   if (!model) return next(apiErrorHandler(404, "Model is required"));
 
   try {
-    //Generating slug for product name as it is unique
-    let slug = name.split(" ").join("-").toLowerCase();
+    //Generating slug for product name as it is unique and remove all special characters
+    let slug = name.split(" ")
+    //check for special characters and remove them
+    .map((word) => {
+      return word.replace(/[^a-zA-Z0-9]/g, "-");
+    })
+    .join("-").toLowerCase();
 
     //Checking if slug already exists
     let slugExists = await Product.findOne({ slug });

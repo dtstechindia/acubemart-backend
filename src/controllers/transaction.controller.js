@@ -48,7 +48,7 @@ const addNewTransaction = async (req, res, next) => {
 /* Get All Transactions */
 const getAllTransactions = async (req, res, next) => {
     try {
-        const transactions = await Transaction.find()
+        const transactions = await Transaction.find().sort({ createdAt: -1 })
         .populate({ path: "orderId", select: "products total status address status phone _id" })
         .populate({ path: "userId", select: "name email _id" });
         if (!transactions) return next(apiErrorHandler(404, "No Transactions Found"));

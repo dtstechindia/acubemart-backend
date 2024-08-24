@@ -36,7 +36,7 @@ const registerAdmin = async (req, res, next) => {
 /* Get All Admins */
 const getAllAdmins = async (req, res, next) => {
     try {
-        const admins = await Admin.find()
+        const admins = await Admin.find().sort({ createdAt: -1 })
         .select("-password")
         .populate({ path: "avatar", select: "url _id", strictPopulate: false });
         return res.status(200).json({ 

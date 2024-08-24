@@ -48,7 +48,7 @@ const addNewOrder = async (req, res, next) => {
 /* Get all orders list of customers */
 const getAllOrdersList = async (req, res, next) => {
     try {
-        const orders = await Order.find()
+        const orders = await Order.find().sort({ createdAt: -1 })
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })

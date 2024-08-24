@@ -35,7 +35,8 @@ const addNewModel = async (req, res, next) => {
 /* Get All Models */
 const getAllModels = async (req, res, next) => {
     try {
-        const models = await Model.find().populate("brandId typeId")
+        const models = await Model.find().sort({ createdAt: -1 })
+            .populate("brandId typeId")
             .populate({ path: "brandId", select: "name _id", strictPopulate: false })
             .populate({ path: "typeId", select: "name _id", strictPopulate: false })
             .populate({ path: "mediaId", select: "url _id", strictPopulate: false });

@@ -34,7 +34,7 @@ const addNewElement = async (req, res, next) => {
 /* Get All Elements */
 const getAllElements = async (req, res, next) => {
     try {
-        const elements = await Element.find()
+        const elements = await Element.find().sort({ createdAt: -1 })
         .populate({ path: "categoryId", select: "name _id" })
         .populate({ path: "typeId", select: "name _id" })
         .populate({ path: "mediaId", select: "url _id", strictPopulate: false });

@@ -33,7 +33,7 @@ const addNewBrand = async (req, res, next) => {
 /* Get All Brands */
 const getAllBrands = async (req, res, next) => {
     try {
-        const brands = await Brand.find()
+        const brands = await Brand.find().sort({ createdAt: -1 })
         .populate({ path: "typeId", select: "name _id", strictPopulate: false })
         .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
 

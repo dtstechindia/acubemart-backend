@@ -33,7 +33,7 @@ const addNewCoupon = async (req, res, next) => {
 /* Get All Coupons */
 const getAllCoupons = async (req, res, next) => {
     try {
-        const coupons = await Coupon.find();
+        const coupons = await Coupon.find().sort({ createdAt: -1 });
         if (!coupons) return next(apiErrorHandler(404, "No Coupons Found"));
         return res.status(200).json({
             success: true,

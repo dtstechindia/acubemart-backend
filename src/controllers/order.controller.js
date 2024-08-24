@@ -67,6 +67,20 @@ const getAllOrdersList = async (req, res, next) => {
     }
 }
 
+/* Get All Orders count */
+const getAllOrdersCount = async (req, res, next) => {
+    try {
+        const count = await Order.countDocuments();
+        return res.status(200).json({
+            success: true,
+            message: "All Orders Count",
+            data: count,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Get All Orders by UserId */
 const getAllOrdersByUserId = async (req, res, next) => {
     const userId = req.params.id;
@@ -147,6 +161,7 @@ const updateOrder = async (req, res, next) => {
 export { 
     addNewOrder, 
     getAllOrdersList,
+    getAllOrdersCount,
     getAllOrdersByUserId, 
     getOrderById,
     updateOrder 

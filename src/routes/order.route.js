@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     addNewOrder,
     getAllOrdersList,
+    getAllOrdersCount,
     getAllOrdersByUserId,
     getOrderById,
     updateOrder
@@ -26,6 +27,8 @@ router.get("/:id", getOrderById);
 /* Add New Order Route -POST `/api/order/add` */
 router.post("/add", addNewOrder);
 
+/* All Orders Count Route -POST `/api/order/count` */
+router.post("/count", getAllOrdersCount);
 
 //PATCH Routes
 /* Update Order Route -PATCH `/api/order/update/:id` */

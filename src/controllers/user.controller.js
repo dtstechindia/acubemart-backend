@@ -119,6 +119,20 @@ const getAllUsers = async (req, res, next) => {
 }
 
 
+/* Get All users count */
+const getAllUsersCount = async (req, res, next) => {
+    try {
+        const count = await User.countDocuments();
+        return res.status(200).json({
+            success: true,
+            message: "All Users Count",
+            data: count,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Update User Password */
 const updateUserPassword = async (req, res, next) => {
    
@@ -209,6 +223,7 @@ export {
     loginUser,
     logoutUser,
     getAllUsers,
+    getAllUsersCount,
     updateUser,
     getUserById,
     updateUserPassword,

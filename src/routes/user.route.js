@@ -5,6 +5,7 @@ import {
     loginUser,
     logoutUser,
     getAllUsers,
+    getAllUsersCount,
     updateUser,
     updateUserPassword,
     getUserById,
@@ -30,6 +31,9 @@ router.post("/login", loginUser);
 
 /* Logout User Route - POST `/api/user/logout` */
 router.post("/logout", logoutUser);
+
+/* All Users Count Route - POST `/api/user/count` */
+router.post("/count", getAllUsersCount);
 
 
 //PATCH Routes

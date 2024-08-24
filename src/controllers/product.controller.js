@@ -91,10 +91,24 @@ const addNewProduct = async (req, res, next) => {
   }
 };
 
+/* Get All Products count */
+const getAllProductsCount = async (req, res, next) => {
+  try {
+    const count = await Product.countDocuments();
+    return res.status(200).json({
+      success: true,
+      message: "All Products Count",
+      data: count,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /* Get All Published Products */
 const getAllPublishedProducts = async (req, res, next) => {
   try {
-    const products = await Product.find({ status: "published" })
+    const products = await Product.find({ status: "published" }).sort({ createdAt: -1 })
       .populate({ path: "type", select: "name _id" })
       .populate({ path: "category", select: "name description isActive _id" })
       .populate({ path: "element", select: "name description _id" })
@@ -140,7 +154,7 @@ const getAllPublishedProducts = async (req, res, next) => {
 /*  Get All Products */
 const getAllProducts = async (req, res, next) => {
   try {
-    const products = await Product.find()
+    const products = await Product.find().sort({ createdAt: -1 })
       .populate({ path: "type", select: "name _id" })
       .populate({ path: "category", select: "name description _id" })
       .populate({ path: "element", select: "name description _id" })
@@ -378,6 +392,7 @@ export {
   addNewProduct,
   getAllProducts,
   getAllPublishedProducts,
+  getAllProductsCount,
   getProductById,
   getProductBySlug,
   editProductById,

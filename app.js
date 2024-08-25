@@ -3,26 +3,26 @@ import express from "express"
 import cors from 'cors';
 import multer from 'multer';
 
-import ConnectDB from './db/connection.db.js';
-import { errorHandler } from './middlewares/errorhandler.middleware.js';
+import ConnectDB from './src/db/connection.db.js';
+import { errorHandler } from './src/middlewares/errorhandler.middleware.js';
 
-import userRouter from './routes/user.route.js';
-import productRouter from './routes/product.route.js';
-import cartRouter from './routes/cart.route.js';
-import categoryRouter from './routes/category.route.js';
-import brandRouter from './routes/brand.route.js';
-import modelRouter from './routes/model.route.js';
-import imageRouter from './routes/image.route.js';
-import addressRouter from './routes/address.route.js';
-import orderRouter from './routes/order.route.js';
-import transactionRouter from './routes/transaction.route.js';
-import typeRouter from './routes/type.route.js';
-import attributeRouter from './routes/attribute.route.js';
-import elementRouter from './routes/element.route.js';
-import variantRouter from './routes/variant.route.js';
-import adminRouter from './routes/admin.route.js';
-import mediaRouter from './routes/media.route.js';
-import couponRouter from './routes/coupon.route.js';
+import userRouter from './src/routes/user.route.js';
+import productRouter from './src/routes/product.route.js';
+import cartRouter from './src/routes/cart.route.js';
+import categoryRouter from './src/routes/category.route.js';
+import brandRouter from './src/routes/brand.route.js';
+import modelRouter from './src/routes/model.route.js';
+import imageRouter from './src/routes/image.route.js';
+import addressRouter from './src/routes/address.route.js';
+import orderRouter from './src/routes/order.route.js';
+import transactionRouter from './src/routes/transaction.route.js';
+import typeRouter from './src/routes/type.route.js';
+import attributeRouter from './src/routes/attribute.route.js';
+import elementRouter from './src/routes/element.route.js';
+import variantRouter from './src/routes/variant.route.js';
+import adminRouter from './src/routes/admin.route.js';
+import mediaRouter from './src/routes/media.route.js';
+import couponRouter from './src/routes/coupon.route.js';
 
 
 //App

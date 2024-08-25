@@ -1,14 +1,14 @@
 {
   "name": "acube-mart-backend",
   "version": "1.0.0",
-  "description": "Acube Mart Backend ",
-  "main": "index.js",
+  "description": "Acubemart Backend ",
+  "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
-  "author": "harsh",
+  "author": "DTS Tech India",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -188,6 +188,42 @@ const updateImageById = async (req, res, next) => {
 };
 
 
+/* Update Featured Image with new image */
+const updateFeaturedImage = async (req, res, next) => {
+    const imageId  = req.params.id;
+    if (!imageId) return next(apiErrorHandler(400, "Image Id not found"));
+
+    const { productId } = req.body;
+
+    try {
+        const imageUrl = await uploadSingleImage(req, res, next);
+        if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
+        const image = await Image.findByIdAndUpdate(
+            imageId,
+            {
+                isFeatured: false
+            }
+        );
+
+        const newFeturedImage = await Image.create({
+            url: imageUrl,
+            isFeatured: true,
+            productId
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Featured Image Updated Successfully",
+            data: newFeturedImage
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+
+}
+            
 
 /* Delete Image */
 const deleteImage = async (req, res, next) => {
@@ -226,5 +262,6 @@ export {
     addNewImageForVariant,
     getImageById,
     updateImageById,
+    updateFeaturedImage,
     deleteImage 
 }

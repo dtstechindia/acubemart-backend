@@ -7,7 +7,8 @@ import {
     getImageById,
     updateImageById,
     deleteImage,
-    addNewImageForVariant
+    addNewImageForVariant,
+    updateFeaturedImage
 } from "../controllers/image.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import multer from "multer";
@@ -36,9 +37,11 @@ router.post("/add/variant", upload.single("image"), addNewImageForVariant);
 
 
 //PATCH Routes
-/* Update Image Route -PATCH `/api/image/update` */
+/* Update Image Route -PATCH `/api/image/update/:id` */
 router.patch("/update/:id", updateImageById);
 
+/* Update featured image Route -PATCH `/api/image/update/featured/:id` */
+router.patch("/update/featured/:id", upload.single("image"), updateFeaturedImage);
 
 //DELETE Routes
 /* Delete Image Route -DELETE `/api/image/delete/:id` */

@@ -77,6 +77,11 @@ app.get('/api/health', (_req, res) => {
     res.send("Server is Healthy ...")
 });
 
+// ZERO SSL Validation
+app.get("/.well-known/pki-validation/14279CB10049F94424683C2B23044845.txt", (_req, res) => {
+  res.send("754F182D38B19168907B8534D046D336ECAD0A218755A0084209740046DBBBC7\ncomodoca.com\n71770c20c84f5b5")
+});
+
 
 //Port Listening
   app.listen(port, () => {

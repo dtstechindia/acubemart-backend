@@ -194,7 +194,7 @@ const updateFeaturedImage = async (req, res, next) => {
     if (!imageId) return next(apiErrorHandler(400, "Image Id not found"));
 
     const { productId } = req.body;
-
+    
     try {
         const imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
@@ -211,6 +211,13 @@ const updateFeaturedImage = async (req, res, next) => {
             isFeatured: true,
             productId
         });
+
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        product.image.push(newFeturedImage._id);
+        product.featuredImage = newFeturedImage._id;
+        await product.save();
 
         return res.status(200).json({
             success: true,

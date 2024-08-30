@@ -18,6 +18,11 @@ const orderSchema = new mongoose.Schema({
         quantity: {
             type: Number,
             required: [true, "Quantity is required"]
+        },
+        variantId: {
+            type: Schema.Types.ObjectId,
+            ref: "Variant",
+            //required: [true, "Variant Id is required"]
         }
     }],
     total: {

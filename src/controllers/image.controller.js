@@ -190,21 +190,20 @@ const updateImageById = async (req, res, next) => {
 
 /* Update Featured Image with new image */
 const updateFeaturedImage = async (req, res, next) => {
-    const imageId  = req.params.id;
-    if (!imageId) return next(apiErrorHandler(400, "Image Id not found"));
-
-    const { productId } = req.body;
+    const productId  = req.params.id;
+    if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     
     try {
         const imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
 
-        const image = await Image.findByIdAndUpdate(
-            imageId,
-            {
-                isFeatured: false
-            }
+        const image = await Image.findOne(
+            { productId, isFeatured: true }
         );
+        if (image) {
+            image.isFeatured = false;
+            await image.save();
+        }
 
         const newFeturedImage = await Image.create({
             url: imageUrl,

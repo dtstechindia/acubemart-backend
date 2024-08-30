@@ -50,6 +50,7 @@ const getAllOrdersList = async (req, res, next) => {
     try {
         const orders = await Order.find().sort({ createdAt: -1 })
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
+        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
@@ -89,6 +90,7 @@ const getAllOrdersByUserId = async (req, res, next) => {
     try {
         const orders = await Order.find({ userId })
         .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
+        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
@@ -114,6 +116,7 @@ const getOrderById = async (req, res, next) => {
     try {
         const order = await Order.findById(orderId)
         .populate({ path:"products.productId", select: "name slug price sp sku deliveryCharges codCharges _id", populate: { path: "featuredImage", select: "url _id" } })
+        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
@@ -141,6 +144,7 @@ const updateOrder = async (req, res, next) => {
     try {
         const order = await Order.findByIdAndUpdate(id, { status, couponId }, { new: true })
         .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
+        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
         .populate({ path: "address", select: "street city state country pincode _id" })
         .populate({ path: "userId", select: "name email phone _id" })
         .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });

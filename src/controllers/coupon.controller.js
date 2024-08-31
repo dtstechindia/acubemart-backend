@@ -64,6 +64,23 @@ const getCouponById = async (req, res, next) => {
     }
 }
 
+/* get coupon by coupon code */
+const getCouponByCode = async (req, res, next) => {
+  const couponCode = req.params.code;
+  if (!couponCode) return next(apiErrorHandler(400, "Coupon Code is required"));
+
+  try {
+    const coupon = await Coupon.findOne({ code: couponCode });
+    if (!coupon) return next(apiErrorHandler(404, "No Coupon Found"));
+    return res.status(200).json({
+      success: true,
+      message: "Coupon Fetched Successfully",
+      data: coupon,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /* Update Coupon by Id */
 const updateCouponById = async (req, res, next) => {
@@ -123,6 +140,7 @@ export {
     addNewCoupon, 
     getAllCoupons, 
     getCouponById, 
+    getCouponByCode,
     updateCouponById, 
     deleteCouponById 
 }

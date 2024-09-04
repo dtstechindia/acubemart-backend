@@ -6,7 +6,7 @@ import {
     getPaymentMethodById,
     updatePaymentMethod,
     deletePaymentMethod
-} from "../controllers/paymentMethod.controller.js";
+} from "../controllers/paymentmethod.controller.js";
 
 
 const router = Router();

@@ -1,6 +1,6 @@
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
-import PaymentMethod from "../models/paymentMethod.model.js";
+import PaymentMethod from "../models/paymentmethod.model.js";
 
 
 /* Add new Payment Method */

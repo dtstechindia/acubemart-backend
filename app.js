@@ -24,7 +24,7 @@ import variantRouter from './src/routes/variant.route.js';
 import adminRouter from './src/routes/admin.route.js';
 import mediaRouter from './src/routes/media.route.js';
 import couponRouter from './src/routes/coupon.route.js';
-import paymentMethodRouter from './src/routes/paymentMethod.route.js';
+import paymentMethodRouter from './src/routes/paymentmethod.route.js';
 
 
 //App

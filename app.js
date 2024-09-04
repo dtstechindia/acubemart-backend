@@ -24,6 +24,7 @@ import variantRouter from './src/routes/variant.route.js';
 import adminRouter from './src/routes/admin.route.js';
 import mediaRouter from './src/routes/media.route.js';
 import couponRouter from './src/routes/coupon.route.js';
+import paymentMethodRouter from './src/routes/paymentMethod.route.js';
 
 
 //App
@@ -65,6 +66,7 @@ app.use('/api/variant', variantRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/media', mediaRouter);
 app.use('/api/coupon', couponRouter);
+app.use('/api/paymentmethod', paymentMethodRouter);
 
 
 // Home Route

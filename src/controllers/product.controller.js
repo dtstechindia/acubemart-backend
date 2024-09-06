@@ -47,6 +47,9 @@ const addNewProduct = async (req, res, next) => {
     })
     .join("-").toLowerCase();
 
+    //three random numbers and alphabets combination
+    slug = slug + "-" + Math.floor(1000 + Math.random() * 9000);
+
     //Checking if slug already exists
     let slugExists = await Product.findOne({ slug });
 

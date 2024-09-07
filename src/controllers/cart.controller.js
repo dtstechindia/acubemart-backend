@@ -63,6 +63,9 @@ const getCartProducts = async (req, res, next) => {
           path: "brand",
           model: "Brand", // Ensure Brand model is correctly referenced
         },
+        {
+          path: "featuredImage"
+        }
       ],
     });
 

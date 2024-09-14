@@ -6,11 +6,13 @@ import User from "../models/user.model.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
-    const { userId, products, address, phone, couponId, transactionId, total } = req.body;
-    if (!userId || !products || !address || !phone) return next(apiErrorHandler(400, "Please provide all fields"));
-    
-    try {
-        /*
+  const { userId, products, address, phone, couponId, transactionId, total } =
+    req.body;
+  if (!userId || !products || !address || !phone)
+    return next(apiErrorHandler(400, "Please provide all fields"));
+
+  try {
+    /*
         let total = 0;
          Calculate Total Price for Order Products and Update Stock 
         for (let i = 0; i < products.length; i++) {
@@ -22,155 +24,225 @@ const addNewOrder = async (req, res, next) => {
         }
         */
 
-        /* Create New Order */
-        const order = await Order.create({ 
-            userId, 
-            products, 
-            total, 
-            address,
-            phone,
-            couponId,
-            transactionId,
-            total
-        });
+    /* Create New Order */
+    const order = await Order.create({
+      userId,
+      products,
+      total,
+      address,
+      phone,
+      couponId,
+      transactionId,
+      total,
+    });
 
-        await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
+    await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
 
-        if (!order) return next(apiErrorHandler(404, "No Order Found"));
+    if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
-        return res.status(201).json({
-            success: true,
-            message: "Order Added Successfully",
-            data: order
-        })
-        
-    } catch (error) {
-        next(error);
-    }
+    return res.status(201).json({
+      success: true,
+      message: "Order Added Successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /* Get all orders list of customers */
 const getAllOrdersList = async (req, res, next) => {
-    try {
-        const orders = await Order.find().sort({ createdAt: -1 })
-        .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
-        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
-        .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
-        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
-        if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
+  try {
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "products.productId",
+        select: "name slug price sp _id",
+        populate: { path: "featuredImage", select: "url _id" },
+      })
+      .populate({
+        path: "porducts.variantId",
+        select: "name mrp sp variantAttributes _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "address",
+        select: "street city state country pincode _id",
+      })
+      .populate({ path: "userId", select: "name email phone _id" })
+      .populate({
+        path: "transactionId",
+        select: "amount paymentMode status createdAt _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "couponId",
+        select: "code couponType amount _id",
+        strictPopulate: false,
+      });
+    if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
 
-        return res.status(200).json({
-            success: true,
-            message: "Orders Fetched Successfully",
-            data: orders
-        })
-        
-    } catch (error) {
-        next(error);
-    }
-}
+    return res.status(200).json({
+      success: true,
+      message: "Orders Fetched Successfully",
+      data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /* Get All Orders count */
 const getAllOrdersCount = async (req, res, next) => {
-    try {
-        const count = await Order.countDocuments();
-        return res.status(200).json({
-            success: true,
-            message: "All Orders Count",
-            data: count,
-        });
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const count = await Order.countDocuments();
+    return res.status(200).json({
+      success: true,
+      message: "All Orders Count",
+      data: count,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /* Get All Orders by UserId */
 const getAllOrdersByUserId = async (req, res, next) => {
-    const userId = req.params.id;
-    if (!userId) return next(apiErrorHandler(400, "User Id is required"));
-    
-    try {
-        const orders = await Order.find({ userId })
-        .populate({ path:"products.productId", select: "name slug price sp _id", populate: { path: "featuredImage", select: "url _id" } })
-        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
-        .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
-        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
-        if (!orders) return next(apiErrorHandler(404, "No Orders Found"));  
+  const userId = req.params.id;
+  if (!userId) return next(apiErrorHandler(400, "User Id is required"));
 
-        return res.status(200).json({
-            success: true,
-            message: "Orders Fetched Successfully",
-            data: orders
-        })
-        
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const orders = await Order.find({ userId })
+      .populate({
+        path: "products.productId",
+        select: "name slug price sp _id",
+        populate: { path: "featuredImage", select: "url _id" },
+      })
+      .populate({
+        path: "porducts.variantId",
+        select: "name mrp sp variantAttributes _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "address",
+        select: "street city state country pincode _id",
+      })
+      .populate({ path: "userId", select: "name email phone _id" })
+      .populate({
+        path: "transactionId",
+        select: "amount paymentMode status createdAt _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "couponId",
+        select: "code couponType amount _id",
+        strictPopulate: false,
+      });
+    if (!orders) return next(apiErrorHandler(404, "No Orders Found"));
+
+    return res.status(200).json({
+      success: true,
+      message: "Orders Fetched Successfully",
+      data: orders,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 /* Get Order by Id */
 const getOrderById = async (req, res, next) => {
-    const orderId  = req.params.id;
-    if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
-    
-    try {
-        const order = await Order.findById(orderId)
-        .populate({ path:"products.productId", select: "name slug price sp sku deliveryCharges codCharges _id", populate: { path: "featuredImage", select: "url _id" } })
-        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
-        .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "transactionId", select: "amount paymentMode status createdAt _id", strictPopulate: false  })
-        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
-        if (!order) return next(apiErrorHandler(404, "No Order Found"));
+  const orderId = req.params.id;
+  if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
 
-        return res.status(200).json({
-            success: true,
-            message: "Order Fetched Successfully",
-            data: order
-        })
-        
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const order = await Order.findById(orderId)
+      .populate({
+        path: "products.productId",
+        select: "name slug price sp sku deliveryCharges codCharges _id",
+        populate: { path: "featuredImage", select: "url _id" },
+      })
+      .populate({
+        path: "porducts.variantId",
+        select: "name mrp sp variantAttributes _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "address",
+        select: "street city state country pincode _id",
+      })
+      .populate({ path: "userId", select: "name email phone _id" })
+      .populate({
+        path: "transactionId",
+        select: "amount paymentMode status createdAt _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "couponId",
+        select: "code couponType amount _id",
+        strictPopulate: false,
+      });
+    if (!order) return next(apiErrorHandler(404, "No Order Found"));
+
+    return res.status(200).json({
+      success: true,
+      message: "Order Fetched Successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
-
 
 /* Update Order */
 const updateOrder = async (req, res, next) => {
-    const { id } = req.params;
-    const { status, couponId } = req.body;
-    if (!id || !status) return next(apiErrorHandler(400, "Please provide all fields"));
-    
-    try {
-        const order = await Order.findByIdAndUpdate(id, { status, couponId }, { new: true })
-        .populate({ path:"products.productId", select: "name slug price sp featuredImage _id" })
-        .populate({ path: "porducts.variantId", select: "name mrp sp variantAttributes _id", strictPopulate: false  })
-        .populate({ path: "address", select: "street city state country pincode _id" })
-        .populate({ path: "userId", select: "name email phone _id" })
-        .populate({ path: "couponId", select: "code couponType amount _id", strictPopulate: false  });
-        if (!order) return next(apiErrorHandler(404, "No Order Found"));
+  const { id } = req.params;
+  const { status, couponId } = req.body;
+  if (!id || !status)
+    return next(apiErrorHandler(400, "Please provide all fields"));
 
-        return res.status(200).json({
-            success: true,
-            message: "Order Updated Successfully",
-            data: order
-        })
-        
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const order = await Order.findByIdAndUpdate(
+      id,
+      { status, couponId },
+      { new: true }
+    )
+      .populate({
+        path: "products.productId",
+        select: "name slug price sp featuredImage _id",
+      })
+      .populate({
+        path: "porducts.variantId",
+        select: "name mrp sp variantAttributes _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "address",
+        select: "street city state country pincode _id",
+      })
+      .populate({ path: "userId", select: "name email phone _id" })
+      .populate({
+        path: "couponId",
+        select: "code couponType amount _id",
+        strictPopulate: false,
+      });
+    if (!order) return next(apiErrorHandler(404, "No Order Found"));
+
+    return res.status(200).json({
+      success: true,
+      message: "Order Updated Successfully",
+      data: order,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-
-export { 
-    addNewOrder, 
-    getAllOrdersList,
-    getAllOrdersCount,
-    getAllOrdersByUserId, 
-    getOrderById,
-    updateOrder 
-}
+export {
+  addNewOrder,
+  getAllOrdersList,
+  getAllOrdersCount,
+  getAllOrdersByUserId,
+  getOrderById,
+  updateOrder,
+};

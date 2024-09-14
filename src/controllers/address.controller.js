@@ -7,7 +7,8 @@ import User from "../models/user.model.js";
 
 /* Add New Address */
 const addNewAddress = async (req, res, next) => {
-    const { street, city, state, country, pincode, userId } = req.body;
+    const { street, city, state, pincode, userId } = req.body;
+    const country = "India";
     if (!street || !city || !state || !country || !pincode || !userId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {

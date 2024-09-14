@@ -6,12 +6,13 @@ import User from "../models/user.model.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
-    const { userId, products, address, phone, couponId } = req.body;
+    const { userId, products, address, phone, couponId, transactionId, total } = req.body;
     if (!userId || !products || !address || !phone) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
+        /*
         let total = 0;
-        /* Calculate Total Price for Order Products and Update Stock */
+         Calculate Total Price for Order Products and Update Stock 
         for (let i = 0; i < products.length; i++) {
             const product = await Product.findById(products[i].productId);
             if (!product) return next(apiErrorHandler(404, "No Product Found"));
@@ -19,6 +20,7 @@ const addNewOrder = async (req, res, next) => {
             
             total += product.sp * products[i].quantity;
         }
+        */
 
         /* Create New Order */
         const order = await Order.create({ 
@@ -27,7 +29,9 @@ const addNewOrder = async (req, res, next) => {
             total, 
             address,
             phone,
-            couponId
+            couponId,
+            transactionId,
+            total
         });
 
         await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });

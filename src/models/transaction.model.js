@@ -12,7 +12,7 @@ const transactionSchema = new mongoose.Schema({
     orderId: {
         type: Schema.Types.ObjectId,
         ref: "Order",
-        required: [true, "Order Id is required"]
+        //required: [true, "Order Id is required"]
     },
     amount: {
         type: Number,

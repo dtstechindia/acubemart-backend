@@ -7,31 +7,30 @@ import Order from "../models/order.model.js";
 
 /* Add New Transaction */
 const addNewTransaction = async (req, res, next) => {
-    const { userId, orderId, paymentMode, status } = req.body;
-    if (!userId || !orderId || !paymentMode) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { userId, paymentMode, status, amount } = req.body;
+    if (!userId || !paymentMode) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        /* Get Total Amount from Order */
+        /* Get Total Amount from Order 
         let amount = 0;
         const order = await Order.findById(orderId);
         if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
         amount = order.total;
-
+        */
         /* Create New Transaction */
         const transaction = await Transaction.create({ 
-            userId, 
-            orderId, 
+            userId,  
             amount, 
             paymentMode, 
             status
         });
 
-        /* Update Order */
+        /* Update Order 
         //order.isPaid = true;
         order.transactionId.push(transaction._id);
         order.status = "placed";
-        order.save();
+        order.save();*/
 
         return res.status(201).json({
             success: true,
@@ -109,6 +108,7 @@ const getTransactionsByOrderId = async (req, res, next) => {
         next(error);
     }
 };
+
 
 /* Get all Transactions by UserId */
 const getTransactionsByUserId = async (req, res, next) => {

@@ -1,3 +1,4 @@
+import { Transaction } from "mongodb";
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Order from "../models/order.model.js";
@@ -38,8 +39,10 @@ const addNewOrder = async (req, res, next) => {
 
     await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });
 
+    await Transaction.findByIdAndUpdate(transactionId, { $push: { orderId: order._id } });
+    
     if (!order) return next(apiErrorHandler(404, "No Order Found"));
-
+    
     return res.status(201).json({
       success: true,
       message: "Order Added Successfully",

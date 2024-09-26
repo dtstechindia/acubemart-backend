@@ -10,7 +10,7 @@ const addNewVariant = async (req, res, next) => {
     const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video, description, sku, barcode, stock } = req.body;
     //console.log(req.body);
     //console.log(productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, vodeo);
-    if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges || !sku || !barcode || !stock ) return next(apiErrorHandler(400, "Please provide all fields"));
+    if (!productId || !name || !variantAttributes || !mrp || !sp || !discount || !deliveryCharges || !codCharges || !stock ) return next(apiErrorHandler(400, "Please provide all fields"));
     //Add Attributes value to an array if attribute name is same
     
     const result = variantAttributes.reduce((acc, {name, value}) => {
@@ -105,11 +105,26 @@ const getVariantById = async (req, res, next) => {
 /* Update Product Variant */
 const updateVariant = async (req, res, next) => {
     const { id } = req.params;
-    const { varient } = req.body;
-    if (!id || !varient) return next(apiErrorHandler(400, "Please provide all fields"));
+    const { productId, name , variantAttributes, mrp, sp, discount, deliveryCharges, codCharges, video, description, sku, barcode, stock } = req.body;
+    if (!id) return next(apiErrorHandler(400, "Variant Id is required"));
     
     try {
-        const variant = await Variant.findByIdAndUpdate(id, { varient });
+        const variant = await Variant.findByIdAndUpdate(id, { 
+            productId, 
+            name,
+            mrp,
+            sp,
+            discount,
+            deliveryCharges,
+            codCharges, 
+            variantAttributes,
+            video,
+            description,
+            sku,
+            barcode,
+            stock
+         }, { new: true });
+        if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
         
         return res.status(200).json({
             success: true,

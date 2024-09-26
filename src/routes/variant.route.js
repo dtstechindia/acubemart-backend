@@ -26,8 +26,8 @@ router.post("/add", addNewVariant);
 
 
 //PATCH Routes
-/* Update Variant Route -PATCH `/api/variant/update` */
-router.patch("/update", updateVariant);
+/* Update Variant Route -PATCH `/api/variant/update/:id` */
+router.patch("/update/:id", updateVariant);
 
 
 //DELETE Routes

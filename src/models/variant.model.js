@@ -57,11 +57,11 @@ const variantSchema = new mongoose.Schema({
     },
     sku: {
         type: String,
-        required: [true, "Variant SKU is required"]
+        //required: [true, "Variant SKU is required"]
     },
     barcode: {
         type: String,
-        required: [true, "Variant Barcode is required"]
+        //required: [true, "Variant Barcode is required"]
     },
     stock: {
         type: Number,

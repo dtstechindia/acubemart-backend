@@ -208,8 +208,17 @@ const updateOrder = async (req, res, next) => {
   try {
     const order = await Order.findByIdAndUpdate(
       id,
-      { status, couponId },
-      { new: true }
+      { 
+        status, 
+        couponId,
+        //push status and time in the statusUpdateTime array based on the status update
+        $push: { 
+          statusUpdateTime: { 
+            status, 
+            time: new Date()
+          } 
+        }
+      }, { new: true }
     )
       .populate({
         path: "products.productId",

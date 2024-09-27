@@ -53,7 +53,15 @@ const orderSchema = new mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: "Coupon",
         //required: [true, "Coupon Id is required"]
-    }
+    },
+    statusUpdateTime: [{
+        status: {
+            type: String,
+        },
+        time: {
+            type: Date,
+        }
+    }]
 }, { 
     timestamps: true 
 });

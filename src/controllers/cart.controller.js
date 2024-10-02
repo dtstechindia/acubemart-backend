@@ -69,7 +69,7 @@ const getCartProducts = async (req, res, next) => {
       ],
     });
 
-    if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
+    if (!cart) return res.status(404).json({ success: false, message: "Cart Not Found" });
 
     // Transform the products array
     const transformedProducts = cart.products
@@ -140,4 +140,22 @@ const removeCartProduct = async (req, res, next) => {
   }
 };
 
-export { addToCart, getCartProducts, removeCartProduct };
+// clear cart
+const clearCart = async (req, res, next) => {
+  const { userId } = req.body;
+  console.log("clearing cart", userId);
+  if (!userId) return next(apiErrorHandler(400, "UserId is required"));
+  try {
+    const cart = await Cart.findOneAndDelete({ userId });
+    if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
+    return res.status(200).json({
+      success: true,
+      message: "Cart Cleared Successfully",
+      data: cart,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { addToCart, getCartProducts, removeCartProduct, clearCart };

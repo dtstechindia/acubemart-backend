@@ -1,14 +1,13 @@
 import { Router } from "express";
 
-import { 
-    addToCart,
-    getCartProducts,
-    removeCartProduct
- } from "../controllers/cart.controller.js";
-
+import {
+  addToCart,
+  getCartProducts,
+  removeCartProduct,
+  clearCart,
+} from "../controllers/cart.controller.js";
 
 const router = Router();
-
 
 //GET Routes
 /* Get Cart Products Route -GET `/api/cart/all` */
@@ -22,4 +21,8 @@ router.post("/add", addToCart);
 /* Remove Product from Cart Route -DELETE `/api/cart/remove` */
 router.patch("/remove", removeCartProduct);
 
-export default router
+// POST Routes
+/* Clear Cart Route -POST `/api/cart/clear` */
+router.post("/clear", clearCart);
+
+export default router;

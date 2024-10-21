@@ -108,6 +108,37 @@ const getCartProducts = async (req, res, next) => {
   }
 };
 
+/* Update Cart Product Quantity by Product Id */
+const updateCartProductQuantity = async (req, res, next) => {
+  const { userId, productId, quantity } = req.body;
+  if (!userId || !productId || !quantity)
+    return next(apiErrorHandler(400, "Please provide all fields"));
+
+  try {
+    const cart = await Cart.findOneAndUpdate(
+      {
+        userId,
+        "products.productId": productId,
+      },
+      {
+        $set: {
+          "products.$.quantity": quantity,
+        },
+      }
+    );
+
+    if (!cart) return next(apiErrorHandler(404, "No Cart Found"));
+
+    return res.status(200).json({
+      success: true,
+      message: "Product Quantity Updated Successfully",
+      data: cart,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /* Remove Cart Products */
 const removeCartProduct = async (req, res, next) => {
   const { userId, productId } = req.body;
@@ -158,4 +189,4 @@ const clearCart = async (req, res, next) => {
   }
 };
 
-export { addToCart, getCartProducts, removeCartProduct, clearCart };
+export { addToCart, getCartProducts, removeCartProduct, clearCart, updateCartProductQuantity };

@@ -254,6 +254,27 @@ const updateOrder = async (req, res, next) => {
   }
 };
 
+/* Delete Order by Id */
+const deleteOrderById = async (req, res, next) => {
+  const orderId = req.params.id;
+  if (!orderId) return next(apiErrorHandler(400, "Order Id is required"));
+
+  try {
+    const order = await Order.findByIdAndDelete(orderId);
+    if (!order) return next(apiErrorHandler(404, "No Order Found"));
+
+    //delete transactions related to order by order id
+    await Transaction.deleteMany({ orderId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order Deleted Successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   addNewOrder,
   getAllOrdersList,
@@ -261,4 +282,5 @@ export {
   getAllOrdersByUserId,
   getOrderById,
   updateOrder,
+  deleteOrderById
 };

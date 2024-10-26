@@ -60,6 +60,9 @@ const orderSchema = new mongoose.Schema({
         },
         time: {
             type: Date,
+        },
+        remark: {
+            type: String
         }
     }]
 }, { 

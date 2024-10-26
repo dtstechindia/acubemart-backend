@@ -9,7 +9,8 @@ import {
     updateUser,
     updateUserPassword,
     getUserById,
-    deleteUser
+    deleteUser,
+    checkUserByEmailOrPhone
  } from "../controllers/user.controller.js";
 
 const router = Router();
@@ -34,6 +35,9 @@ router.post("/logout", logoutUser);
 
 /* All Users Count Route - POST `/api/user/count` */
 router.post("/count", getAllUsersCount);
+
+/* Check User Email or Phone Route - POST `/api/user/check` */
+router.post("/checkuser", checkUserByEmailOrPhone);
 
 
 //PATCH Routes

@@ -79,6 +79,27 @@ const logoutUser = (req, res, next) => {
     })
 }
 
+
+/* Get User by email */
+const checkUserByEmailOrPhone = async (req, res, next) => {
+    const {email, phone} = req.body;
+    if (!email) return next(apiErrorHandler(400, "Please provide email or phone number"));
+    
+    try {
+        const user = await User.findOne({ email, phone }).select("+password");
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+        console.log(user);
+        return res.status(200).json({
+            success: true,
+            message: "User Fetched Successfully",
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
 /* Get User by Id */
 const getUserById = async (req, res, next) => {
     const userId  = req.params.id;
@@ -229,5 +250,6 @@ export {
     updateUser,
     getUserById,
     updateUserPassword,
+    checkUserByEmailOrPhone,
     deleteUser
 }

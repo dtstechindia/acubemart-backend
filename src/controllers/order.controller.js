@@ -204,7 +204,7 @@ const getOrderById = async (req, res, next) => {
 /* Update Order */
 const updateOrder = async (req, res, next) => {
   const { id } = req.params;
-  const { status, couponId } = req.body;
+  const { status, couponId, remark } = req.body;
   if (!id || !status)
     return next(apiErrorHandler(400, "Please provide all fields"));
 
@@ -218,7 +218,8 @@ const updateOrder = async (req, res, next) => {
         $push: { 
           statusUpdateTime: { 
             status, 
-            time: new Date()
+            time: new Date(),
+            remark
           } 
         }
       }, { new: true }

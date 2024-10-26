@@ -6,7 +6,8 @@ import {
     getAllOrdersCount,
     getAllOrdersByUserId,
     getOrderById,
-    updateOrder
+    updateOrder,
+    deleteOrderById
 } from "../controllers/order.controller.js";
 
 
@@ -34,5 +35,7 @@ router.post("/count", getAllOrdersCount);
 /* Update Order Route -PATCH `/api/order/update/:id` */
 router.patch("/update/:id", updateOrder);
 
+//DELETE Routes
+router.delete("/delete/:id", deleteOrderById);
 
 export default router;

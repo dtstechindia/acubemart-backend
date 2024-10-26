@@ -44,11 +44,13 @@ const registerUser = async (req, res, next) => {
 /* Login User with access token and refresh token */
 const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
+    console.log(email, password);
     if (!email) return next(apiErrorHandler(400, "Email is required"));
     if (!password) return next(apiErrorHandler(400, "Password is required"));
 
     try {
         const user = await User.findOne({ email }).select("+password");
+        console.log(user);
         if (!user) return next(apiErrorHandler(404, "No User Found"));
 
         const isMatch = await bcryptjs.compare(password, user.password);

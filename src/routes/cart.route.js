@@ -19,11 +19,12 @@ router.get("/all", getCartProducts);
 router.post("/add", addToCart);
 
 //PATCH Routes
-/* Update Cart Product Quantity Route -PATCH `/api/cart/update` */
-router.patch("/update", updateCartProductQuantity);
-
 /* Remove Product from Cart Route -DELETE `/api/cart/remove` */
 router.patch("/remove", removeCartProduct);
+
+//Put Routes
+/* Update Cart Product Quantity Route -PATCH `/api/cart/update` */
+router.put("/update", updateCartProductQuantity);
 
 // POST Routes
 /* Clear Cart Route -POST `/api/cart/clear` */

@@ -34,7 +34,7 @@ const addToCart = async (req, res, next) => {
       userId,
       products: [{ productId, quantity }],
     });
-
+    //console.log(cart);
     return res.status(201).json({
       success: true,
       message: "Product Added to Cart Successfully",
@@ -68,7 +68,7 @@ const getCartProducts = async (req, res, next) => {
         }
       ],
     });
-
+    //console.log(cart);
     if (!cart) return res.status(404).json({ success: false, message: "Cart Not Found" });
 
     // Transform the products array

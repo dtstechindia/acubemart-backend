@@ -6,6 +6,8 @@ const createPayment = async (req, res) => {
     const razorpay = new Razorpay({
       key_id: "rzp_live_b54diYjb2fsFgi",
       key_secret: "2fpwEWmDFhc2cRRsLDrRqyaW",
+      //     key_id: "rzp_test_8rtBlOXwhirTBk",
+      // key_secret: "fboOPpzXfDHx4lFH6Xjmc2zt",
     });
     const options = {
       amount: amount * 100,

@@ -5,6 +5,7 @@ import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 import User from "../models/user.model.js";
 import Transaction from "../models/transaction.model.js";
+import { getOrderNumber } from "../utils/order.counter.js";
 
 /* Add New Order */
 const addNewOrder = async (req, res, next) => {
@@ -17,6 +18,7 @@ const addNewOrder = async (req, res, next) => {
     return next(apiErrorHandler(400, "Please provide all fields"));
 
   try {
+    const orderNumber = await getOrderNumber();
     /*
         let total = 0;
          Calculate Total Price for Order Products and Update Stock 
@@ -39,6 +41,7 @@ const addNewOrder = async (req, res, next) => {
       couponId,
       transactionId,
       total,
+      orderNumber
     });
 
     await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });

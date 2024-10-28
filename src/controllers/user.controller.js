@@ -128,7 +128,8 @@ const getAllUsers = async (req, res, next) => {
     try {
         const users = await User.find().sort({ createdAt: -1 })
         .populate({path: "address", select: "street city state country pincode _id", strictPopulate: false  })
-        .populate({path: "avatar", select: "url _id", strictPopulate: false  });
+        .populate({path: "avatar", select: "url _id", strictPopulate: false  })
+        .populate({path: "orders", select: "total orderNumber _id", strictPopulate: false  });
         if (!users) return next(apiErrorHandler(404, "No Users Found"));
 
         return res.status(200).json({

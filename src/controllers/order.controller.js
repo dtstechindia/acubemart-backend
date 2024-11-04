@@ -41,7 +41,7 @@ const addNewOrder = async (req, res, next) => {
       couponId,
       transactionId,
       total,
-      orderNumber
+      orderNumber: orderNumber
     });
 
     await User.findByIdAndUpdate(userId, { $push: { orders: order._id } });

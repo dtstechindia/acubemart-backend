@@ -6,7 +6,8 @@ import {
     getElementById,
     getAllElementsByCategoryId,
     updateElementById,
-    deleteElementById
+    deleteElementById,
+    getAllActiveElements
  } from "../controllers/element.controller.js";
 
 
@@ -16,6 +17,9 @@ const router = Router();
 //GET Routes
 /* Get Elements Route -GET `/api/element/all` */
 router.get("/all", getAllElements);
+
+/* Get All Active Elements Route -GET `/api/element/active` */
+router.get("/active", getAllActiveElements);
 
 /* Get All Elements by Category Id Route -GET `/api/element/category/:id` */
 router.get("/category/:id", getAllElementsByCategoryId);

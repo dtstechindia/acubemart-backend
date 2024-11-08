@@ -53,7 +53,9 @@ const getCategories = async (req, res, next) => {
 /* Get All Active Categories */
 const getAllActiveCategories = async (req, res, next) => {
     try {
-        const categories = await Category.find({ isActive: true });
+        const categories = await Category.find({ isActive: true }).sort({ createdAt: -1 })
+        .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
         if (!categories) return next(apiErrorHandler(404, "No Categories Found"));
 
         return res.status(200).json({

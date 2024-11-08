@@ -22,6 +22,10 @@ const brandSchema = new mongoose.Schema({
         ref: "Media",
         //required: [true, "Category image is required"]
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    }
 }, { 
     timestamps: true 
 });

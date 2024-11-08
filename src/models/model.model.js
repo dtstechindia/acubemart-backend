@@ -27,6 +27,10 @@ const modelSchema = new mongoose.Schema({
         ref: "Media",
         //required: [true, "Model image is required"]
     },
+    isActive: {
+        type: Boolean,
+        default: true
+    }
 }, { 
     timestamps: true 
 });

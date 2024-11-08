@@ -4,7 +4,8 @@ import {
     addNewType,
     getAllTypes,
     updateTypeById,
-    deleteType
+    deleteType,
+    getAllActiveTypes
 } from "../controllers/type.controller.js";
 
 
@@ -14,6 +15,9 @@ const router = Router();
 //GET Routes
 // Get All Types Route -GET `/api/type/all`
 router.get("/all", getAllTypes);
+
+//Get All Active Types Route -GET `/api/type/active`
+router.get("/active", getAllActiveTypes);
 
 
 //POST Routes

@@ -47,7 +47,26 @@ const getAllElements = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-}  
+} 
+
+
+/* Get All Active Elements */
+const getAllActiveElements = async (req, res, next) => {
+    try {
+        const elements = await Element.find({ isActive: true }).sort({ createdAt: -1 })
+        .populate({ path: "categoryId", select: "name _id" })
+        .populate({ path: "typeId", select: "name _id" })
+        .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
+        if (!elements) return next(apiErrorHandler(404, "No Elements Found"));
+        res.status(200).json({
+            success: true,
+            message: "All Elements",
+            data: elements
+        })
+    } catch (error) {
+        next(error);
+    }
+}
 
 
 /* Get Element by Id */
@@ -98,7 +117,7 @@ const getAllElementsByCategoryId = async (req, res, next) => {
 const updateElementById = async (req, res, next) => {
     const elementId  = req.params.id;
     if (!elementId) return next(apiErrorHandler(400, "Element Id not found"));
-    const { name, description, categoryId, typeId, mediaId } = req.body;
+    const { name, description, categoryId, typeId, mediaId, isActive } = req.body;
     
     try {
         const element = await Element.findByIdAndUpdate(
@@ -108,7 +127,8 @@ const updateElementById = async (req, res, next) => {
                 description,
                 categoryId,
                 typeId,
-                mediaId
+                mediaId,
+                isActive
             }, { 
                 new: true, 
                 runValidators: true
@@ -150,6 +170,7 @@ const deleteElementById = async (req, res, next) => {
 export { 
     addNewElement, 
     getAllElements,
+    getAllActiveElements,
     getElementById,
     getAllElementsByCategoryId,
     updateElementById,

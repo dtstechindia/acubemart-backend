@@ -5,7 +5,8 @@ import {
     getAllModels,
     getModelById,
     updateModelById,
-    deleteModel
+    deleteModel,
+    getAllActiveModels
 } from "../controllers/model.controller.js";
 
 
@@ -14,6 +15,10 @@ const router = Router();
 //GET Routes
 // Get All Models Route -GET `/api/model/all`
 router.get("/all", getAllModels);
+
+
+// Get All Active Models Route -GET `/api/model/active`
+router.get("/active", getAllActiveModels);
 
 // Get Model by Id Route -GET `/api/model/:id`
 router.get("/:id", getModelById);

@@ -54,6 +54,28 @@ const getAllModels = async (req, res, next) => {
 };
 
 
+/* Get All Active Models */
+const getAllActiveModels = async (req, res, next) => {
+    try {
+        const models = await Model.find({ isActive: true }).sort({ createdAt: -1 })
+            .populate("brandId typeId")
+            .populate({ path: "brandId", select: "name _id", strictPopulate: false })
+            .populate({ path: "typeId", select: "name _id", strictPopulate: false })
+            .populate({ path: "mediaId", select: "url _id", strictPopulate: false });
+        if (!models) return next(apiErrorHandler(404, "No Models Found"));
+
+        return res.status(200).json({
+            success: true,
+            message: "Models Fetched Successfully",
+            data: models
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 /* Get Model By Id */
 const getModelById = async (req, res, next) => {
     const modelId = req.params.id;
@@ -81,7 +103,7 @@ const getModelById = async (req, res, next) => {
 const updateModelById = async (req, res, next) => {
     const modelId  = req.params.id;
     if (!modelId) return next(apiErrorHandler(400, "Model Id not found"));
-    const { name, description, brandId, typeId } = req.body;
+    const { name, description, brandId, typeId, isActive } = req.body;
     
     try {
         const model = await Model.findByIdAndUpdate(
@@ -90,7 +112,8 @@ const updateModelById = async (req, res, next) => {
                 name, 
                 description,
                 brandId,
-                typeId
+                typeId,
+                isActive
             }, { 
                 new: true, 
                 runValidators: true
@@ -133,6 +156,7 @@ const deleteModel = async (req, res, next) => {
 export { 
         addNewModel,
         getAllModels,
+        getAllActiveModels,
         getModelById,
         updateModelById,
         deleteModel 

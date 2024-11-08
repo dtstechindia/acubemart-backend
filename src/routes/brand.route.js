@@ -5,7 +5,8 @@ import {
     deleteBrand,
     updateBrandById,
     getAllBrands,
-    getBrandById
+    getBrandById,
+    getAllActiveBrands
 } from "../controllers/brand.controller.js";
 
 
@@ -15,6 +16,8 @@ const router = Router();
 /* Get All Brands Route -GET `/api/brand/all` */
 router.get("/all", getAllBrands);
 
+/* Get All Active Brands Route -GET `/api/brand/active` */
+router.get("/active", getAllActiveBrands);
 
 /* Get Brand by Id Route -GET `/api/brand/:id` */
 router.get("/:id", getBrandById);

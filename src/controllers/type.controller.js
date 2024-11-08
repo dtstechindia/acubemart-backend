@@ -41,6 +41,21 @@ const getAllTypes = async (req, res, next) => {
 }
 
 
+/* Get All Active Types */
+const getAllActiveTypes = async (req, res, next) => {
+    try {
+        const types = await Type.find({ isActive: true });
+        res.status(200).json({ 
+            success: true, 
+            message: "Types Fetched Successfully",
+            data: types 
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 /* Update Type by Id */
 const updateTypeById = async (req, res, next) => {
     const typeId  = req.params.id;
@@ -94,6 +109,7 @@ const deleteType = async (req, res, next) => {
 export {
     addNewType,
     getAllTypes,
+    getAllActiveTypes,
     updateTypeById,
     deleteType
 }

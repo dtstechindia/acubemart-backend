@@ -7,6 +7,10 @@ const typeSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "Type name is required"]
+    },
+    isActive: {
+        type: Boolean,
+        default: true
     }
 }, { 
     timestamps: true 

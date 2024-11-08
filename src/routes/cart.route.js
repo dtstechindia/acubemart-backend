@@ -24,7 +24,7 @@ router.patch("/remove", removeCartProduct);
 
 //Put Routes
 /* Update Cart Product Quantity Route -PATCH `/api/cart/update` */
-router.put("/update", updateCartProductQuantity);
+router.patch("/update", updateCartProductQuantity);
 
 // POST Routes
 /* Clear Cart Route -POST `/api/cart/clear` */

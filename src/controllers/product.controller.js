@@ -387,6 +387,28 @@ const deleteProductById = async (req, res, next) => {
   }
 };
 
+/* Bulk Edit Products by pushing category Id in products by Id */
+const bulkEditProducts = async (req, res, next) => {
+  const { products, categoryType, category } = req.body;
+  if (!products || !categoryType || !category){
+    return next(apiErrorHandler(400, "Please provide all fields"));
+  }
+
+  try {
+    const updatedProducts = await Product.updateMany(
+      { _id: { $in: products } },
+      { $addToSet: { [categoryType]: category } }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Products Updated Successfully",
+      data: updatedProducts,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 //Filter Get routes
 //todo
 /* Get All Products By Type, Category, Brand, Model Id */
@@ -400,4 +422,5 @@ export {
   getProductBySlug,
   editProductById,
   deleteProductById,
+  bulkEditProducts,
 };

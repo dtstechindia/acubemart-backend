@@ -11,8 +11,7 @@ import { getOrderNumber } from "../utils/order.counter.js";
 const addNewOrder = async (req, res, next) => {
   const { userId, products, address, phone, couponId, transactionId, total } =
     req.body;
-
-    console.log("order", req.body);
+    //console.log("order", req.body);
 
   if (!userId || !products || !address || !phone)
     return next(apiErrorHandler(400, "Please provide all fields"));

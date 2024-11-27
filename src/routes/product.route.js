@@ -8,7 +8,8 @@ import {
     getProductById,
     editProductById,
     deleteProductById,
-    getProductBySlug
+    getProductBySlug,
+    bulkEditProducts
 } from "../controllers/product.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -36,6 +37,9 @@ router.post("/add", addNewProduct);
 
 // All Products Count Route -POST `/api/product/count`
 router.post("/count", getAllProductsCount);
+
+// Bulk Edit Products Route -POST `/api/product/bulk/edit`
+router.post("/bulk/edit", bulkEditProducts);
 
 
 //PATCH Routes

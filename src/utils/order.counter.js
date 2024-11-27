@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 import Order from "../models/order.model.js";
+/* import Product from "../models/product.model.js";
+import fs from 'fs';
+import { json2csv } from 'json-2-csv'; */
 
 // Create a new schema for the counter
 const counterSchema = new mongoose.Schema({
@@ -36,5 +39,71 @@ const getOrderNumber = async () => {
   const counter = await Counter.findOneAndUpdate({ name: 'orderNumber' }, { $inc: { count: 1 } }, { new: true });
   return counter.count;
 };
+
+/* const getProductsDataAndWriteToFile = async () => {
+  try {
+    const products = await Product.find({ status: "published" })
+    .populate({ path: "type", select: "name _id" })
+    .populate({ path: "category", select: "name description isActive _id" })
+    .populate({ path: "element", select: "name description _id" })
+    .populate({ path: "brand", select: "name logo description _id" })
+    .populate({ path: "model", select: "name description _id" })
+    .populate({
+      path: "image",
+      select: "url isFeatured _id",
+      strictPopulate: false,
+    })
+    .populate({
+      path: "attributes",
+      select: "name value _id",
+      strictPopulate: false,
+    })
+    .populate({
+      path: "variants",
+      select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+      strictPopulate: false,
+      populate: {
+        path: "image",
+        select: "url _id",
+        strictPopulate: false,
+      },
+    })
+    .populate({
+      path: "featuredImage",
+      select: "url _id",
+      strictPopulate: false,
+    });
+    if(products) console.log("Products Data Fetched Successfully");
+    
+    //create a data form products with fields _id, name, description, price, sp, image: featuredImage
+    const data = products.map((product, index) => ({
+      //_id: product._id,
+      id: index + 1,
+      title: product.name,
+      description: product.description,
+      link: `https://www.acubemart.in/product/${product.slug}`,
+      image_link: product.featuredImage?.url,
+      price: `${product.price.toFixed(2)} INR`,
+      sale_price: `${product.sp.toFixed(2)} INR`,
+      availability: product.stock > 0 ? "in_stock" : "out_of_stock",
+      stock: product.stock,
+      barcode: product.barcode,
+      whole_sale_price: ``,
+      variants: product.variants.length > 0 && product.variants.map((variant) => ({
+        name: variant.name,
+        price: `${variant.mrp.toFixed(2)} INR`,
+        sale_price: `${variant.sp.toFixed(2)} INR`,
+      }))
+    }))
+    //convert data so that to write it into a csv file 
+    const csv = await json2csv(data);
+    console.log("Data converted to CSV successfully");
+    fs.writeFileSync("products.csv", csv);
+    console.log("Data written to file successfully");
+  } catch (error) {
+    console.log(error);
+  }
+};
+getProductsDataAndWriteToFile(); */
 
 export { initializeCounter, getOrderNumber };

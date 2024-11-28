@@ -169,10 +169,80 @@ const deleteVariant = async (req, res, next) => {
     }
 };
 
+/* Update variant Images Order and sort them */
+const updateVariantImagesOrder = async (req, res, next) => {
+    const { variantId, imagesOrder } = req.body;
+    if (!variantId || !imagesOrder) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const variant = await Variant.findById(variantId);
+        if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
+
+        // Sort the images according to the imagesOrder array
+        const sortedImages = variant.image.sort((a, b) => {
+            return imagesOrder.indexOf(a.toString()) - imagesOrder.indexOf(b.toString());
+        });
+
+        // Update the variant document with the sorted images
+        variant.image = sortedImages;
+
+        // Save the updated variant document
+        await variant.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Variant images updated successfully",
+            data: variant
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+/* Delete variant image by Id and remove the image id form the variant image array, products image array */
+const deleteVariantImage = async (req, res, next) => {
+    const { variantId, imageId } = req.params;
+    if (!variantId || !imageId) return next(apiErrorHandler(400, "Please provide all fields"));
+    
+    try {
+        const variant = await Variant.findById(variantId);
+        if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
+
+        const image = await Image.findById(imageId);
+        if (!image) return next(apiErrorHandler(404, "No Image Found"));
+
+        const product = await Product.findById(variant.productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        const index = variant.image.indexOf(imageId);
+        if (index > -1) {
+            variant.image.splice(index, 1);
+            await variant.save();
+        }
+        const productImageIndex = product.image.indexOf(imageId);
+        if (productImageIndex > -1) {
+            product.image.splice(productImageIndex, 1);
+            await product.save();
+        }
+        await Image.findByIdAndDelete(imageId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Variant image deleted successfully",
+            data: variant
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export { 
     addNewVariant, 
     getAllVariantsByProductId, 
     getVariantById,
     updateVariant,
-    deleteVariant 
+    deleteVariant,
+    updateVariantImagesOrder,
+    deleteVariantImage 
 }

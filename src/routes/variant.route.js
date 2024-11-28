@@ -5,7 +5,9 @@ import {
     getAllVariantsByProductId,
     getVariantById,
     updateVariant,
-    deleteVariant
+    deleteVariant,
+    updateVariantImagesOrder,
+    deleteVariantImage
  } from "../controllers/variant.controller.js";
 
 
@@ -29,10 +31,16 @@ router.post("/add", addNewVariant);
 /* Update Variant Route -PATCH `/api/variant/update/:id` */
 router.patch("/update/:id", updateVariant);
 
+/* Update Variant Images Order Route -PATCH `/api/variant/image/update/:id` */
+router.patch("/image/update/:id", updateVariantImagesOrder);
+
 
 //DELETE Routes
 /* Delete Variant Route -DELETE `/api/variant/delete/:id` */
 router.delete("/delete/:id", deleteVariant);
+
+/* Delete Variant Image Route -DELETE `/api/variant/image/delete/:id` */
+router.delete("/:variantId/image/delete/:imageId", deleteVariantImage);
 
 
 export default router

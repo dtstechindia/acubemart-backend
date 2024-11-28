@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 import Order from "../models/order.model.js";
 /* import Product from "../models/product.model.js";
 import fs from 'fs';
-import { json2csv } from 'json-2-csv'; */
-
+import { json2csv } from 'json-2-csv';
+ */
 // Create a new schema for the counter
 const counterSchema = new mongoose.Schema({
   name: String,
@@ -88,13 +88,29 @@ const getOrderNumber = async () => {
       availability: product.stock > 0 ? "in_stock" : "out_of_stock",
       stock: product.stock,
       barcode: product.barcode,
-      whole_sale_price: ``,
-      variants: product.variants.length > 0 && product.variants.map((variant) => ({
-        name: variant.name,
-        price: `${variant.mrp.toFixed(2)} INR`,
-        sale_price: `${variant.sp.toFixed(2)} INR`,
-      }))
+      whole_sale_price: "",
+      stock_jump: "",
     }))
+
+    //extract variants data from all the products and add to the data array with same format and continuation of the data array
+    for (let i = 0; i < products.length; i++) {
+      for (let j = 0; j < products[i].variants.length; j++) {
+        data.push({
+          id: i + 1,
+          title: products[i].variants[j].name,
+          description: products[i].variants[j].description,
+          link: `https://www.acubemart.in/product/${products[i].slug}`,
+          image_link: products[i].variants[j].image[0]?.url,
+          price: `${products[i].variants[j].mrp.toFixed(2)} INR`,
+          sale_price: `${products[i].variants[j].sp.toFixed(2)} INR`,
+          availability: products[i].variants[j].stock > 0 ? "in_stock" : "out_of_stock",
+          stock: products[i].variants[j].stock,
+          barcode: products[i].variants[j].barcode,
+          whole_sale_price: "",
+          stock_jump: "",
+        });
+      }
+    }
     //convert data so that to write it into a csv file 
     const csv = await json2csv(data);
     console.log("Data converted to CSV successfully");

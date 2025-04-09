@@ -49,6 +49,15 @@ const addNewOrder = async (req, res, next) => {
     
     if (!order) return next(apiErrorHandler(404, "No Order Found"));
 
+    //upddate stock
+    for (let i = 0; i < order.products.length; i++) {
+      const product = await Product.findById(order.products[i].productId);
+      if (!product) return next(apiErrorHandler(404, "No Product Found"));
+      if (product.stock < order.products[i].quantity) return next(apiErrorHandler(400, "Insufficient Stock"));
+      product.stock -= order.products[i].quantity;
+      await product.save();
+    }
+
     return res.status(201).json({
       success: true,
       message: "Order Added Successfully",

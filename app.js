@@ -27,6 +27,10 @@ import mediaRouter from "./src/routes/media.route.js";
 import couponRouter from "./src/routes/coupon.route.js";
 import paymentMethodRouter from "./src/routes/paymentmethod.route.js";
 import paymentRouter from "./src/routes/payment.route.js";
+import serviceRouter from "./src/routes/service.route.js";
+import serviceproviderRouter from "./src/routes/serviceprovider.route.js";
+import appointmentRouter from "./src/routes/appointment.route.js";
+import vehicletypeRouter from "./src/routes/vehicletype.route.js";
 
 //App
 const app = express();
@@ -71,6 +75,10 @@ app.use("/api/media", mediaRouter);
 app.use("/api/coupon", couponRouter);
 app.use("/api/paymentmethod", paymentMethodRouter);
 app.use("/api/payment/order", paymentRouter);
+app.use("/api/service", serviceRouter);
+app.use("/api/serviceprovider", serviceproviderRouter);
+app.use("/api/appointment", appointmentRouter);
+app.use("/api/vehicletype", vehicletypeRouter);
 
 // Home Route
 app.get("/", (_req, res) => {

@@ -7,9 +7,9 @@ import ServiceProvider from "../models/serviceprovider.model.js";
 const addNewAppointment = async (req, res, next) => {
     console.log(req.body);
     try {
-        const { date, startTime, endTime, serviceProviderId, userId, phone, email, name, totalAmount, advancePayment, pendingPayment, transactionId } = req.body;
+        const { date, startTime, endTime, serviceProviderId, userId, phone, email, name, totalAmount, advancePayment, pendingPayment, transactionId, paymentMode } = req.body;
         let calculatedPrice = 0;
-        if (!startTime || !endTime || !date || !serviceProviderId || !userId || !totalAmount || !advancePayment || !pendingPayment) return next(apiErrorHandler(400, "Please provide all fields"));
+        if (!startTime || !endTime || !date || !serviceProviderId || !userId || !totalAmount /* || !advancePayment */ || !pendingPayment || !paymentMode) return next(apiErrorHandler(400, "Please provide all fields"));
 
         const serviceProvider = await ServiceProvider.findById(serviceProviderId);
         if (!serviceProvider) return next(apiErrorHandler(404, "Service Provider not found"));
@@ -40,7 +40,8 @@ const addNewAppointment = async (req, res, next) => {
                 totalAmount,
                 advancePayment,
                 pendingPayment,
-                transactionId
+                transactionId,
+                paymentMode,
             })
 
             return res.status(201).json({
@@ -103,7 +104,7 @@ const getAppointmentsByUserId = async (req, res, next) => {
 const updateAppointment = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const { startTime, endTime, date, serviceId, vehicleTypeId, serviceProviderId, userId, price, duration, phone, email, name, totalAmount, advancePayment, pendingPayment, transactionId, status } = req.body;
+        const { startTime, endTime, date, serviceId, vehicleTypeId, serviceProviderId, userId, price, duration, phone, email, name, totalAmount, advancePayment, pendingPayment, transactionId, status, paymentMode } = req.body;
         const apointment = await Appointment.findByIdAndUpdate(id, {
             startTime, 
             endTime, 
@@ -121,7 +122,8 @@ const updateAppointment = async (req, res, next) => {
             advancePayment,
             pendingPayment,
             transactionId,
-            status
+            status,
+            paymentMode,
         }, { new: true });
         if (!apointment) return next(apiErrorHandler(404, "Apointment not found"));
         return res.status(200).json({

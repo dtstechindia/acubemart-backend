@@ -2,8 +2,8 @@ import "dotenv/config";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import express from "express";
 import cors from "cors";
-import Razorpay from "razorpay";
-import multer from "multer";
+//import Razorpay from "razorpay";
+//import multer from "multer";
 
 import ConnectDB from "./src/db/connection.db.js";
 import { errorHandler } from "./src/middlewares/errorhandler.middleware.js";

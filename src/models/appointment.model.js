@@ -83,6 +83,14 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         //required: [true, "Transaction ID is required"]
     },
+    paymentMode: {
+        type: String,
+        enum: ["COD", "UPI", "10%_ADVANCE", ],
+        message: "{VALUE} is not a valid payment mode",
+        //default: "COD",
+        toUpperCase: true,
+        required: [true, "Payment Mode is required"]
+    },
 }, { 
     timestamps: true
 })

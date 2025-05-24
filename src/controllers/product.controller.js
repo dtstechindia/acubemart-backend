@@ -108,6 +108,52 @@ const getAllProductsCount = async (req, res, next) => {
   }
 };
 
+const getSaleProducts = async (req, res, next) => {
+  try {
+    const products = await Product.find({ status: "published" })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+    if (!products) return next(apiErrorHandler(404, "No Products Found"));
+    return res.status(200).json({
+      success: true,
+      message: "Sale Products Fetched Successfully",
+      data: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /* Get All Published Products */
 const getAllPublishedProducts = async (req, res, next) => {
   try {
@@ -416,6 +462,7 @@ const bulkEditProducts = async (req, res, next) => {
 export {
   addNewProduct,
   getAllProducts,
+  getSaleProducts,
   getAllPublishedProducts,
   getAllProductsCount,
   getProductById,

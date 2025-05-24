@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
     addNewProduct,
     getAllProducts,
+    getSaleProducts,
     getAllPublishedProducts,
     getAllProductsCount,
     getProductById,
@@ -20,6 +21,9 @@ const router = Router();
 //GET Routes
 // Get All Products Route -GET `/api/product/all`
 router.get("/all", getAllProducts);
+
+// Get All Sale Products Route -GET `/api/product/sale`
+router.get("/sale", getSaleProducts);
 
 // Get All Published Products Route -GET `/api/product/published`
 router.get("/published", getAllPublishedProducts);

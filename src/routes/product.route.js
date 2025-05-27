@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import {
     addNewProduct,
+    searchProducts,
     getAllProducts,
     getSaleProducts,
     getAllPublishedProducts,
@@ -44,6 +45,9 @@ router.post("/count", getAllProductsCount);
 
 // Bulk Edit Products Route -POST `/api/product/bulk/edit`
 router.post("/bulk/edit", bulkEditProducts);
+
+//Search Products Route -POST `/api/product/search`
+router.post("/search", searchProducts);
 
 
 //PATCH Routes

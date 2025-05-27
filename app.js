@@ -42,7 +42,7 @@ ConnectDB();
 //Middlewares
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in"],
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })

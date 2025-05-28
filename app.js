@@ -34,7 +34,7 @@ import vehicletypeRouter from "./src/routes/vehicletype.route.js";
 
 //App
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 
 //Database connection
 ConnectDB();
@@ -42,7 +42,7 @@ ConnectDB();
 //Middlewares
 app.use(
   cors({
-    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in", "http://localhost:3000", "http://localhost:8000"],
+    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in"],
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })

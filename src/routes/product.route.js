@@ -8,13 +8,14 @@ import {
     getSaleProducts,
     getAllPublishedProducts,
     getAllProductsCount,
+    getPublishedProductsCount,
+    getPaginatedProducts,
     getProductById,
     editProductById,
     deleteProductById,
     getProductBySlug,
     bulkEditProducts
 } from "../controllers/product.controller.js";
-import { upload } from "../middlewares/multer.middleware.js";
 
 
 const router = Router();
@@ -36,6 +37,11 @@ router.get("/:id", getProductById);
 // Get Product by SLUG Route -GET `/api/product/slug/:slug`
 router.get("/slug/:slug", getProductBySlug);
 
+//Get Paginated Products Route -GET `/api/product/page/:page`
+router.get("/page/:page", getPaginatedProducts);
+
+// Get Published Products Count Route -GET `/api/product/published/count`
+router.get("/published/count", getPublishedProductsCount);
 
 //POST Routes
 // Add New Product Route -POST `/api/product/add`

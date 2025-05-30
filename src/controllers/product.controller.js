@@ -107,9 +107,7 @@ const searchProducts = async (req, res, next) => {
           index: "default",
           text: {
             query: searchQuery,
-            path: {
-              wildcard: "*",
-            },
+            path: ["name", "description"],
             fuzzy: {
               maxEdits: 1,
             },
@@ -178,9 +176,7 @@ const searchAllMatchedProducts = async (req, res, next) => {
           index: "default",
           text: {
             query: searchQuery,
-            path: {
-              wildcard: "*",
-            },
+            path: ["name", "description"],
             fuzzy: {
               maxEdits: 1,
             },
@@ -252,6 +248,20 @@ const getAllProductsCount = async (req, res, next) => {
   }
 };
 
+/* Get Published Products count */
+const getPublishedProductsCount = async (req, res, next) => {
+  try {
+    const count = await Product.countDocuments({ status: "published" });
+    return res.status(200).json({
+      success: true,
+      message: "Published Products Count",
+      data: count,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getSaleProducts = async (req, res, next) => {
   try {
     const products = await Product.find({ status: "published" })
@@ -291,6 +301,59 @@ const getSaleProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Sale Products Fetched Successfully",
+      data: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* Get Paginated Products */
+const getPaginatedProducts = async (req, res, next) => {
+  let page = req.params.page || 1;
+  page = parseInt(page);
+  console.log("Page Number:", page);
+  const { limit = 12 } = req.query;
+  const skip = (page - 1) * limit;
+  try {
+    const products = await Product.find({ status: "published" })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+    if (!products) return next(apiErrorHandler(404, "No Products Found"));
+    return res.status(200).json({
+      success: true,
+      message: "Products Fetched Successfully",
       data: products,
     });
   } catch (error) {
@@ -611,6 +674,8 @@ export {
   getSaleProducts,
   getAllPublishedProducts,
   getAllProductsCount,
+  getPublishedProductsCount,
+  getPaginatedProducts,
   getProductById,
   getProductBySlug,
   editProductById,

@@ -15,8 +15,8 @@ const addNewAppointment = async (req, res, next) => {
         if (!serviceProvider) return next(apiErrorHandler(404, "Service Provider not found"));
 
         //check if is there any appointment on that date with same time start and end time
-        const existingAppointment = await Appointment.findOne({ date, startTime, endTime });
-        if (existingAppointment) return next(apiErrorHandler(400, "Appointment already booked for this time slot, please choose another time slot"));
+        /* const existingAppointment = await Appointment.findOne({ date, startTime, endTime });
+        if (existingAppointment) return next(apiErrorHandler(409, "Appointment already booked for this time slot, please choose another time slot")); */
 
         //extract the day of date and compare with serviceProvider daywiseprice day and assign price
         const day = new Date(date).toLocaleDateString('en-US', { weekday: 'long' }).toLocaleLowerCase();
@@ -53,6 +53,30 @@ const addNewAppointment = async (req, res, next) => {
             return next(apiErrorHandler(400, "Something went wrong while calculating appointment price"))
         }
  
+    } catch (error) {
+        next(error);
+    }
+}
+
+const CheckAppointmentAvailability = async (req, res, next) => {
+    try {
+        const { date, startTime, endTime } = req.body;
+        if (!date || !startTime || !endTime) return next(apiErrorHandler(400, "Please provide all fields"));
+        // Check if there is an existing appointment on the same date and time
+        const existingAppointment = await Appointment.findOne({ date, startTime, endTime });
+        if (existingAppointment) {
+            return res.status(200).json({ 
+                success: true, 
+                message: "Appointment already exists" ,
+                data: {slotAvailable: false}
+            });
+        } else {
+            return res.status(200).json({ 
+                success: true, 
+                message: "Appointment is available" ,
+                data: {slotAvailable: true}
+            });
+        }
     } catch (error) {
         next(error);
     }

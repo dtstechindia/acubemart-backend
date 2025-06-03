@@ -4,6 +4,7 @@ import {
     addNewProduct,
     searchProducts,
     searchAllMatchedProducts,
+    searchPerfectMatchedProducts,
     getAllProducts,
     getSaleProducts,
     getAllPublishedProducts,
@@ -59,6 +60,9 @@ router.post("/search", searchProducts);
 // Search All Matched Products Route -POST `/api/product/search/all`
 router.post("/search/all", searchAllMatchedProducts);
 
+
+// Search Perfect Matched Products Route -POST `/api/product/search/perfect`
+router.post("/search/perfect", searchPerfectMatchedProducts);
 
 //PATCH Routes
 // Edit Product Route -PATCH `/api/product/edit`

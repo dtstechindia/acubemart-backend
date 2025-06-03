@@ -107,9 +107,11 @@ const searchProducts = async (req, res, next) => {
           index: "default",
           text: {
             query: searchQuery,
-            path: ["name", "description"],
+            path: ["name",/*  "description", */ "element.name", "model.name"],
             fuzzy: {
               maxEdits: 1,
+              prefixLength: 3,
+
             },
           },
         },
@@ -176,10 +178,79 @@ const searchAllMatchedProducts = async (req, res, next) => {
           index: "default",
           text: {
             query: searchQuery,
-            path: ["name", "description"],
+            path: ["name", /* "description", */ "element.name", "model.name"],
             fuzzy: {
               maxEdits: 1,
             },
+          },
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      /* {
+        $limit: 20,
+      }, */
+    ]);
+    await Product.populate(products, [
+      { path: "type", select: "name _id" },
+      { path: "category", select: "name description _id" },
+      { path: "element", select: "name description _id" },
+      { path: "brand", select: "name logo description _id" },
+      { path: "model", select: "name description _id" },
+      {
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      },
+      {
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      },
+      {
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        },
+      },
+      {
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Products Fetched Successfully",
+      data: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const searchPerfectMatchedProducts = async (req, res, next) => {
+  const { searchQuery } = req.body;
+  if (!searchQuery) return next(apiErrorHandler(400, "Please provide a search query"));
+
+  try {
+    const products = await Product.aggregate([
+      {
+        $search: {
+          index: "default",
+          text: {
+            query: searchQuery,
+            path: ["name", /* "description", */ "element.name", "model.name"],
+            /* fuzzy: {
+              maxEdits: 1,
+            }, */
           },
         },
       },
@@ -670,6 +741,7 @@ export {
   addNewProduct,
   searchProducts,
   searchAllMatchedProducts,
+  searchPerfectMatchedProducts,
   getAllProducts,
   getSaleProducts,
   getAllPublishedProducts,

@@ -41,6 +41,71 @@ const registerUser = async (req, res, next) => {
     }
 };
 
+
+/* Register New User with otp and phone */
+const registerUserWithPhone = async (req, res, next) => {
+    const { name, email, phone } = req.body;
+    if (!name || !email || !phone) return next(apiErrorHandler(400, "Please provide all fields"));
+
+    try {
+        
+        const userExists = await User.findOne({ phone });
+        if (userExists) return next(apiErrorHandler(400, "User Already Exists"));
+        // Generate a random 6-digit OTP
+        const geteratedOTP = Math.floor(100000 + Math.random() * 900000);
+        // Send OTP to user phone number
+        const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${phone}&message=${geteratedOTP} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }   
+        )
+        if (!response.ok) {
+            return next(apiErrorHandler(500, "Failed to send OTP"));
+        }
+
+        const user = await User.create({ 
+            name, 
+            email, 
+            phone,
+            otp: geteratedOTP
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "User Registered Successfully",
+            data: user,
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+const verifyRegistrationOtpAndLogin = async (req, res, next) => {
+    const { phone, otp } = req.body;
+    if (!phone) return next(apiErrorHandler(400, "Phone Number is required"));
+    if (!otp) return next(apiErrorHandler(400, "OTP is required"));
+
+    try {
+        const user = await User.findOne({ phone, otp });
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+        if (user.otp !== otp) return next(apiErrorHandler(400, "Incorrect OTP"));
+        return res.status(200).json({
+            success: true,
+            message: "User Logged In Successfully",
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 /* Login User with access token and refresh token */
 const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
@@ -63,6 +128,67 @@ const loginUser = async (req, res, next) => {
             success: true,
             message: "User Logged In Successfully",
             data: userWithoutPassword
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+/* Send OTP to user phone number */
+const sendOtpToUserPhone = async (req, res, next) => {
+    const { phone } = req.body;
+    if (!phone) return next(apiErrorHandler(400, "Phone Number is required"));
+
+    try {
+        const user = await User.findOne({ phone });
+        if (!user) return next(apiErrorHandler(404, "No User Found"));
+        const otp = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
+        const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${phone}&message=${otp} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }   
+        )
+        if (!response.ok) {
+            return next(apiErrorHandler(500, "Failed to send OTP"));
+        }
+        user.otp = otp; // Assuming otp is generated and passed in the request body
+        await user.save();
+        //console.log(user);
+        return res.status(200).json({
+            success: true,
+            message: "OTP Sent Successfully",
+            data: user
+        })
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+/* User Loging with Phone Number and otp */
+const loginUserWithPhoneOtp = async (req, res, next) => {
+    const { phone, otp } = req.body;
+
+    if (!phone) return next(apiErrorHandler(400, "Phone Number is required"));
+    if (!otp) return next(apiErrorHandler(400, "OTP is required"));
+
+    try {
+        //console.log(phone, otp);
+        const user = await User.findOne({ phone });
+        
+        if (!user) return next(apiErrorHandler(404, "No User Found with this Phone Number"));
+        //console.log(user);
+        if (user.otp !== otp) return next(apiErrorHandler(400, "Incorrect OTP"));
+        return res.status(200).json({
+            success: true,
+            message: "User Logged In Successfully",
+            data: user
         })
         
     } catch (error) {
@@ -244,7 +370,11 @@ const deleteUser = async (req, res, next) => {
 
 export {
     registerUser,
+    registerUserWithPhone,
+    verifyRegistrationOtpAndLogin,
     loginUser,
+    sendOtpToUserPhone,
+    loginUserWithPhoneOtp,
     logoutUser,
     getAllUsers,
     getAllUsersCount,

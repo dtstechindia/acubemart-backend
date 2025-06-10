@@ -2,7 +2,11 @@ import { Router } from "express";
 
 import { 
     registerUser,
+    registerUserWithPhone,
+    verifyRegistrationOtpAndLogin,
     loginUser,
+    sendOtpToUserPhone,
+    loginUserWithPhoneOtp,
     logoutUser,
     getAllUsers,
     getAllUsersCount,
@@ -25,7 +29,19 @@ router.get("/:id", getUserById);
 
 //POST Routes
  /* Register User Route - POST `/api/user/register` */
-router.post("/register", registerUser);   
+router.post("/register", registerUser);  
+
+/* Register User with Phone Route - POST `/api/user/registerwithphone` */
+router.post("/registerwithphone", registerUserWithPhone);
+
+/* Verify Registration OTP and Login Route - POST `/api/user/verifyotpandlogin` */
+router.post("/verifyotpandlogin", verifyRegistrationOtpAndLogin);
+
+/* Send OTP to User Phone Route - POST `/api/user/sendotp` */
+router.post("/sendotp", sendOtpToUserPhone);
+
+/* Login User with Phone OTP Route - POST `/api/user/loginwithphoneotp` */
+router.post("/loginwithphoneotp", loginUserWithPhoneOtp);
 
 /* Login User Route - POST `/api/user/login` */
 router.post("/login", loginUser);

@@ -4,11 +4,12 @@ const createPayment = async (req, res) => {
     const { amount, currency, user } = req.body;
     console.log(amount, currency, user);
     const razorpay = new Razorpay({
-      key_id: "rzp_live_b54diYjb2fsFgi",
-      key_secret: "2fpwEWmDFhc2cRRsLDrRqyaW",
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
+    
     const options = {
-      amount: amount * 100,
+      amount: parseInt(amount * 100),
       currency: currency,
     };
     const order = await razorpay.orders.create(options);

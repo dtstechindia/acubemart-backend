@@ -16,12 +16,15 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Please provide a password"],
+        //required: [true, "Please provide a password"],
         minlength: 6,
         select: false
     },
     phone: {
-       type: String, 
+        type: String, 
+        unique: true,
+        minlength: 10,
+        maxlength: 15,
     },
     address: [
         {
@@ -44,7 +47,10 @@ const userSchema = new mongoose.Schema({
         default: "active",
         enum: ["active", "blocked"],
         message: "{VALUE} is not a valid status"
-    }
+    }, 
+    otp: {
+        type: String,
+    },
 }, {
     timestamps: true
 });

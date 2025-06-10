@@ -84,7 +84,8 @@ const CheckAppointmentAvailability = async (req, res, next) => {
 
 const getAllAppointments = async (req, res, next) => {
     try {
-        const apointments = await Appointment.find().populate("serviceId serviceProviderId vehicleTypeId userId");
+        const apointments = await Appointment.find().sort({ createdAt: -1 })
+        .populate("serviceId serviceProviderId vehicleTypeId userId");
         return res.status(200).json({
             success: true,
             message: "Apointments Fetched Successfully",

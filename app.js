@@ -31,6 +31,7 @@ import serviceRouter from "./src/routes/service.route.js";
 import serviceproviderRouter from "./src/routes/serviceprovider.route.js";
 import appointmentRouter from "./src/routes/appointment.route.js";
 import vehicletypeRouter from "./src/routes/vehicletype.route.js";
+import googlesheetproductsRouter from "./src/routes/googlesheetproducts.route.js";
 
 //App
 const app = express();
@@ -42,7 +43,7 @@ ConnectDB();
 //Middlewares
 app.use(
   cors({
-    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in", "https://main.d2fon6a396l5uy.amplifyapp.com"],
+    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in", "https://main.d2fon6a396l5uy.amplifyapp.com"/* , "http://localhost:3000" */],
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -79,6 +80,7 @@ app.use("/api/service", serviceRouter);
 app.use("/api/serviceprovider", serviceproviderRouter);
 app.use("/api/appointment", appointmentRouter);
 app.use("/api/vehicletype", vehicletypeRouter);
+app.use("/api/googlesheetproducts", googlesheetproductsRouter);
 
 // Home Route
 app.get("/", (_req, res) => {

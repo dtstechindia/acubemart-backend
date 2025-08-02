@@ -15,7 +15,11 @@ import {
     editProductById,
     deleteProductById,
     getProductBySlug,
-    bulkEditProducts
+    bulkEditProducts,
+    getAllProductsByElementId,
+    getAllProductsByCategoryId,
+    getAllProductsByBrandId,
+    getAllProductsByModelId,
 } from "../controllers/product.controller.js";
 
 
@@ -43,6 +47,18 @@ router.get("/page/:page", getPaginatedProducts);
 
 // Get Published Products Count Route -GET `/api/product/published/count`
 router.get("/published/count", getPublishedProductsCount);
+
+// Get All Products by Element Id Route -GET `/api/product/element/:id`
+router.get("/element/:id", getAllProductsByElementId);
+
+// Get All Products by Category Id Route -GET `/api/product/category/:id`
+router.get("/category/:id", getAllProductsByCategoryId);
+
+// Get All Products by Brand Id Route -GET `/api/product/brand/:id`
+router.get("/brand/:id", getAllProductsByBrandId);
+
+// Get All Products by Model Id Route -GET `/api/product/model/:id`
+router.get("/model/:id", getAllProductsByModelId);
 
 //POST Routes
 // Add New Product Route -POST `/api/product/add`

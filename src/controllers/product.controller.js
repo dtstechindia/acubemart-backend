@@ -737,6 +737,203 @@ const bulkEditProducts = async (req, res, next) => {
 //todo
 /* Get All Products By Type, Category, Brand, Model Id */
 
+/* Get All Products By Element Id */
+
+const getAllProductsByElementId = async (req, res, next) => {
+  const elementId = req.params.id;
+  if (!elementId) return next(apiErrorHandler(400, "Element Id not found"));
+
+  try {
+    const products = await Product.find({ element: elementId })
+      //.sort({ createdAt: -1 })
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        } ,
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "All Products",
+      data: products || [],
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/* Get All Products By Category Id */
+
+const getAllProductsByCategoryId = async (req, res, next) => {
+  const categoryId = req.params.id;
+  if (!categoryId) return next(apiErrorHandler(400, "Category Id not found"));
+
+  try {
+    const products = await Product.find({ category: categoryId })
+      //.sort({ createdAt: -1 })
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        } ,
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "All Products",
+      data: products || [],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* Get All Products By Brand Id */
+
+const getAllProductsByBrandId = async (req, res, next) => {
+  const brandId = req.params.id;
+  if (!brandId) return next(apiErrorHandler(400, "Brand Id not found"));
+  try {
+    const products = await Product.find({ brand: brandId })
+      .sort({ createdAt: -1 })
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        } ,
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "All Products",
+      data: products || [],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* Get All Products By Model Id */
+const getAllProductsByModelId = async (req, res, next) => {
+  const modelId = req.params.id;
+  if (!modelId) return next(apiErrorHandler(400, "Model Id not found"));
+  try {
+    const products = await Product.find({ model: modelId })
+      .sort({ createdAt: -1 })
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name description isActive _id" })
+      .populate({ path: "element", select: "name description _id" })
+      .populate({ path: "brand", select: "name logo description _id" })
+      .populate({ path: "model", select: "name description _id" })
+      .populate({
+        path: "image",
+        select: "url isFeatured _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "attributes",
+        select: "name value _id",
+        strictPopulate: false,
+      })
+      .populate({
+        path: "variants",
+        select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+        strictPopulate: false,
+        populate: {
+          path: "image",
+          select: "url _id",
+          strictPopulate: false,
+        } ,
+      })
+      .populate({
+        path: "featuredImage",
+        select: "url _id",
+        strictPopulate: false,
+      });
+
+    return res.status(200).json({
+      success: true,
+      message: "All Products",
+      data: products || [],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   addNewProduct,
   searchProducts,
@@ -753,4 +950,8 @@ export {
   editProductById,
   deleteProductById,
   bulkEditProducts,
+  getAllProductsByElementId,
+  getAllProductsByCategoryId,
+  getAllProductsByBrandId,
+  getAllProductsByModelId
 };

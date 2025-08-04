@@ -105,23 +105,67 @@ const searchProducts = async (req, res, next) => {
       {
         $search: {
           index: "default",
-          text: {
-            query: searchQuery,
-            path: ["name",/*  "description", */ "element.name", "model.name"],
-            fuzzy: {
-              maxEdits: 1,
-              prefixLength: 3,
-
-            },
-          },
-        },
+          compound: {
+            should: [
+              // Exact phrase match (highest score)
+              {
+                phrase: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 0,
+                  score: { boost: { value: 3 } }
+                }
+              },
+              // Phrase with flexibility (medium score)
+              {
+                phrase: {
+                  query: searchQuery, 
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 10,
+                  score: { boost: { value: 2 } }
+                }
+              },
+              // Text with fuzzy matching (good for typos)
+              {
+                text: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 1,
+                    maxExpansions: 100
+                  },
+                  score: { boost: { value: 1.5 } }
+                }
+              },
+              // Wildcard for partial matches
+              {
+                wildcard: {
+                  query: `*${searchQuery.split(' ').join('*')}*`,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  allowAnalyzedField: true,
+                  score: { boost: { value: 1 } }
+                }
+              }
+            ],
+            minimumShouldMatch: 1
+          }
+        }
       },
       {
-        $sort: { createdAt: -1 },
+        $addFields: {
+          score: { $meta: "searchScore" }
+        }
       },
       {
-        $limit: 20,
+        $sort: { 
+          score: -1,
+          createdAt: -1 
+        }
       },
+      {
+        $limit: 20
+      }
     ]);
     await Product.populate(products, [
       { path: "type", select: "name _id" },
@@ -176,22 +220,69 @@ const searchAllMatchedProducts = async (req, res, next) => {
       {
         $search: {
           index: "default",
-          text: {
-            query: searchQuery,
-            path: ["name", /* "description", */ "element.name", "model.name"],
-            fuzzy: {
-              maxEdits: 1,
-            },
-          },
-        },
+          compound: {
+            should: [
+              // Exact phrase match (highest score)
+              {
+                phrase: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 0,
+                  score: { boost: { value: 3 } }
+                }
+              },
+              // Phrase with flexibility (medium score)
+              {
+                phrase: {
+                  query: searchQuery, 
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 10,
+                  score: { boost: { value: 2 } }
+                }
+              },
+              // Text with fuzzy matching (good for typos)
+              {
+                text: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 1,
+                    maxExpansions: 100
+                  },
+                  score: { boost: { value: 1.5 } }
+                }
+              },
+              // Wildcard for partial matches
+              {
+                wildcard: {
+                  query: `*${searchQuery.split(' ').join('*')}*`,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  allowAnalyzedField: true,
+                  score: { boost: { value: 1 } }
+                }
+              }
+            ],
+            minimumShouldMatch: 1
+          }
+        }
       },
       {
-        $sort: { createdAt: -1 },
+        $addFields: {
+          score: { $meta: "searchScore" }
+        }
       },
-      /* {
-        $limit: 20,
-      }, */
+      {
+        $sort: { 
+          score: -1,
+          createdAt: -1 
+        }
+      },
+      {
+        $limit: 40
+      }
     ]);
+      
     await Product.populate(products, [
       { path: "type", select: "name _id" },
       { path: "category", select: "name description _id" },
@@ -245,21 +336,67 @@ const searchPerfectMatchedProducts = async (req, res, next) => {
       {
         $search: {
           index: "default",
-          text: {
-            query: searchQuery,
-            path: ["name", /* "description", */ "element.name", "model.name"],
-            /* fuzzy: {
-              maxEdits: 1,
-            }, */
-          },
-        },
+          compound: {
+            should: [
+              // Exact phrase match (highest score)
+              {
+                phrase: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 0,
+                  score: { boost: { value: 3 } }
+                }
+              },
+              // Phrase with flexibility (medium score)
+              {
+                phrase: {
+                  query: searchQuery, 
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  slop: 10,
+                  score: { boost: { value: 2 } }
+                }
+              },
+              // Text with fuzzy matching (good for typos)
+              {
+                text: {
+                  query: searchQuery,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  fuzzy: {
+                    maxEdits: 2,
+                    prefixLength: 1,
+                    maxExpansions: 100
+                  },
+                  score: { boost: { value: 1.5 } }
+                }
+              },
+              // Wildcard for partial matches
+              {
+                wildcard: {
+                  query: `*${searchQuery.split(' ').join('*')}*`,
+                  path: ["name", "element.name", "model.name", "category.name", "brand.name", "type.name"],
+                  allowAnalyzedField: true,
+                  score: { boost: { value: 1 } }
+                }
+              }
+            ],
+            minimumShouldMatch: 1
+          }
+        }
       },
       {
-        $sort: { createdAt: -1 },
+        $addFields: {
+          score: { $meta: "searchScore" }
+        }
       },
-      /* {
-        $limit: 20,
-      }, */
+      {
+        $sort: { 
+          score: -1,
+          createdAt: -1 
+        }
+      },
+      {
+        $limit: 40
+      }
     ]);
     await Product.populate(products, [
       { path: "type", select: "name _id" },

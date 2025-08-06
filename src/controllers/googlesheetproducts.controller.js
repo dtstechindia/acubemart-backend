@@ -104,17 +104,97 @@ const addAllPublishedProductsToGoogleSheet = async (req, res, next) => {
     }
 }
 
-/* const updateAllPublishedProductsInGoogleSheet = async (req, res, next) => {
+const updateAllPublishedProductsInGoogleSheet = async (req, res, next) => {
     try {
         // Logic to update products in Google Sheet
+        const allProducts = await Product.find({ status: "published" })
+        .sort({ createdAt: -1 })
+        .populate({ path: "type", select: "name _id" })
+        .populate({ path: "category", select: "name description isActive _id" })
+        .populate({ path: "element", select: "name description _id" })
+        .populate({ path: "brand", select: "name logo description _id" })
+        .populate({ path: "model", select: "name description _id" })
+        .populate({
+            path: "image",
+            select: "url isFeatured _id",
+            strictPopulate: false,
+        })
+        .populate({
+            path: "attributes",
+            select: "name value _id",
+            strictPopulate: false,
+        })
+        .populate({
+            path: "variants",
+            select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
+            strictPopulate: false,
+            populate: {
+            path: "image",
+            select: "url _id",
+            strictPopulate: false,
+            },
+        })
+        .populate({
+            path: "featuredImage",
+            select: "url _id",
+            strictPopulate: false,
+        });
+        if (!allProducts) return next(apiErrorHandler(404, "No Products Found"));
+        
+        const productValues = allProducts.map((product) => {
+            return [
+                product._id,
+                product.name,
+                product.description,
+                'in_stock',
+                '',
+                '',
+                `https://www.acubemart.in/product/${product?.slug}` || '',
+                '',
+                product.featuredImage?.url || '',
+                `${product?.price || ''} INR`,
+                `${product?.sp || ''} INR`,
+                '',
+                'no',
+                '',
+                '',
+                product.brand?.name || 'acube mart',
+            ]
+        });
+
+        const rangeResponse = await sheets.spreadsheets.values.get({
+            auth,
+            spreadsheetId,
+            range: "sheet1!A3:P",
+        });
+
+        const existingValues = rangeResponse.data.values || [];
+        let lastRow = existingValues.length || 0;
+
+        const range = `sheet1!A3:P${lastRow + productValues.length}`;
+
+        const response = await sheets.spreadsheets.values.update({
+            auth,
+            spreadsheetId,
+            range: range,
+            valueInputOption: 'RAW',
+            resource: {
+                values: productValues
+            },
+        });
+        return res.status(200).json({
+            success: true,
+            message: "Products updated in Google Sheet Successfully",
+            data: {response, productValues, allProducts },
+        });
     } catch (error) {
         console.log(error);
         return next(error);
     }
-} */
+}
 
 export {
     addAllPublishedProductsToGoogleSheet,
-   // updateAllPublishedProductsInGoogleSheet,
+    updateAllPublishedProductsInGoogleSheet,
     
 }

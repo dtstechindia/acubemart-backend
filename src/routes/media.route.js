@@ -9,7 +9,8 @@ import {
     addNewMediaForAdmin,
     addNewMediaForUser,
     getMediaById,
-    deleteMediaById
+    deleteMediaById,
+    updateAllMediaUrls
 } from "../controllers/media.controller.js";
 
 
@@ -39,6 +40,9 @@ router.post("/add/admin/:id", upload.single("image"), addNewMediaForAdmin);
 
 /* Add New Media Route -POST `/api/media/add/user/:id` */
 router.post("/add/user/:id", upload.single("image"), addNewMediaForUser);
+
+/* Update All Media URLs Route -POST `/api/media/update/all` */
+router.post("/update/all", updateAllMediaUrls);
 
 
 //DELETE Routes

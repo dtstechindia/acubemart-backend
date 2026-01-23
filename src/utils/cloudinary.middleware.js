@@ -69,3 +69,22 @@ export const uploadSingleImage = async (req, res, next) => {
         next(error);
     }
 }
+
+
+// Add f_auto,q_auto transformation to Cloudinary URLs
+export const addCloudinaryTransformation = (url) => {
+    if (!url || !url.includes("res.cloudinary.com")) {
+        return url;
+    }
+    
+    // Check if transformation already exists
+    if (url.includes("f_auto,q_auto")) {
+        return url;
+    }
+    
+    // Add f_auto,q_auto after /upload/ and before /v
+    return url.replace(
+        /\/upload\/(?=v\d+)/,
+        "/upload/f_auto,q_auto/"
+    );
+}

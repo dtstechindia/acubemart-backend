@@ -79,7 +79,7 @@ const getAllOrdersList = async (req, res, next) => {
         populate: { path: "featuredImage", select: "url _id" },
       })
       .populate({
-        path: "porducts.variantId",
+        path: "products.variantId",
         select: "name mrp sp variantAttributes _id",
         strictPopulate: false,
       })
@@ -137,7 +137,7 @@ const getAllOrdersByUserId = async (req, res, next) => {
         populate: { path: "featuredImage", select: "url _id" },
       })
       .populate({
-        path: "porducts.variantId",
+        path: "products.variantId",
         select: "name mrp sp variantAttributes _id",
         strictPopulate: false,
       })
@@ -181,7 +181,7 @@ const getOrderById = async (req, res, next) => {
         populate: { path: "featuredImage", select: "url _id" },
       })
       .populate({
-        path: "porducts.variantId",
+        path: "products.variantId",
         select: "name mrp sp variantAttributes _id",
         strictPopulate: false,
       })
@@ -240,7 +240,7 @@ const updateOrder = async (req, res, next) => {
         select: "name slug price sp featuredImage _id",
       })
       .populate({
-        path: "porducts.variantId",
+        path: "products.variantId",
         select: "name mrp sp variantAttributes _id",
         strictPopulate: false,
       })

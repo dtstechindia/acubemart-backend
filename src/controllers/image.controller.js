@@ -4,7 +4,7 @@ import Image from "../models/image.model.js";
 import Product from "../models/product.model.js";
 import Variant from "../models/variant.model.js";
 
-import { uploadMultipleImages, uploadSingleImage } from "../utils/cloudinary.middleware.js";
+import { uploadMultipleImages, uploadSingleImage, addCloudinaryTransformation } from "../utils/cloudinary.middleware.js";
 
 
 
@@ -14,9 +14,12 @@ const addImagesByProductId = async (req, res, next) => {
     
     if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     //Upload Multiple Images
-    const imageUrls = await uploadMultipleImages(req, res, next); 
+    let imageUrls = await uploadMultipleImages(req, res, next); 
     //console.log(imageUrls);
     if (!imageUrls) return next(apiErrorHandler(400, "Images upload failed"));
+
+    // Apply Cloudinary transformation to all URLs
+    imageUrls = imageUrls.map(url => addCloudinaryTransformation(url));
 
     const images = [];
     try {
@@ -51,8 +54,11 @@ const addNewImage = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const imageUrl = await uploadSingleImage(req, res, next);
+        let imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
+        // Apply Cloudinary transformation
+        imageUrl = addCloudinaryTransformation(imageUrl);
 
         const image = await Image.create({ 
             url: imageUrl,
@@ -85,8 +91,11 @@ const addNewImageForVariant = async (req, res, next) => {
     if (!productId || !variantId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
-        const imageUrl = await uploadSingleImage(req, res, next);
+        let imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
+        // Apply Cloudinary transformation
+        imageUrl = addCloudinaryTransformation(imageUrl);
 
         const image = await Image.create({ 
             url: imageUrl,
@@ -194,8 +203,11 @@ const updateFeaturedImage = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
     
     try {
-        const imageUrl = await uploadSingleImage(req, res, next);
+        let imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
+
+        // Apply Cloudinary transformation
+        imageUrl = addCloudinaryTransformation(imageUrl);
 
         const image = await Image.findOne(
             { productId, isFeatured: true }
@@ -261,6 +273,58 @@ const deleteImage = async (req, res, next) => {
 };
 
 
+/* Update All Image URLs with Cloudinary Transformations */
+const updateAllImageUrls = async (req, res, next) => {
+    try {
+        // Fetch all image documents
+        const allImages = await Image.find({});
+        
+        if (!allImages || allImages.length === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No image documents found to update",
+                data: []
+            });
+        }
+
+        const updatedImages = [];
+        let updateCount = 0;
+
+        for (const image of allImages) {
+            if (image.url && image.url.includes("res.cloudinary.com")) {
+                // Check if the URL already has the transformation parameters
+                if (!image.url.includes("f_auto,q_auto")) {
+                    // Add f_auto,q_auto after /upload/ and before /v
+                    const updatedUrl = image.url.replace(
+                        /\/upload\/(?=v\d+)/,
+                        "/upload/f_auto,q_auto/"
+                    );
+
+                    image.url = updatedUrl;
+                    await image.save();
+                    updateCount++;
+                }
+            }
+            updatedImages.push(image);
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Image URLs updated successfully. Updated ${updateCount} documents out of ${allImages.length}`,
+            data: {
+                totalDocuments: allImages.length,
+                updatedDocuments: updateCount,
+                skippedDocuments: allImages.length - updateCount,
+                updatedImages: updatedImages
+            }
+        });
+        
+    } catch (error) {
+        next(error);
+    }
+}
+
+
 export { 
     addNewImage,
     addImagesByProductId, 
@@ -269,5 +333,6 @@ export {
     getImageById,
     updateImageById,
     updateFeaturedImage,
-    deleteImage 
+    deleteImage,
+    updateAllImageUrls
 }

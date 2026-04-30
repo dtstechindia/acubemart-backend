@@ -49,6 +49,7 @@ app.use(
   })
 );
 
+app.use("/api/payment/order/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: "50mb" }));
 app.use(
   express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 1000000 })

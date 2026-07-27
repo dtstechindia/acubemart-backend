@@ -171,22 +171,24 @@ const deleteVariant = async (req, res, next) => {
 
 /* Update variant Images Order and sort them */
 const updateVariantImagesOrder = async (req, res, next) => {
-    const { variantId, imagesOrder } = req.body;
-    if (!variantId || !imagesOrder) return next(apiErrorHandler(400, "Please provide all fields"));
+    const variantId = req.params.id;
+    const { imagesOrder } = req.body;
+    if (!variantId || !Array.isArray(imagesOrder)) return next(apiErrorHandler(400, "VariantId and imagesOrder are required"));
     
     try {
         const variant = await Variant.findById(variantId);
         if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
 
-        // Sort the images according to the imagesOrder array
-        const sortedImages = variant.image.sort((a, b) => {
-            return imagesOrder.indexOf(a.toString()) - imagesOrder.indexOf(b.toString());
-        });
+        const currentIds = variant.image.map((imageId) => imageId.toString());
+        const requestedIds = imagesOrder.map(String);
+        const hasExactImageSet = currentIds.length === requestedIds.length
+            && currentIds.every((imageId) => requestedIds.includes(imageId));
 
-        // Update the variant document with the sorted images
-        variant.image = sortedImages;
+        if (!hasExactImageSet) {
+            return next(apiErrorHandler(400, "imagesOrder must contain every variant image exactly once"));
+        }
 
-        // Save the updated variant document
+        variant.image = requestedIds;
         await variant.save();
 
         return res.status(200).json({

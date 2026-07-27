@@ -851,8 +851,14 @@ const deleteProductById = async (req, res, next) => {
 /* Bulk Edit Products by pushing category Id in products by Id */
 const bulkEditProducts = async (req, res, next) => {
   const { products, categoryType, category } = req.body;
-  if (!products || !categoryType || !category){
+  const allowedRelationshipTypes = ["category", "element", "brand", "model"];
+
+  if (!Array.isArray(products) || products.length === 0 || !categoryType || !category){
     return next(apiErrorHandler(400, "Please provide all fields"));
+  }
+
+  if (!allowedRelationshipTypes.includes(categoryType)) {
+    return next(apiErrorHandler(400, "Invalid product relationship type"));
   }
 
   try {

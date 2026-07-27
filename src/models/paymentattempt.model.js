@@ -146,6 +146,13 @@ const paymentAttemptSchema = new mongoose.Schema(
     lastError: {
       type: String,
     },
+    providerError: {
+      code: String,
+      description: String,
+      source: String,
+      step: String,
+      reason: String,
+    },
     lastEventSource: {
       type: String,
       enum: ["frontend", "webhook"],

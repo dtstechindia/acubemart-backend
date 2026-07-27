@@ -8,6 +8,7 @@ import PaymentAttempt from "../models/paymentattempt.model.js";
 import Product from "../models/product.model.js";
 import Transaction from "../models/transaction.model.js";
 import User from "../models/user.model.js";
+import Variant from "../models/variant.model.js";
 import { getOrderNumber } from "../utils/order.counter.js";
 
 const ATTEMPT_STATUS = {
@@ -227,6 +228,63 @@ const ensureTransaction = async (attempt) => {
   return transaction;
 };
 
+const reserveInventory = async (products) => {
+  const reservations = [];
+
+  try {
+    for (const item of products) {
+      const quantity = Number(item.quantity);
+      if (!Number.isInteger(quantity) || quantity <= 0) {
+        throw apiErrorHandler(400, "Product quantity must be a positive whole number");
+      }
+
+      if (item.variantId) {
+        const variant = await Variant.findOneAndUpdate(
+          {
+            _id: item.variantId,
+            productId: item.productId,
+            stock: { $gte: quantity },
+          },
+          { $inc: { stock: -quantity } },
+          { new: true }
+        );
+
+        if (!variant) {
+          throw apiErrorHandler(409, "The selected product variant is unavailable or out of stock");
+        }
+        reservations.push({ model: Variant, id: item.variantId, quantity });
+        continue;
+      }
+
+      const product = await Product.findOneAndUpdate(
+        { _id: item.productId, stock: { $gte: quantity } },
+        { $inc: { stock: -quantity } },
+        { new: true }
+      );
+
+      if (!product) {
+        throw apiErrorHandler(409, "A product in your cart is unavailable or out of stock");
+      }
+      reservations.push({ model: Product, id: item.productId, quantity });
+    }
+
+    return reservations;
+  } catch (error) {
+    await Promise.all(
+      reservations.map(({ model, id, quantity }) => model.findByIdAndUpdate(id, {
+        $inc: { stock: quantity },
+      }))
+    );
+    throw error;
+  }
+};
+
+const releaseInventory = (reservations) => Promise.all(
+  reservations.map(({ model, id, quantity }) => model.findByIdAndUpdate(id, {
+    $inc: { stock: quantity },
+  }))
+);
+
 const createOrderFromAttempt = async (attempt, address, transaction) => {
   const orderNumber = await getOrderNumber();
   const order = await Order.create({
@@ -244,30 +302,6 @@ const createOrderFromAttempt = async (attempt, address, transaction) => {
     orderNumber,
   });
 
-  await User.findByIdAndUpdate(attempt.userId, {
-    $addToSet: { orders: order._id },
-  });
-
-  await Transaction.findByIdAndUpdate(transaction._id, {
-    $set: { orderId: order._id },
-  });
-
-  for (let index = 0; index < order.products.length; index += 1) {
-    const orderProduct = order.products[index];
-    const product = await Product.findById(orderProduct.productId);
-
-    if (!product) {
-      throw apiErrorHandler(404, "No Product Found");
-    }
-
-    if (product.stock < orderProduct.quantity) {
-      throw apiErrorHandler(400, "Insufficient Stock");
-    }
-
-    product.stock -= orderProduct.quantity;
-    await product.save();
-  }
-
   await PaymentAttempt.findByIdAndUpdate(attempt._id, {
     $set: {
       orderId: order._id,
@@ -276,6 +310,15 @@ const createOrderFromAttempt = async (attempt, address, transaction) => {
       completedAt: new Date(),
     },
   });
+
+  await Promise.allSettled([
+    User.findByIdAndUpdate(attempt.userId, {
+      $addToSet: { orders: order._id },
+    }),
+    Transaction.findByIdAndUpdate(transaction._id, {
+      $set: { orderId: order._id },
+    }),
+  ]);
 
   return order;
 };
@@ -304,11 +347,15 @@ const finalizeAttempt = async ({
   }
 
   const { attempt } = reservation;
+  let inventoryReservations = [];
+  let orderCreated = false;
 
   try {
+    inventoryReservations = await reserveInventory(attempt.products);
     const address = await ensureAddress(attempt);
     const transaction = await ensureTransaction(attempt);
     const order = await createOrderFromAttempt(attempt, address, transaction);
+    orderCreated = true;
     const refreshedAttempt = await PaymentAttempt.findById(attempt._id);
 
     return {
@@ -317,6 +364,9 @@ const finalizeAttempt = async ({
       alreadyCompleted: false,
     };
   } catch (error) {
+    if (!orderCreated && inventoryReservations.length > 0) {
+      await releaseInventory(inventoryReservations);
+    }
     await PaymentAttempt.findByIdAndUpdate(attempt._id, {
       $set: {
         status: ATTEMPT_STATUS.FAILED,
@@ -501,13 +551,44 @@ const handlePaymentWebhook = async (req, res, next) => {
 
     const payload = JSON.parse(rawBody.toString("utf8"));
     const event = payload.event;
+    const paymentEntity = payload.payload?.payment?.entity;
+    const orderEntity = payload.payload?.order?.entity;
+
+    if (event === "payment.failed") {
+      const razorpayOrderId = paymentEntity?.order_id;
+      const attemptReceipt = paymentEntity?.notes?.checkoutAttemptId;
+      const attemptQuery = attemptReceipt
+        ? { _id: attemptReceipt }
+        : { razorpayOrderId };
+
+      if (attemptReceipt || razorpayOrderId) {
+        await PaymentAttempt.findOneAndUpdate(
+          { ...attemptQuery, status: { $ne: ATTEMPT_STATUS.COMPLETED } },
+          {
+            $set: {
+              status: ATTEMPT_STATUS.FAILED,
+              razorpayPaymentId: paymentEntity?.id,
+              lastEventSource: "webhook",
+              lastError: paymentEntity?.error_description || "Payment failed at Razorpay checkout",
+              providerError: {
+                code: paymentEntity?.error_code,
+                description: paymentEntity?.error_description,
+                source: paymentEntity?.error_source,
+                step: paymentEntity?.error_step,
+                reason: paymentEntity?.error_reason,
+              },
+            },
+          }
+        );
+      }
+
+      return res.status(200).json({ success: true, message: "Payment failure recorded" });
+    }
 
     if (event !== "payment.captured" && event !== "order.paid") {
       return res.status(200).json({ success: true, message: "Webhook ignored" });
     }
 
-    const paymentEntity = payload.payload?.payment?.entity;
-    const orderEntity = payload.payload?.order?.entity;
     const razorpayOrderId = paymentEntity?.order_id || orderEntity?.id;
     const razorpayPaymentId = paymentEntity?.id;
     const attemptReceipt =

@@ -6,6 +6,7 @@ import {
     getImagesByProductId,
     getImageById,
     updateImageById,
+    updateProductImagesOrder,
     deleteImage,
     addNewImageForVariant,
     updateFeaturedImage,
@@ -40,6 +41,9 @@ router.post("/add/variant", upload.single("image"), addNewImageForVariant);
 //PATCH Routes
 /* Update Image Route -PATCH `/api/image/update/:id` */
 router.patch("/update/:id", updateImageById);
+
+/* Update product gallery order Route -PATCH `/api/image/order/:id` */
+router.patch("/order/:id", updateProductImagesOrder);
 
 /* Update featured image Route -PATCH `/api/image/update/featured/:id` */
 router.patch("/update/featured/:id", upload.single("image"), updateFeaturedImage);

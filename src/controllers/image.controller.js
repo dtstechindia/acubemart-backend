@@ -196,6 +196,41 @@ const updateImageById = async (req, res, next) => {
     }   
 };
 
+/* Update product gallery image order */
+const updateProductImagesOrder = async (req, res, next) => {
+    const productId = req.params.id;
+    const { imagesOrder } = req.body;
+
+    if (!productId || !Array.isArray(imagesOrder)) {
+        return next(apiErrorHandler(400, "ProductId and imagesOrder are required"));
+    }
+
+    try {
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
+        const currentIds = product.image.map((imageId) => imageId.toString());
+        const requestedIds = imagesOrder.map(String);
+        const hasExactImageSet = currentIds.length === requestedIds.length
+            && currentIds.every((imageId) => requestedIds.includes(imageId));
+
+        if (!hasExactImageSet) {
+            return next(apiErrorHandler(400, "imagesOrder must contain every product image exactly once"));
+        }
+
+        product.image = requestedIds;
+        await product.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Product images reordered successfully",
+            data: product
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 /* Update Featured Image with new image */
 const updateFeaturedImage = async (req, res, next) => {
@@ -332,6 +367,7 @@ export {
     addNewImageForVariant,
     getImageById,
     updateImageById,
+    updateProductImagesOrder,
     updateFeaturedImage,
     deleteImage,
     updateAllImageUrls

@@ -1,200 +1,151 @@
-import { apiErrorHandler } from '../middlewares/errorhandler.middleware.js';
+import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import { google } from "googleapis";
-import Product from '../models/product.model.js';
+import Product from "../models/product.model.js";
 
+const DEFAULT_SHEET_GID = "79216810";
 
-const sheets = google.sheets({ version: "v4", auth: process.env.GOOGLE_SHEETS_API_KEY });
-const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+const createSheetsClient = () => {
+    const requiredEnvironmentVariables = [
+        "GOOGLE_SHEETS_SPREADSHEET_ID",
+        "GOOGLE_SHEETS_PROJECT_ID",
+        "GOOGLE_SHEETS_PRIVATE_KEY",
+        "GOOGLE_SHEETS_CLIENT_EMAIL",
+    ];
+    const missingVariables = requiredEnvironmentVariables.filter((name) => !process.env[name]);
 
-const auth = new google.auth.GoogleAuth({
-    //keyFile: "./service-account.json",
-    credentials: {
-        type: "service_account",
-        project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
-        private_key_id: process.env.GOOGLE_SHEETS_PRIVATE_KEY_ID,
-        private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY.replace(/\\n/g, "\n"),
-        client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-        client_id: process.env.GOOGLE_SHEETS_CLIENT_ID,
-        auth_uri: "https://accounts.google.com/o/oauth2/auth",
-        token_uri: "https://oauth2.googleapis.com/token",
-        auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-        client_x509_cert_url: process.env.GOOGLE_SHEETS_CLIENT_X509_CERT_URL,    
-        universe_domain: "googleapis.com"
-    },
-    scopes: "https://www.googleapis.com/auth/spreadsheets",
-})
+    if (missingVariables.length > 0) {
+        throw apiErrorHandler(500, `Missing Google Sheets configuration: ${missingVariables.join(", ")}`);
+    }
 
+    const auth = new google.auth.GoogleAuth({
+        credentials: {
+            type: "service_account",
+            project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
+            private_key_id: process.env.GOOGLE_SHEETS_PRIVATE_KEY_ID,
+            private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY.replace(/\\n/g, "\n"),
+            client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+            client_id: process.env.GOOGLE_SHEETS_CLIENT_ID,
+            auth_uri: "https://accounts.google.com/o/oauth2/auth",
+            token_uri: "https://oauth2.googleapis.com/token",
+            auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+            client_x509_cert_url: process.env.GOOGLE_SHEETS_CLIENT_X509_CERT_URL,
+            universe_domain: "googleapis.com",
+        },
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    });
 
+    return {
+        auth,
+        sheets: google.sheets({ version: "v4", auth }),
+        spreadsheetId: process.env.GOOGLE_SHEETS_SPREADSHEET_ID,
+    };
+};
+
+const getSheetTitle = async (sheets, spreadsheetId) => {
+    const metadata = await sheets.spreadsheets.get({
+        spreadsheetId,
+        fields: "sheets.properties(sheetId,title)",
+    });
+    const sheetGid = Number(process.env.GOOGLE_SHEETS_SHEET_GID || DEFAULT_SHEET_GID);
+    const sheet = metadata.data.sheets?.find(({ properties }) => properties?.sheetId === sheetGid);
+
+    if (!sheet?.properties?.title) {
+        throw apiErrorHandler(404, `Google Sheet tab with gid ${sheetGid} was not found`);
+    }
+
+    return `'${sheet.properties.title.replace(/'/g, "''")}'`;
+};
+
+const getPublishedProducts = () => Product.find({ status: "published" })
+    .sort({ createdAt: -1 })
+    .populate({ path: "brand", select: "name _id" })
+    .populate({ path: "featuredImage", select: "url _id" })
+    .lean();
+
+const stripHtml = (value = "") => value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const toMerchantRows = (products) => products.map((product) => {
+    const regularPrice = Number(product.price) || 0;
+    const sellingPrice = Number(product.sp) || regularPrice;
+
+    return [
+        product._id.toString(),
+        product.name,
+        stripHtml(product.description),
+        Number(product.stock) > 0 ? "in_stock" : "out_of_stock",
+        "",
+        "",
+        `https://acubemart.in/product/${product.slug}`,
+        "",
+        product.featuredImage?.url || "",
+        regularPrice ? `${regularPrice.toFixed(2)} INR` : "",
+        sellingPrice && sellingPrice < regularPrice ? `${sellingPrice.toFixed(2)} INR` : "",
+        "",
+        "no",
+        "",
+        "",
+        product.brand?.[0]?.name || "Acube Mart",
+    ];
+});
+
+const replacePublishedProductsInGoogleSheet = async () => {
+    const products = await getPublishedProducts();
+    if (products.length === 0) throw apiErrorHandler(404, "No published products found");
+
+    const { auth, sheets, spreadsheetId } = createSheetsClient();
+    const sheetTitle = await getSheetTitle(sheets, spreadsheetId);
+    const productValues = toMerchantRows(products);
+
+    const response = await sheets.spreadsheets.values.update({
+        auth,
+        spreadsheetId,
+        range: `${sheetTitle}!A3:P${productValues.length + 2}`,
+        valueInputOption: "RAW",
+        resource: { values: productValues },
+    });
+
+    await sheets.spreadsheets.values.clear({
+        auth,
+        spreadsheetId,
+        range: `${sheetTitle}!A${productValues.length + 3}:P`,
+    });
+
+    return {
+        updatedRows: response.data.updatedRows || productValues.length,
+        sheetGid: Number(process.env.GOOGLE_SHEETS_SHEET_GID || DEFAULT_SHEET_GID),
+    };
+};
 
 const addAllPublishedProductsToGoogleSheet = async (req, res, next) => {
     try {
-        const allProducts = await Product.find({ status: "published" })
-        .sort({ createdAt: -1 })
-        .populate({ path: "type", select: "name _id" })
-        .populate({ path: "category", select: "name description isActive _id" })
-        .populate({ path: "element", select: "name description _id" })
-        .populate({ path: "brand", select: "name logo description _id" })
-        .populate({ path: "model", select: "name description _id" })
-        .populate({
-            path: "image",
-            select: "url isFeatured _id",
-            strictPopulate: false,
-        })
-        .populate({
-            path: "attributes",
-            select: "name value _id",
-            strictPopulate: false,
-        })
-        .populate({
-            path: "variants",
-            select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
-            strictPopulate: false,
-            populate: {
-            path: "image",
-            select: "url _id",
-            strictPopulate: false,
-            },
-        })
-        .populate({
-            path: "featuredImage",
-            select: "url _id",
-            strictPopulate: false,
-        });
-        if (!allProducts) return next(apiErrorHandler(404, "No Products Found"));
-    
-       const productValues = allProducts.map((product) => {
-           return [
-               product._id,
-               product.name,
-               product.description,
-               'in_stock',
-               '',
-               '',
-               `https://www.acubemart.in/product/${product?.slug}` || '',
-               '',
-               product.featuredImage?.url || '',
-               `${product?.price || ''} INR`,
-               `${product?.sp || ''} INR`,
-               '',
-               'no',
-               '',
-               '',
-               product.brand?.name || 'acube mart',
-           ]
-       })
-        const response = await sheets.spreadsheets.values.append({
-            auth,
-            spreadsheetId,
-            range: "sheet1!A3:P",
-            valueInputOption: 'RAW',
-            resource: {
-                values: productValues
-            },
-        });
-        
+        const data = await replacePublishedProductsInGoogleSheet();
         return res.status(200).json({
             success: true,
-            message: "Products added to Google Sheet Successfully",
-            data: {response, productValues, allProducts},
+            message: `${data.updatedRows} published products synced to the Google Sheet`,
+            data,
         });
-
     } catch (error) {
-        console.log(error);
-        return next(error);
+        next(error);
     }
-}
+};
 
 const updateAllPublishedProductsInGoogleSheet = async (req, res, next) => {
     try {
-        // Logic to update products in Google Sheet
-        const allProducts = await Product.find({ status: "published" })
-        .sort({ createdAt: -1 })
-        .populate({ path: "type", select: "name _id" })
-        .populate({ path: "category", select: "name description isActive _id" })
-        .populate({ path: "element", select: "name description _id" })
-        .populate({ path: "brand", select: "name logo description _id" })
-        .populate({ path: "model", select: "name description _id" })
-        .populate({
-            path: "image",
-            select: "url isFeatured _id",
-            strictPopulate: false,
-        })
-        .populate({
-            path: "attributes",
-            select: "name value _id",
-            strictPopulate: false,
-        })
-        .populate({
-            path: "variants",
-            select: "name mrp sp discount deliveryCharges codCharges video variantAttributes description sku barcode stock _id",
-            strictPopulate: false,
-            populate: {
-            path: "image",
-            select: "url _id",
-            strictPopulate: false,
-            },
-        })
-        .populate({
-            path: "featuredImage",
-            select: "url _id",
-            strictPopulate: false,
-        });
-        if (!allProducts) return next(apiErrorHandler(404, "No Products Found"));
-        
-        const productValues = allProducts.map((product) => {
-            return [
-                product._id,
-                product.name,
-                product.description,
-                'in_stock',
-                '',
-                '',
-                `https://www.acubemart.in/product/${product?.slug}` || '',
-                '',
-                product.featuredImage?.url || '',
-                `${product?.price || ''} INR`,
-                `${product?.sp || ''} INR`,
-                '',
-                'no',
-                '',
-                '',
-                product.brand?.name || 'acube mart',
-            ]
-        });
-
-        const rangeResponse = await sheets.spreadsheets.values.get({
-            auth,
-            spreadsheetId,
-            range: "sheet1!A3:P",
-        });
-
-        const existingValues = rangeResponse.data.values || [];
-        let lastRow = existingValues.length || 0;
-
-        const range = `sheet1!A3:P${lastRow + productValues.length}`;
-
-        const response = await sheets.spreadsheets.values.update({
-            auth,
-            spreadsheetId,
-            range: range,
-            valueInputOption: 'RAW',
-            resource: {
-                values: productValues
-            },
-        });
+        const data = await replacePublishedProductsInGoogleSheet();
         return res.status(200).json({
             success: true,
-            message: "Products updated in Google Sheet Successfully",
-            data: {response, productValues, allProducts },
+            message: `${data.updatedRows} published products synced to the Google Sheet`,
+            data,
         });
     } catch (error) {
-        console.log(error);
-        return next(error);
+        next(error);
     }
-}
+};
 
 export {
     addAllPublishedProductsToGoogleSheet,
     updateAllPublishedProductsInGoogleSheet,
-    
-}
+};

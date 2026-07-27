@@ -43,7 +43,7 @@ ConnectDB();
 //Middlewares
 app.use(
   cors({
-    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in", "https://main.d2fon6a396l5uy.amplifyapp.com", "http://localhost:3000", "http://localhost:3001", "https://acubemart-backend.vercel.app"],
+    origin: ["https://main.d2fon6a396l5uy.amplifyapp.com", "https://www.acubemart.in", "https://acubemart.in", "http://localhost:3000", "http://localhost:3001", "https://acubemart-backend.vercel.app"],
     methods: ["GET", "POST", "HEAD", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
@@ -55,8 +55,6 @@ app.use(
   express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 1000000 })
 );
 app.use(express.static("uploads"));
-
-app.use(errorHandler);
 
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
@@ -102,6 +100,8 @@ app.get(
     );
   }
 );
+
+app.use(errorHandler);
 
 //Port Listening
 app.listen(port, () => {

@@ -1,28 +1,92 @@
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 import { google } from "googleapis";
+import { createPrivateKey } from "node:crypto";
 import Product from "../models/product.model.js";
 
 const DEFAULT_SHEET_GID = "79216810";
+
+const normalizePrivateKey = () => {
+    const configuredKey = process.env.GOOGLE_SHEETS_PRIVATE_KEY_BASE64
+        ? Buffer.from(process.env.GOOGLE_SHEETS_PRIVATE_KEY_BASE64.trim(), "base64").toString("utf8")
+        : process.env.GOOGLE_SHEETS_PRIVATE_KEY;
+
+    if (!configuredKey) {
+        throw apiErrorHandler(500, "Missing Google Sheets configuration: GOOGLE_SHEETS_PRIVATE_KEY");
+    }
+
+    let privateKey = configuredKey.trim();
+
+    if (
+        (privateKey.startsWith('"') && privateKey.endsWith('"'))
+        || (privateKey.startsWith("'") && privateKey.endsWith("'"))
+    ) {
+        privateKey = privateKey.slice(1, -1);
+    }
+
+    privateKey = privateKey
+        .replace(/\\+r\\+n/g, "\n")
+        .replace(/\\+n/g, "\n")
+        .replace(/\r\n/g, "\n");
+
+    if (!privateKey.includes("-----BEGIN") && /^[A-Za-z0-9+/=\s]+$/.test(privateKey)) {
+        const decodedKey = Buffer.from(privateKey.replace(/\s/g, ""), "base64").toString("utf8");
+        if (decodedKey.includes("-----BEGIN")) privateKey = decodedKey;
+    }
+
+    const pemMatch = privateKey.match(
+        /-----BEGIN ([A-Z ]*PRIVATE KEY)-----([\s\S]*?)-----END \1-----/
+    );
+
+    if (!pemMatch) {
+        throw apiErrorHandler(
+            500,
+            "Google Sheets private key is not a valid PEM key. Configure it with escaped newlines or as GOOGLE_SHEETS_PRIVATE_KEY_BASE64."
+        );
+    }
+
+    const pemBody = pemMatch[2].replace(/\s/g, "");
+    privateKey = [
+        `-----BEGIN ${pemMatch[1]}-----`,
+        ...(pemBody.match(/.{1,64}/g) || []),
+        `-----END ${pemMatch[1]}-----`,
+        "",
+    ].join("\n");
+
+    try {
+        createPrivateKey(privateKey);
+    } catch {
+        throw apiErrorHandler(
+            500,
+            "Google Sheets private key could not be decoded. Update the deployed service-account key and try again."
+        );
+    }
+
+    return privateKey;
+};
 
 const createSheetsClient = () => {
     const requiredEnvironmentVariables = [
         "GOOGLE_SHEETS_SPREADSHEET_ID",
         "GOOGLE_SHEETS_PROJECT_ID",
-        "GOOGLE_SHEETS_PRIVATE_KEY",
         "GOOGLE_SHEETS_CLIENT_EMAIL",
     ];
     const missingVariables = requiredEnvironmentVariables.filter((name) => !process.env[name]);
+
+    if (!process.env.GOOGLE_SHEETS_PRIVATE_KEY && !process.env.GOOGLE_SHEETS_PRIVATE_KEY_BASE64) {
+        missingVariables.push("GOOGLE_SHEETS_PRIVATE_KEY");
+    }
 
     if (missingVariables.length > 0) {
         throw apiErrorHandler(500, `Missing Google Sheets configuration: ${missingVariables.join(", ")}`);
     }
 
+    const privateKey = normalizePrivateKey();
     const auth = new google.auth.GoogleAuth({
         credentials: {
             type: "service_account",
             project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
             private_key_id: process.env.GOOGLE_SHEETS_PRIVATE_KEY_ID,
-            private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY.replace(/\\n/g, "\n"),
+            private_key: privateKey,
             client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
             client_id: process.env.GOOGLE_SHEETS_CLIENT_ID,
             auth_uri: "https://accounts.google.com/o/oauth2/auth",

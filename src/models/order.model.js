@@ -4,6 +4,14 @@ import { Schema } from "mongoose";
 
 //Order Schema Model/Document
 const orderSchema = new mongoose.Schema({
+    paymentAttemptId: {
+        type: Schema.Types.ObjectId,
+        ref: "PaymentAttempt",
+        index: {
+            unique: true,
+            sparse: true
+        }
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",

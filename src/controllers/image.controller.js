@@ -13,18 +13,13 @@ const addImagesByProductId = async (req, res, next) => {
     const { productId } = req.body;
     
     if (!productId) return next(apiErrorHandler(400, "ProductId is required"));
-    //Upload Multiple Images
-    let imageUrls = await uploadMultipleImages(req, res, next); 
-    //console.log(imageUrls);
-    if (!imageUrls) return next(apiErrorHandler(400, "Images upload failed"));
-
-    // Apply Cloudinary transformation to all URLs
-    imageUrls = imageUrls.map(url => addCloudinaryTransformation(url));
-
-    const images = [];
     try {
         const product = await Product.findById(productId);
         if (!product) return next(apiErrorHandler(404, "No Product Found"));
+        let imageUrls = await uploadMultipleImages(req, res, next);
+        if (!imageUrls) return next(apiErrorHandler(400, "Images upload failed"));
+        imageUrls = imageUrls.map(url => addCloudinaryTransformation(url));
+        const images = [];
 
         for (let index = 0; index < imageUrls.length; index++) {
             const image = await Image.create({ 
@@ -34,8 +29,8 @@ const addImagesByProductId = async (req, res, next) => {
 
             images.push(image);
             product.image.push(image._id);
-            await product.save();
         }
+        await product.save();
 
         return res.status(201).json({
             success: true,
@@ -54,6 +49,9 @@ const addNewImage = async (req, res, next) => {
     if (!productId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
+        const product = await Product.findById(productId);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+
         let imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
 
@@ -65,9 +63,6 @@ const addNewImage = async (req, res, next) => {
             productId,
             isFeatured
         });
-
-        const product = await Product.findById(productId);
-        if (!product) return next(apiErrorHandler(404, "No Product Found"));
 
         product.image.push(image._id);
         product.featuredImage = image._id;
@@ -91,6 +86,15 @@ const addNewImageForVariant = async (req, res, next) => {
     if (!productId || !variantId) return next(apiErrorHandler(400, "Please provide all fields"));
     
     try {
+        const [product, variant] = await Promise.all([
+            Product.findById(productId),
+            Variant.findById(variantId),
+        ]);
+        if (!product) return next(apiErrorHandler(404, "No Product Found"));
+        if (!variant || variant.productId.toString() !== productId) {
+            return next(apiErrorHandler(400, "Variant does not belong to this product"));
+        }
+
         let imageUrl = await uploadSingleImage(req, res, next);
         if (!imageUrl) return next(apiErrorHandler(400, "Image upload failed"));
 
@@ -102,14 +106,8 @@ const addNewImageForVariant = async (req, res, next) => {
             productId,
         });
 
-        const product = await Product.findById(productId);
-        if (!product) return next(apiErrorHandler(404, "No Product Found"));
-
         product.image.push(image._id);
         await product.save();
-
-        const variant = await Variant.findById(variantId);
-        if (!variant) return next(apiErrorHandler(404, "No Variant Found"));
 
         variant.image.push(image._id);
         await variant.save();
@@ -218,6 +216,14 @@ const updateProductImagesOrder = async (req, res, next) => {
             return next(apiErrorHandler(400, "imagesOrder must contain every product image exactly once"));
         }
 
+        const ownedImageCount = await Image.countDocuments({
+            _id: { $in: requestedIds },
+            productId,
+        });
+        if (ownedImageCount !== requestedIds.length) {
+            return next(apiErrorHandler(400, "Every image must belong to this product"));
+        }
+
         product.image = requestedIds;
         await product.save();
 
@@ -293,8 +299,15 @@ const deleteImage = async (req, res, next) => {
         const index = product.image.indexOf(image._id);
         if (index > -1) {
             product.image.splice(index, 1);
-            await product.save();
         }
+        if (product.featuredImage?.toString() === image._id.toString()) {
+            const nextFeaturedImage = await Image.findOne({
+                _id: { $in: product.image },
+                productId: product._id,
+            }).sort({ createdAt: 1 });
+            product.featuredImage = nextFeaturedImage?._id;
+        }
+        await product.save();
 
         return res.status(200).json({
             success: true,

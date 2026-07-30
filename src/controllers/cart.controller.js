@@ -4,7 +4,7 @@ import Cart from "../models/cart.model.js";
 
 /* Add New Product */
 const addToCart = async (req, res, next) => {
-  const { userId, productId, quantity } = req.body;
+  const { userId, productId, variantId, quantity } = req.body;
   if (!userId) return next(apiErrorHandler(400, "User not found"));
 
   if (!productId || !quantity || quantity < 1)
@@ -14,13 +14,21 @@ const addToCart = async (req, res, next) => {
     /* Check if Cart Already Exists */
     const iscart = await Cart.findOne({ userId });
     if (iscart) {
-      if (iscart.products.find((p) => p.productId.toString() === productId)) {
+      const existingProduct = iscart.products.find(
+        (product) =>
+          product.productId.toString() === productId &&
+          (product.variantId?.toString() || "") === (variantId || "")
+      );
+      if (existingProduct) {
+        existingProduct.quantity += Number(quantity);
+        await iscart.save();
         return res.status(201).json({
           success: true,
-          message: "Product Already Exists in Cart",
+          data: iscart,
+          message: "Product quantity updated",
         });
       }
-      iscart.products = [...iscart.products, { productId, quantity }];
+      iscart.products = [...iscart.products, { productId, variantId, quantity }];
       await iscart.save();
       return res.status(201).json({
         success: true,
@@ -32,7 +40,7 @@ const addToCart = async (req, res, next) => {
     /* Create New Cart */
     const cart = await Cart.create({
       userId,
-      products: [{ productId, quantity }],
+      products: [{ productId, variantId, quantity }],
     });
     //console.log(cart);
     return res.status(201).json({
@@ -65,6 +73,14 @@ const getCartProducts = async (req, res, next) => {
         },
         {
           path: "featuredImage"
+        },
+        {
+          path: "variants",
+          model: "Variant",
+          populate: {
+            path: "image",
+            model: "Image",
+          },
         }
       ],
     });
@@ -84,12 +100,32 @@ const getCartProducts = async (req, res, next) => {
               // Include any other brand fields you need
             }))
           : [];
+        const selectedVariant = product.variantId
+          ? product.productId.variants?.find(
+              (variant) => variant._id.toString() === product.variantId.toString()
+            )
+          : null;
 
         return {
-          _id: product._id,
-          quantity: product.quantity,
           ...product.productId._doc,
-          image: product.productId.image.map((img) => img.url),
+          ...(selectedVariant
+            ? {
+                name: selectedVariant.name,
+                price: selectedVariant.mrp,
+                sp: selectedVariant.sp,
+                stock: selectedVariant.stock,
+                image:
+                  selectedVariant.image?.length > 0
+                    ? selectedVariant.image
+                    : product.productId.image,
+              }
+            : {}),
+          quantity: product.quantity,
+          variantId: product.variantId?.toString(),
+          image:
+            selectedVariant?.image?.length > 0
+              ? selectedVariant.image
+              : product.productId.image,
           brand: brands,
         };
       })
@@ -110,7 +146,7 @@ const getCartProducts = async (req, res, next) => {
 
 /* Update Cart Product Quantity by Product Id */
 const updateCartProductQuantity = async (req, res, next) => {
-  const { userId, productId, quantity } = req.body;
+  const { userId, productId, variantId, quantity } = req.body;
   if (!userId || !productId || !quantity)
     return next(apiErrorHandler(400, "Please provide all fields"));
 
@@ -118,12 +154,26 @@ const updateCartProductQuantity = async (req, res, next) => {
     const cart = await Cart.findOneAndUpdate(
       {
         userId,
-        "products.productId": productId,
+        products: {
+          $elemMatch: {
+            productId,
+            variantId: variantId || { $exists: false },
+          },
+        },
       },
       {
         $set: {
-          "products.$.quantity": quantity,
+          "products.$[item].quantity": quantity,
         },
+      },
+      {
+        arrayFilters: [
+          {
+            "item.productId": productId,
+            "item.variantId": variantId || { $exists: false },
+          },
+        ],
+        new: true,
       }
     );
 
@@ -141,7 +191,7 @@ const updateCartProductQuantity = async (req, res, next) => {
 
 /* Remove Cart Products */
 const removeCartProduct = async (req, res, next) => {
-  const { userId, productId } = req.body;
+  const { userId, productId, variantId } = req.body;
   if (!userId || !productId)
     return next(apiErrorHandler(400, "Please provide all fields"));
 
@@ -154,6 +204,7 @@ const removeCartProduct = async (req, res, next) => {
         $pull: {
           products: {
             productId,
+            variantId: variantId || { $exists: false },
           },
         },
       }
@@ -173,8 +224,7 @@ const removeCartProduct = async (req, res, next) => {
 
 // clear cart
 const clearCart = async (req, res, next) => {
-  const { userId } = req.body;
-  console.log("clearing cart", userId);
+  const userId = req.body.userId || req.query.userId;
   if (!userId) return next(apiErrorHandler(400, "UserId is required"));
   try {
     const cart = await Cart.findOneAndDelete({ userId });

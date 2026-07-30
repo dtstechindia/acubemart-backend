@@ -14,6 +14,19 @@ const transactionSchema = new mongoose.Schema({
         ref: "Order",
         //required: [true, "Order Id is required"]
     },
+    providerPaymentId: {
+        type: String,
+        trim: true,
+        index: {
+            unique: true,
+            sparse: true
+        }
+    },
+    providerOrderId: {
+        type: String,
+        trim: true,
+        index: true
+    },
     amount: {
         type: Number,
         required: [true, "Amount is required"]

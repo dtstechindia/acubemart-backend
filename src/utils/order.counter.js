@@ -7,7 +7,10 @@ import { json2csv } from 'json-2-csv';
 // Create a new schema for the counter
 const counterSchema = new mongoose.Schema({
   name: String,
-  count: Number
+  count: {
+    type: Number,
+    default: 5000,
+  }
 });
 
 // Create a model for the counter
@@ -35,8 +38,28 @@ const updateOrderNumber = async () => {
 //updateOrderNumber();
 
 // Increment the counter and get the new order number
-const getOrderNumber = async () => {
-  const counter = await Counter.findOneAndUpdate({ name: 'orderNumber' }, { $inc: { count: 1 } }, { new: true });
+const getOrderNumber = async (session) => {
+  const counter = await Counter.findOneAndUpdate(
+    { name: 'orderNumber' },
+    [
+      {
+        $set: {
+          name: 'orderNumber',
+          count: {
+            $add: [
+              { $ifNull: ['$count', 5000] },
+              1,
+            ],
+          },
+        },
+      },
+    ],
+    {
+      new: true,
+      upsert: true,
+      session,
+    }
+  );
   return counter.count;
 };
 

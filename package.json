@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "test": "node --test test/**/*.test.js"
   },
   "author": "DTS Tech India",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "razorpay": "^2.9.4"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^10.4.3",
     "nodemon": "^3.1.2"
   }
 }

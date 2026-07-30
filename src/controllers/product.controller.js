@@ -1,6 +1,78 @@
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import Product from "../models/product.model.js";
+import Image from "../models/image.model.js";
+
+const sanitizeProductMedia = async (productOrProducts) => {
+  const products = (Array.isArray(productOrProducts)
+    ? productOrProducts
+    : [productOrProducts]
+  ).filter(Boolean);
+  const imageIds = products.flatMap((product) =>
+    (Array.isArray(product.image) ? product.image : []).map((image) =>
+      String(image?._id || image)
+    )
+  );
+  const featuredIds = products
+    .map((product) => product.featuredImage?._id || product.featuredImage)
+    .filter(Boolean)
+    .map(String);
+
+  if (imageIds.length === 0 && featuredIds.length === 0) {
+    return productOrProducts;
+  }
+
+  const imageOwners = await Image.find({
+    _id: { $in: [...new Set([...imageIds, ...featuredIds])] },
+  }).select("_id productId");
+  const ownerByImageId = new Map(
+    imageOwners.map((image) => [image._id.toString(), image.productId.toString()])
+  );
+  const repairs = [];
+
+  products.forEach((product) => {
+    const productId = product._id.toString();
+    const originalImages = Array.isArray(product.image) ? product.image : [];
+    const validImages = originalImages.filter(
+      (image) => ownerByImageId.get(String(image?._id || image)) === productId
+    );
+    const featuredImageId = String(
+      product.featuredImage?._id || product.featuredImage || ""
+    );
+    const hasOwnedFeaturedImage =
+      featuredImageId && ownerByImageId.get(featuredImageId) === productId;
+
+    if (
+      validImages.length !== originalImages.length ||
+      (featuredImageId && !hasOwnedFeaturedImage)
+    ) {
+      repairs.push({
+        updateOne: {
+          filter: { _id: product._id },
+          update: {
+            $set: {
+              image: validImages.map((image) => image?._id || image),
+              featuredImage: hasOwnedFeaturedImage
+                ? product.featuredImage?._id || product.featuredImage
+                : validImages[0]?._id || validImages[0] || null,
+            },
+          },
+        },
+      });
+    }
+
+    product.image = validImages;
+    if (!hasOwnedFeaturedImage) {
+      product.featuredImage = validImages[0] || null;
+    }
+  });
+
+  if (repairs.length > 0) {
+    await Product.bulkWrite(repairs);
+  }
+
+  return productOrProducts;
+};
 
 /* Add New Product */
 const addNewProduct = async (req, res, next) => {
@@ -203,7 +275,7 @@ const searchProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -319,7 +391,7 @@ const searchAllMatchedProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -434,7 +506,7 @@ const searchPerfectMatchedProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -509,7 +581,7 @@ const getSaleProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Sale Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -562,7 +634,7 @@ const getPaginatedProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -608,7 +680,7 @@ const getAllPublishedProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
@@ -654,10 +726,64 @@ const getAllProducts = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Products Fetched Successfully",
-      data: products,
+      data: await sanitizeProductMedia(products),
     });
   } catch (error) {
     next(error);
+  }
+};
+
+const searchProductRelationshipSources = async (req, res, next) => {
+  const searchQuery = String(req.query.query || "").trim();
+  const excludeId = String(req.query.excludeId || "").trim();
+  const requestedLimit = Number.parseInt(req.query.limit, 10);
+  const limit = Number.isInteger(requestedLimit)
+    ? Math.min(Math.max(requestedLimit, 1), 30)
+    : 15;
+
+  if (searchQuery.length < 2) {
+    return res.status(200).json({
+      success: true,
+      message: "Enter at least two characters to search products",
+      data: [],
+    });
+  }
+
+  try {
+    const escapedQuery = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const searchRegex = new RegExp(escapedQuery, "i");
+    const conditions = [
+      { name: searchRegex },
+      { sku: searchRegex },
+    ];
+
+    if (/^[a-f\d]{24}$/i.test(searchQuery)) {
+      conditions.unshift({ _id: searchQuery });
+    }
+
+    const filter = { $or: conditions };
+    if (/^[a-f\d]{24}$/i.test(excludeId)) {
+      filter._id = { $ne: excludeId };
+    }
+
+    const products = await Product.find(filter)
+      .select("_id name sku type category element brand model")
+      .populate({ path: "type", select: "name _id" })
+      .populate({ path: "category", select: "name _id" })
+      .populate({ path: "element", select: "name _id" })
+      .populate({ path: "brand", select: "name _id" })
+      .populate({ path: "model", select: "name _id" })
+      .sort({ name: 1 })
+      .limit(limit)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      message: "Product relationship sources fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -704,7 +830,7 @@ const getProductById = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Product Fetched Successfully",
-      data: product,
+      data: await sanitizeProductMedia(product),
     });
   } catch (error) {
     next(error);
@@ -753,7 +879,7 @@ const getProductBySlug = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Product Fetched Successfully",
-      data: product,
+      data: await sanitizeProductMedia(product),
     });
   } catch (error) {
     next(error);
@@ -850,10 +976,16 @@ const deleteProductById = async (req, res, next) => {
 
 /* Bulk Edit Products by pushing category Id in products by Id */
 const bulkEditProducts = async (req, res, next) => {
-  const { products, categoryType, category } = req.body;
-  const allowedRelationshipTypes = ["category", "element", "brand", "model"];
+  const { products, removeProducts = [], categoryType, category } = req.body;
+  const allowedRelationshipTypes = ["type", "category", "element", "brand", "model"];
 
-  if (!Array.isArray(products) || products.length === 0 || !categoryType || !category){
+  if (
+    !Array.isArray(products) ||
+    !Array.isArray(removeProducts) ||
+    (products.length === 0 && removeProducts.length === 0) ||
+    !categoryType ||
+    !category
+  ){
     return next(apiErrorHandler(400, "Please provide all fields"));
   }
 
@@ -862,14 +994,22 @@ const bulkEditProducts = async (req, res, next) => {
   }
 
   try {
-    const updatedProducts = await Product.updateMany(
-      { _id: { $in: products } },
-      { $addToSet: { [categoryType]: category } }
-    );
+    const [added, removed] = await Promise.all([
+      Product.updateMany(
+        { _id: { $in: products } },
+        { $addToSet: { [categoryType]: category } }
+      ),
+      Array.isArray(removeProducts) && removeProducts.length > 0
+        ? Product.updateMany(
+            { _id: { $in: removeProducts } },
+            { $pull: { [categoryType]: category } }
+          )
+        : Promise.resolve({ modifiedCount: 0 }),
+    ]);
     return res.status(200).json({
       success: true,
       message: "Products Updated Successfully",
-      data: updatedProducts,
+      data: { added, removed },
     });
   } catch (error) {
     next(error);
@@ -923,7 +1063,7 @@ const getAllProductsByElementId = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Products",
-      data: products || [],
+      data: await sanitizeProductMedia(products || []),
     });
   } catch (error) {
     next(error);
@@ -973,7 +1113,7 @@ const getAllProductsByCategoryId = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Products",
-      data: products || [],
+      data: await sanitizeProductMedia(products || []),
     });
   } catch (error) {
     next(error);
@@ -1022,7 +1162,7 @@ const getAllProductsByBrandId = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Products",
-      data: products || [],
+      data: await sanitizeProductMedia(products || []),
     });
   } catch (error) {
     next(error);
@@ -1070,7 +1210,7 @@ const getAllProductsByModelId = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "All Products",
-      data: products || [],
+      data: await sanitizeProductMedia(products || []),
     });
   } catch (error) {
     next(error);
@@ -1087,8 +1227,9 @@ export {
   getAllPublishedProducts,
   getAllProductsCount,
   getPublishedProductsCount,
-  getPaginatedProducts,
-  getProductById,
+    getPaginatedProducts,
+    searchProductRelationshipSources,
+    getProductById,
   getProductBySlug,
   editProductById,
   deleteProductById,

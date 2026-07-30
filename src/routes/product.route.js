@@ -11,6 +11,7 @@ import {
     getAllProductsCount,
     getPublishedProductsCount,
     getPaginatedProducts,
+    searchProductRelationshipSources,
     getProductById,
     editProductById,
     deleteProductById,
@@ -35,6 +36,9 @@ router.get("/sale", getSaleProducts);
 
 // Get All Published Products Route -GET `/api/product/published`
 router.get("/published", getAllPublishedProducts);
+
+// Search products used as relationship import sources
+router.get("/relationship-sources", searchProductRelationshipSources);
 
 // Get Product by Id Route -GET `/api/product/:id`
 router.get("/:id", getProductById);

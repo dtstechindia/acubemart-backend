@@ -143,7 +143,20 @@ const paymentAttemptSchema = new mongoose.Schema(
     completedAt: {
       type: Date,
     },
+    processingStartedAt: {
+      type: Date,
+    },
+    finalizationAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lastFinalizationAt: {
+      type: Date,
+    },
     lastError: {
+      type: String,
+    },
+    lastErrorStage: {
       type: String,
     },
     providerError: {
@@ -155,7 +168,7 @@ const paymentAttemptSchema = new mongoose.Schema(
     },
     lastEventSource: {
       type: String,
-      enum: ["frontend", "webhook"],
+      enum: ["frontend", "webhook", "reconciliation"],
     },
   },
   {

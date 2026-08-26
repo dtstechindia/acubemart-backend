@@ -2,12 +2,24 @@
 const errorHandler = (err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
-    return res.status(statusCode).json({
+    const response = {
         success: false,
         message,
         statusCode,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : {}
-    })
+    };
+
+    if (
+        process.env.NODE_ENV !== 'production' &&
+        process.env.EXPOSE_ERROR_STACK === 'true'
+    ) {
+        response.stack = err.stack;
+    }
+
+    if (statusCode >= 500) {
+        console.error(`[request-error] ${req.method} ${req.originalUrl}:`, err);
+    }
+
+    return res.status(statusCode).json(response)
 };
 
 

@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
+import crypto from "node:crypto";
 import { after, afterEach, before, test } from "node:test";
 import mongoose from "mongoose";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 
-import { finalizePaymentAttempt } from "../src/controllers/payments.controller.js";
+import {
+  finalizePaymentAttempt,
+  handlePaymentWebhook,
+} from "../src/controllers/payments.controller.js";
 import Address from "../src/models/address.model.js";
 import Order from "../src/models/order.model.js";
 import PaymentAttempt from "../src/models/paymentattempt.model.js";
@@ -224,4 +228,98 @@ test("recovery relinks a legacy order without reserving its stock again", async 
   assert.equal(refreshedAttempt.status, "completed");
   assert.equal(refreshedProduct.stock, 8);
   assert.equal(await Order.countDocuments(), 1);
+});
+
+test("signed captured webhook is acknowledged after persisting the paid attempt", async () => {
+  const { attempt } = await createCheckout("1004");
+  const previousSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  process.env.RAZORPAY_WEBHOOK_SECRET = "test-webhook-secret";
+  const rawBody = Buffer.from(
+    JSON.stringify({
+      event: "payment.captured",
+      payload: {
+        payment: {
+          entity: {
+            id: "pay_test_webhook",
+            order_id: attempt.razorpayOrderId,
+            amount: Math.round(attempt.amount * 100),
+            currency: attempt.currency,
+            status: "captured",
+            captured: true,
+            notes: { checkoutAttemptId: attempt._id.toString() },
+          },
+        },
+      },
+    })
+  );
+  const signature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET)
+    .update(rawBody)
+    .digest("hex");
+  let statusCode;
+  let responseBody;
+  const response = {
+    status(code) {
+      statusCode = code;
+      return this;
+    },
+    json(body) {
+      responseBody = body;
+      return this;
+    },
+  };
+
+  try {
+    await handlePaymentWebhook(
+      {
+        body: rawBody,
+        headers: { "x-razorpay-signature": signature },
+      },
+      response,
+      (error) => {
+        throw error;
+      }
+    );
+
+    assert.equal(statusCode, 200);
+    assert.match(responseBody.message, /webhook processed/i);
+
+    const completedAttempt = await PaymentAttempt.findById(attempt._id);
+    assert.equal(completedAttempt.status, "completed");
+    assert.equal(completedAttempt.razorpayPaymentId, "pay_test_webhook");
+    assert.equal(
+      await Order.countDocuments({ paymentAttemptId: attempt._id }),
+      1
+    );
+  } finally {
+    if (previousSecret === undefined) {
+      delete process.env.RAZORPAY_WEBHOOK_SECRET;
+    } else {
+      process.env.RAZORPAY_WEBHOOK_SECRET = previousSecret;
+    }
+  }
+});
+
+test("webhook reports missing secret as a retryable service configuration error", async () => {
+  const previousSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  delete process.env.RAZORPAY_WEBHOOK_SECRET;
+  let forwardedError;
+  const response = {
+    set() {},
+  };
+
+  try {
+    await handlePaymentWebhook({}, response, (error) => {
+      forwardedError = error;
+    });
+  } finally {
+    if (previousSecret === undefined) {
+      delete process.env.RAZORPAY_WEBHOOK_SECRET;
+    } else {
+      process.env.RAZORPAY_WEBHOOK_SECRET = previousSecret;
+    }
+  }
+
+  assert.equal(forwardedError.statusCode, 503);
+  assert.match(forwardedError.message, /webhook secret is not configured/i);
 });

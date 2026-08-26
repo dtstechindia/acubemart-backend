@@ -750,6 +750,7 @@ const handlePaymentWebhook = async (req, res, next) => {
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
+    res.set("Retry-After", "60");
     return next(apiErrorHandler(503, "Razorpay webhook secret is not configured"));
   }
 
@@ -812,11 +813,13 @@ const handlePaymentWebhook = async (req, res, next) => {
 
     const razorpayOrderId = paymentEntity?.order_id || orderEntity?.id;
     let razorpayPaymentId = paymentEntity?.id;
+    let capturedPayment = paymentEntity;
+
     if (!razorpayPaymentId && razorpayOrderId) {
       const providerPayments = await getRazorpayClient().orders.fetchPayments(
         razorpayOrderId
       );
-      const capturedPayment = providerPayments.items?.find(
+      capturedPayment = providerPayments.items?.find(
         (payment) => payment.status === "captured" && payment.captured === true
       );
       razorpayPaymentId = capturedPayment?.id;
@@ -830,14 +833,64 @@ const handlePaymentWebhook = async (req, res, next) => {
       return res.status(200).json({ success: true, message: "No matching attempt metadata found" });
     }
 
+    const attemptQuery =
+      attemptReceipt && mongoose.isValidObjectId(attemptReceipt)
+        ? { _id: attemptReceipt }
+        : { razorpayOrderId };
+    const updateFields = {
+      status: ATTEMPT_STATUS.PAID,
+      paidAt: new Date(),
+      lastEventSource: "webhook",
+    };
+    if (razorpayOrderId) updateFields.razorpayOrderId = razorpayOrderId;
+    if (razorpayPaymentId) updateFields.razorpayPaymentId = razorpayPaymentId;
+
+    const attempt = await PaymentAttempt.findOneAndUpdate(
+      { ...attemptQuery, status: { $ne: ATTEMPT_STATUS.COMPLETED } },
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!attempt) {
+      return res.status(200).json({
+        success: true,
+        message: "Payment attempt was already completed or could not be matched",
+      });
+    }
+
+    if (capturedPayment) {
+      const amountMatches =
+        Number(capturedPayment.amount) === Math.round(Number(attempt.amount) * 100);
+      const currencyMatches = capturedPayment.currency === attempt.currency;
+
+      if (!amountMatches || !currencyMatches) {
+        await PaymentAttempt.findByIdAndUpdate(attempt._id, {
+          $set: {
+            lastError: "Captured payment amount does not match the checkout attempt",
+            lastErrorStage: "webhook validation",
+          },
+        });
+
+        return res.status(200).json({
+          success: true,
+          message: "Webhook recorded for manual payment review",
+        });
+      }
+    }
+
+    // Persist the paid state first, then finish idempotently before acknowledging.
+    // A transient failure returns non-2xx so Razorpay retries this signed event.
     await finalizeAttempt({
-      attemptId: attemptReceipt,
+      attemptId: attempt._id,
       razorpayOrderId,
       razorpayPaymentId,
       source: "webhook",
     });
 
-    return res.status(200).json({ success: true, message: "Webhook processed" });
+    return res.status(200).json({
+      success: true,
+      message: "Webhook processed",
+    });
   } catch (error) {
     return next(error);
   }

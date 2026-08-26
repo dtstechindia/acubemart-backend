@@ -2,10 +2,15 @@ import "dotenv/config";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import express from "express";
 import cors from "cors";
+import mongoose from "mongoose";
 //import Razorpay from "razorpay";
 //import multer from "multer";
 
 import ConnectDB from "./src/db/connection.db.js";
+import {
+  getPaymentConfigurationStatus,
+  logPaymentConfigurationStatus,
+} from "./src/config/payment.config.js";
 import { errorHandler } from "./src/middlewares/errorhandler.middleware.js";
 
 import userRouter from "./src/routes/user.route.js";
@@ -36,9 +41,6 @@ import googlesheetproductsRouter from "./src/routes/googlesheetproducts.route.js
 //App
 const app = express();
 const port = process.env.PORT || 8000;
-
-//Database connection
-ConnectDB();
 
 //Middlewares
 app.use(
@@ -91,6 +93,20 @@ app.get("/api/health", (_req, res) => {
   res.send("Server is Healthy ...");
 });
 
+app.get("/api/health/readiness", (_req, res) => {
+  const payment = getPaymentConfigurationStatus();
+  const databaseReady = mongoose.connection.readyState === 1;
+  const ready = databaseReady && payment.ready;
+
+  return res.status(ready ? 200 : 503).json({
+    success: ready,
+    checks: {
+      database: databaseReady,
+      payment: payment.checks,
+    },
+  });
+});
+
 // ZERO SSL Validation
 app.get(
   "/.well-known/pki-validation/14279CB10049F94424683C2B23044845.txt",
@@ -103,7 +119,18 @@ app.get(
 
 app.use(errorHandler);
 
-//Port Listening
-app.listen(port, () => {
-  console.log(`Server is Running at PORT: ${port}`);
-});
+const startServer = async () => {
+  try {
+    await ConnectDB();
+    logPaymentConfigurationStatus();
+
+    app.listen(port, () => {
+      console.log(`Server is Running at PORT: ${port}`);
+    });
+  } catch (error) {
+    console.error(`[startup] Server failed to start: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+startServer();

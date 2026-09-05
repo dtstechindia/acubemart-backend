@@ -1,8 +1,25 @@
 import bcryptjs from "bcryptjs";
 
+import {
+    getPlayReviewConfig,
+    isPlayReviewPhone,
+    isValidPlayReviewOtp,
+} from "../config/play-review.config.js";
 import { apiErrorHandler } from "../middlewares/errorhandler.middleware.js";
 
 import User from "../models/user.model.js";
+
+const getPhoneForLookup = (phone) => {
+    if (!isPlayReviewPhone(phone)) return phone;
+    return getPlayReviewConfig().phone;
+};
+
+const sanitizeUser = (user) => {
+    const safeUser = user?.toObject ? user.toObject() : { ...user };
+    delete safeUser.password;
+    delete safeUser.otp;
+    return safeUser;
+};
 
 
 /* Register New User */
@@ -48,35 +65,38 @@ const registerUserWithPhone = async (req, res, next) => {
     if (!name || !email || !phone) return next(apiErrorHandler(400, "Please provide all fields"));
 
     try {
-        
-        const userExists = await User.findOne({ phone });
+        const storedPhone = getPhoneForLookup(phone);
+        const isReviewAccount = isPlayReviewPhone(phone);
+        const userExists = await User.findOne({ phone: storedPhone });
         if (userExists) return next(apiErrorHandler(400, "User Already Exists"));
-        // Generate a random 6-digit OTP
-        const geteratedOTP = Math.floor(100000 + Math.random() * 900000);
-        // Send OTP to user phone number
-        const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${phone}&message=${geteratedOTP} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }   
-        )
-        if (!response.ok) {
-            return next(apiErrorHandler(500, "Failed to send OTP"));
+
+        let generatedOtp;
+        if (!isReviewAccount) {
+            generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${storedPhone}&message=${generatedOtp} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if (!response.ok) {
+                return next(apiErrorHandler(500, "Failed to send OTP"));
+            }
         }
 
         const user = await User.create({ 
             name, 
             email, 
-            phone,
-            otp: geteratedOTP
+            phone: storedPhone,
+            ...(generatedOtp ? { otp: generatedOtp } : {}),
         });
 
         return res.status(201).json({
             success: true,
             message: "User Registered Successfully",
-            data: user,
+            data: sanitizeUser(user),
         })
         
     } catch (error) {
@@ -91,13 +111,20 @@ const verifyRegistrationOtpAndLogin = async (req, res, next) => {
     if (!otp) return next(apiErrorHandler(400, "OTP is required"));
 
     try {
-        const user = await User.findOne({ phone, otp });
+        const user = await User.findOne({ phone: getPhoneForLookup(phone) }).select("+otp");
         if (!user) return next(apiErrorHandler(404, "No User Found"));
-        if (user.otp !== otp) return next(apiErrorHandler(400, "Incorrect OTP"));
+        const isReviewOtp = isValidPlayReviewOtp(phone, otp);
+        if (!isReviewOtp && String(user.otp ?? "") !== String(otp)) {
+            return next(apiErrorHandler(400, "Incorrect OTP"));
+        }
+        if (!isReviewOtp) {
+            user.otp = undefined;
+            await user.save();
+        }
         return res.status(200).json({
             success: true,
             message: "User Logged In Successfully",
-            data: user
+            data: sanitizeUser(user),
         })
         
     } catch (error) {
@@ -142,27 +169,32 @@ const sendOtpToUserPhone = async (req, res, next) => {
     if (!phone) return next(apiErrorHandler(400, "Phone Number is required"));
 
     try {
-        const user = await User.findOne({ phone });
+        const storedPhone = getPhoneForLookup(phone);
+        const isReviewAccount = isPlayReviewPhone(phone);
+        const user = await User.findOne({ phone: storedPhone });
         if (!user) return next(apiErrorHandler(404, "No User Found"));
-        const otp = Math.floor(100000 + Math.random() * 900000); // Generate a random 6-digit OTP
-        const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${phone}&message=${otp} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }   
-        )
-        if (!response.ok) {
-            return next(apiErrorHandler(500, "Failed to send OTP"));
+
+        if (!isReviewAccount) {
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            const response = await fetch(`http://123.108.46.13/sms-panel/api/http/index.php?username=Deuscreation&apikey=4554A-7EDC0&apirequest=Text&sender=ROHIAL&mobile=${storedPhone}&message=${otp} is your OTP, Please enter this code to confirm your Registration. : SMS Sent Via ACUBEMART ROHAIL&route=OTP&TemplateID=1507165087189012738&format=JSON`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+            if (!response.ok) {
+                return next(apiErrorHandler(500, "Failed to send OTP"));
+            }
+            user.otp = otp;
+            await user.save();
         }
-        user.otp = otp; // Assuming otp is generated and passed in the request body
-        await user.save();
-        //console.log(user);
+
         return res.status(200).json({
             success: true,
             message: "OTP Sent Successfully",
-            data: user
+            data: sanitizeUser(user),
         })
         
     } catch (error) {
@@ -179,16 +211,21 @@ const loginUserWithPhoneOtp = async (req, res, next) => {
     if (!otp) return next(apiErrorHandler(400, "OTP is required"));
 
     try {
-        //console.log(phone, otp);
-        const user = await User.findOne({ phone });
+        const user = await User.findOne({ phone: getPhoneForLookup(phone) }).select("+otp");
         
         if (!user) return next(apiErrorHandler(404, "No User Found with this Phone Number"));
-        //console.log(user);
-        if (user.otp !== otp) return next(apiErrorHandler(400, "Incorrect OTP"));
+        const isReviewOtp = isValidPlayReviewOtp(phone, otp);
+        if (!isReviewOtp && String(user.otp ?? "") !== String(otp)) {
+            return next(apiErrorHandler(400, "Incorrect OTP"));
+        }
+        if (!isReviewOtp) {
+            user.otp = undefined;
+            await user.save();
+        }
         return res.status(200).json({
             success: true,
             message: "User Logged In Successfully",
-            data: user
+            data: sanitizeUser(user),
         })
         
     } catch (error) {

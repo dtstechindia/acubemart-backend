@@ -11,6 +11,7 @@ import {
   getPaymentConfigurationStatus,
   logPaymentConfigurationStatus,
 } from "./src/config/payment.config.js";
+import { logPlayReviewConfigurationStatus } from "./src/config/play-review.config.js";
 import { errorHandler } from "./src/middlewares/errorhandler.middleware.js";
 
 import userRouter from "./src/routes/user.route.js";
@@ -123,6 +124,7 @@ const startServer = async () => {
   try {
     await ConnectDB();
     logPaymentConfigurationStatus();
+    logPlayReviewConfigurationStatus();
 
     app.listen(port, () => {
       console.log(`Server is Running at PORT: ${port}`);

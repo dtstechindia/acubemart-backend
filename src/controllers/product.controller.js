@@ -767,12 +767,14 @@ const searchProductRelationshipSources = async (req, res, next) => {
     }
 
     const products = await Product.find(filter)
-      .select("_id name sku type category element brand model")
+      .select("_id name type category element brand model image featuredImage")
       .populate({ path: "type", select: "name _id" })
       .populate({ path: "category", select: "name _id" })
       .populate({ path: "element", select: "name _id" })
       .populate({ path: "brand", select: "name _id" })
       .populate({ path: "model", select: "name _id" })
+      .populate({ path: "featuredImage", select: "url _id" })
+      .populate({ path: "image", select: "url isFeatured _id" })
       .sort({ name: 1 })
       .limit(limit)
       .lean();

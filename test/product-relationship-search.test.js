@@ -8,6 +8,7 @@ import { searchProductRelationshipSources } from "../src/controllers/product.con
 import Brand from "../src/models/brand.model.js";
 import Category from "../src/models/category.model.js";
 import Element from "../src/models/element.model.js";
+import Image from "../src/models/image.model.js";
 import Model from "../src/models/model.model.js";
 import Product from "../src/models/product.model.js";
 import Type from "../src/models/type.model.js";
@@ -68,6 +69,14 @@ const createSourceProduct = async () => {
     brand: [brand._id],
     model: [model._id],
   });
+  const featuredImage = await Image.create({
+    url: "https://res.cloudinary.com/example/image/upload/source-product.jpg",
+    productId: product._id,
+    isFeatured: true,
+  });
+  product.image = [featuredImage._id];
+  product.featuredImage = featuredImage._id;
+  await product.save();
 
   return product;
 };
@@ -127,6 +136,10 @@ test("searches a source product by name and returns populated relationships", as
   assert.equal(result.payload.data[0].element[0].name, "Crash Guard");
   assert.equal(result.payload.data[0].brand[0].name, "Acube");
   assert.equal(result.payload.data[0].model[0].name, "Universal");
+  assert.equal(
+    result.payload.data[0].featuredImage.url,
+    "https://res.cloudinary.com/example/image/upload/source-product.jpg"
+  );
 });
 
 test("searches by exact product ID and excludes the current edit product", async () => {

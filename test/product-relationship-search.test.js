@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { after, afterEach, before, test } from "node:test";
+import express from "express";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
@@ -10,8 +11,11 @@ import Element from "../src/models/element.model.js";
 import Model from "../src/models/model.model.js";
 import Product from "../src/models/product.model.js";
 import Type from "../src/models/type.model.js";
+import productRouter from "../src/routes/product.route.js";
 
 let mongoServer;
+let server;
+let serverUrl;
 
 const invokeSearch = async (query) =>
   await new Promise((resolve, reject) => {
@@ -74,6 +78,14 @@ before(async () => {
   await Promise.all(
     Object.values(mongoose.models).map((model) => model.init())
   );
+
+  const app = express();
+  app.use(express.json());
+  app.use("/api/product", productRouter);
+  server = app.listen(0, "127.0.0.1");
+  await new Promise((resolve) => server.once("listening", resolve));
+  const address = server.address();
+  serverUrl = `http://127.0.0.1:${address.port}`;
 });
 
 afterEach(async () => {
@@ -82,6 +94,9 @@ afterEach(async () => {
 });
 
 after(async () => {
+  await new Promise((resolve, reject) => {
+    server.close((error) => (error ? reject(error) : resolve()));
+  });
   await mongoose.disconnect();
   await mongoServer.stop();
 });
@@ -128,4 +143,22 @@ test("searches by exact product ID and excludes the current edit product", async
   assert.equal(found.payload.data.length, 1);
   assert.equal(found.payload.data[0]._id.toString(), sourceProduct._id.toString());
   assert.equal(excluded.payload.data.length, 0);
+});
+
+test("relationship source URL reaches its named route instead of the ID route", async () => {
+  const sourceProduct = await createSourceProduct();
+  const response = await fetch(
+    `${serverUrl}/api/product/relationship-sources?query=${sourceProduct._id}`
+  );
+  const payload = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(payload.success, true);
+  assert.equal(payload.data.length, 1);
+  assert.equal(payload.data[0]._id.toString(), sourceProduct._id.toString());
+
+  const invalidIdResponse = await fetch(
+    `${serverUrl}/api/product/not-a-product-id`
+  );
+  assert.equal(invalidIdResponse.status, 404);
 });

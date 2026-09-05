@@ -40,8 +40,9 @@ router.get("/published", getAllPublishedProducts);
 // Search products used as relationship import sources
 router.get("/relationship-sources", searchProductRelationshipSources);
 
+// Restrict the dynamic route so named endpoints can never be treated as IDs.
 // Get Product by Id Route -GET `/api/product/:id`
-router.get("/:id", getProductById);
+router.get("/:id([0-9a-fA-F]{24})", getProductById);
 
 // Get Product by SLUG Route -GET `/api/product/slug/:slug`
 router.get("/slug/:slug", getProductBySlug);

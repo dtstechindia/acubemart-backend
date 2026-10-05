@@ -142,7 +142,7 @@ const toMerchantRows = (products) => products.map((product) => {
         Number(product.stock) > 0 ? "in_stock" : "out_of_stock",
         "",
         "",
-        `https://acubemart.in/p/${product._id}`,
+        `https://acubemart.in/product/${product.slug}`,
         "",
         product.featuredImage?.url || "",
         regularPrice ? `${regularPrice.toFixed(2)} INR` : "",
